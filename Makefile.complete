@@ -1,0 +1,118 @@
+# Complete Makefile for Physics Showcase
+# Builds both basic (header-only) and advanced (OOP) physics modules
+
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -march=native
+INCLUDES = -I./include -I/usr/include/eigen3
+LDFLAGS =
+
+# Try to find Eigen in common locations
+EIGEN_PATHS = /usr/include/eigen3 /usr/local/include/eigen3 /opt/homebrew/include/eigen3
+EIGEN_PATH = $(firstword $(foreach path,$(EIGEN_PATHS),$(wildcard $(path))))
+
+ifneq ($(EIGEN_PATH),)
+    INCLUDES = -I./include -I$(EIGEN_PATH)
+endif
+
+# Targets
+.PHONY: all basic advanced examples clean help check-deps
+
+all: check-deps basic advanced
+
+# Basic physics demos (header-only)
+basic: examples/main examples/advanced_demo examples/scientific_demo
+
+examples/main: examples/main.cpp
+	$(CXX) $(CXXFLAGS) -I./include $< -o $@
+
+examples/advanced_demo: examples/advanced_demo.cpp
+	$(CXX) $(CXXFLAGS) -I./include $< -o $@
+
+examples/scientific_demo: examples/scientific_demo.cpp
+	$(CXX) $(CXXFLAGS) -I./include $< -o $@
+
+# Advanced physics (requires Eigen3)
+advanced: advanced_physics examples/field_tensor_demo
+
+advanced_physics: advanced_main.cpp
+	@echo "Building advanced physics showcase..."
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@
+	@echo "✓ Build successful!"
+
+examples/field_tensor_demo: examples/field_tensor_demo.cpp examples/field_tensor_example.hpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@
+
+# Check dependencies
+check-deps:
+	@echo "Checking dependencies..."
+	@command -v $(CXX) >/dev/null 2>&1 || { echo "✗ g++ not found"; exit 1; }
+	@echo "✓ C++ compiler found: $$($(CXX) --version | head -n1)"
+	@if [ -d "$(EIGEN_PATH)" ]; then \
+		echo "✓ Eigen3 found at: $(EIGEN_PATH)"; \
+	else \
+		echo "⚠️  Eigen3 not found (required for advanced modules)"; \
+		echo "   Install: sudo apt install libeigen3-dev (Ubuntu/Debian)"; \
+		echo "           brew install eigen (macOS)"; \
+	fi
+
+# Run demos
+run-basic: basic
+	@echo "\n=== Running basic mechanics demo ==="
+	./examples/main
+
+run-advanced: advanced
+	@echo "\n=== Running advanced physics demo ==="
+	./advanced_physics 1
+
+run-field-tensor: examples/field_tensor_demo
+	@echo "\n=== Running field tensor demo ==="
+	./examples/field_tensor_demo
+
+run-all: run-basic run-advanced run-field-tensor
+
+# Clean
+clean:
+	rm -f examples/main examples/advanced_demo examples/scientific_demo
+	rm -f advanced_physics examples/field_tensor_demo
+	@echo "✓ Cleaned build artifacts"
+
+# Help
+help:
+	@echo "Physics Showcase - Build System"
+	@echo ""
+	@echo "Targets:"
+	@echo "  make all              - Build everything (default)"
+	@echo "  make basic            - Build header-only demos"
+	@echo "  make advanced         - Build advanced physics (requires Eigen3)"
+	@echo "  make check-deps       - Check dependencies"
+	@echo "  make run-basic        - Run basic physics demos"
+	@echo "  make run-advanced     - Run advanced physics demo (Category 1)"
+	@echo "  make run-field-tensor - Run field tensor demo"
+	@echo "  make run-all          - Run all demos"
+	@echo "  make clean            - Remove build artifacts"
+	@echo ""
+	@echo "Requirements:"
+	@echo "  - C++17 compiler (g++ 7+ or clang++ 5+)"
+	@echo "  - Eigen3 library (for advanced modules)"
+	@echo ""
+	@echo "Installing Eigen3:"
+	@echo "  Ubuntu/Debian:  sudo apt install libeigen3-dev"
+	@echo "  macOS:          brew install eigen"
+	@echo "  Arch Linux:     sudo pacman -S eigen"
+	@echo ""
+	@echo "Categories in Advanced Physics:"
+	@echo "  1. Classical Mechanics (Hamilton, Phase Space, Liouville)"
+	@echo "  2. Electromagnetism (Field Tensors, Gauge Theory)"
+	@echo "  3. Relativity (Einstein Equations, Geodesics)"
+	@echo "  4. Wave Theory (Green Functions, Waveguides)"
+	@echo "  5. Thermodynamics (Statistical Mechanics)"
+	@echo "  6. Quantum Mechanics (Schrödinger, Dirac)"
+	@echo "  7. Condensed Matter (Superconductivity)"
+	@echo "  8. Plasma Physics (Transport Equations)"
+	@echo "  9. Advanced Quantum (Group Theory)"
+	@echo "  10. Quantum Field Theory (Interaction Picture, Renormalization)"
+	@echo ""
+	@echo "Run specific categories:"
+	@echo "  ./advanced_physics 1      # Category 1: Classical Mechanics"
+	@echo "  ./advanced_physics 2      # Category 2: Electromagnetism"
+	@echo "  ./advanced_physics all    # All categories"
