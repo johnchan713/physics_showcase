@@ -345,6 +345,85 @@ physics_showcase/
 
 **Applications**: Vibrating strings, heat conduction, electrostatic potential, quantum mechanics (particle in box), acoustics, diffusion processes
 
+### PDE Transform Methods (`maths/advanced/pde/pde_transform_methods.hpp`)
+**~1000 lines | Laplace and Fourier transforms for solving PDEs**
+
+**Laplace Transforms:**
+- **Definition and Notation**: L{f(t)} = F(s) = ∫₀^∞ e^(-st) f(t) dt
+- **Transform Pairs**: Exponentials, polynomials, trigonometric functions, hyperbolic functions
+- **Properties**:
+  - Linearity: L{af + bg} = aL{f} + bL{g}
+  - First shifting theorem: L{e^(at)f(t)} = F(s-a)
+  - Second shifting theorem (time delay): L{f(t-a)u(t-a)} = e^(-as)F(s)
+  - Transform of derivatives: L{f'(t)} = sF(s) - f(0), L{f''(t)} = s²F(s) - sf(0) - f'(0)
+  - Transform of integrals: L{∫₀ᵗ f(τ)dτ} = F(s)/s
+- **Convolution Theorem**: L{f * g} = F(s)G(s)
+- **Inverse Transform**: Partial fraction decomposition, residue method
+
+**Fourier Transforms:**
+- **Fourier Integral**: F{f(x)} = F(k) = ∫₋∞^∞ f(x) e^(-ikx) dx
+- **Inverse Transform**: f(x) = (1/2π) ∫₋∞^∞ F(k) e^(ikx) dk
+- **Transform Pairs**: Gaussian, rectangular pulse, Dirac delta, double exponential
+- **Properties**:
+  - Linearity, time shifting, frequency shifting, scaling
+  - Differentiation: F{f'(x)} = ikF(k), F{f^(n)(x)} = (ik)^n F(k)
+  - Multiplication by x: F{xf(x)} = iF'(k)
+- **Parseval's Theorem**: ∫ |f(x)|² dx = (1/2π) ∫ |F(k)|² dk (energy conservation)
+- **Convolution Theorem**: F{f * g} = F{f} · F{g}
+
+**Fourier Sine and Cosine Transforms:**
+- **Sine Transform**: Fs{f(x)} = ∫₀^∞ f(x) sin(kx) dx for odd extensions
+- **Cosine Transform**: Fc{f(x)} = ∫₀^∞ f(x) cos(kx) dx for even extensions
+- **Inverse Transforms**: f(x) = (2/π) ∫₀^∞ Fs(k) sin(kx) dk
+- **Derivative Properties**: Fs{f''(x)} = -k²Fs{f(x)} - kf(0)
+
+**Finite Fourier Transforms:**
+- **Finite Sine Transform**: Fsn = ∫₀^L f(x) sin(nπx/L) dx
+- **Finite Cosine Transform**: Fcn = ∫₀^L f(x) cos(nπx/L) dx
+- **Applications**: Heat equation on finite intervals, boundary value problems
+
+**Applications**: Transform methods for ODEs, heat equation, wave equation, diffusion problems, signal processing
+
+### PDE Classification Solutions (`maths/advanced/pde/pde_classification_solutions.hpp`)
+**~1200 lines | Detailed solutions for parabolic, elliptic, and hyperbolic PDEs**
+
+**Parabolic Equations (Heat/Diffusion):**
+- **Heat Equation**: u_t = α u_xx (one-dimensional diffusion)
+- **Fundamental Solution**: Heat kernel G(x,t;ξ) = 1/√(4παt) exp(-(x-ξ)²/4αt)
+- **Infinite Domain Solutions**: Convolution with initial data
+- **Bounded Domain Solutions**:
+  - Dirichlet BC: u(x,t) = ∑ Aₙ exp(-α(nπ/L)²t) sin(nπx/L)
+  - Neumann BC: u(x,t) = A₀ + ∑ Aₙ exp(-α(nπ/L)²t) cos(nπx/L)
+- **Maximum Principles**: Weak and strong maximum principles
+- **2D Heat Equation**: Rectangular and circular domains
+- **Properties**: Infinite speed of propagation, smoothing effect, irreversibility
+
+**Elliptic Equations (Laplace/Poisson):**
+- **Laplace Equation**: Δu = 0 (harmonic functions)
+- **Poisson Equation**: Δu = f (with source term)
+- **Mean Value Property**: u(x₀,y₀) = (1/2πr) ∫ u on circle
+- **Maximum Principles**: Maximum and minimum on boundary
+- **Green's Functions**: G(x,y;ξ,η) = -(1/2π) ln(r) for 2D unbounded domain
+- **Rectangular Domains**: Separation of variables with sinh/cosh solutions
+- **Circular Domains**: Poisson integral formula
+- **Harmonic Functions**: Solutions satisfy mean value property
+- **Properties**: No time evolution, boundary value problems, smoothness
+
+**Hyperbolic Equations (Wave):**
+- **Wave Equation**: u_tt = c² u_xx (one-dimensional)
+- **d'Alembert's Solution**: u(x,t) = ½[f(x+ct) + f(x-ct)] + 1/(2c) ∫ g(s) ds
+- **Domain of Dependence**: Solution at (x,t) depends only on [x-ct, x+ct]
+- **Standing Waves**: u(x,t) = ∑ (Aₙcos(ωₙt) + Bₙsin(ωₙt))sin(nπx/L)
+- **Energy Conservation**: E = ½∫[u_t² + c²u_x²]dx is constant
+- **2D Wave Equation**: Rectangular domains, eigenfrequencies ωₘₙ = c√(λₘ² + μₙ²)
+- **Characteristic Cones**: Causality and light cones in spacetime
+- **Finite Speed of Propagation**: Disturbances travel at speed c
+- **Properties**: Reversible, energy conserving, finite propagation speed
+
+**Key Concepts**: Well-posedness, uniqueness, regularity, stability, physical interpretation
+
+**Applications**: Heat conduction, diffusion processes, electrostatics, membrane vibrations, acoustic waves, electromagnetic waves
+
 ### Probability & Statistics (`maths/advanced/probability/distributions.hpp`)
 **~920 lines | Comprehensive probability distributions**
 
@@ -591,10 +670,10 @@ done
 
 ## 📊 Statistics
 
-- **Total Lines**: ~20,000+ lines of computational mathematics and physics
+- **Total Lines**: ~24,000+ lines of computational mathematics and physics
 - **Mathematics Modules**:
   - Basic: 4 modules (calculus, linear algebra, trigonometry, transforms)
-  - Advanced: 9 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability, PDEs)
+  - Advanced: 11 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability, PDEs - classification, solutions, transforms)
   - Applied: 3 modules (finance, actuarial, econometrics)
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
@@ -616,6 +695,12 @@ done
   - Orthogonal polynomial expansions (Legendre, Chebyshev, Hermite, Laguerre)
   - Bessel function computations and zero-finding
   - Fourier series coefficient computation
+  - Laplace transforms and inverse transforms
+  - Fourier transforms (full, sine, cosine, finite)
+  - d'Alembert's solution for wave equation
+  - Heat kernel and fundamental solutions
+  - Green's functions for Poisson equation
+  - Poisson integral formula
 
 ## 🎓 Educational Value
 
@@ -630,7 +715,10 @@ Each module serves as both:
    - Stochastic methods and Monte Carlo simulations
    - Classical and quantum field theory
    - Statistical mechanics and computational physics
-   - PDE theory: heat diffusion, wave propagation, fluid mechanics
+   - PDE theory: parabolic (heat), elliptic (Laplace/Poisson), hyperbolic (wave)
+   - Transform methods: Laplace and Fourier transforms for PDEs
+   - Boundary value problems and initial value problems
+   - Green's functions and fundamental solutions
 
 ## 📝 License
 
