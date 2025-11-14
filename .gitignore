@@ -16,6 +16,7 @@ advanced_subdifferentials_demo
 fourier_analysis_demo
 differential_algebra_demo
 differential_algebra_advanced_demo
+stochastic_methods_demo
 
 # CMake
 build/
