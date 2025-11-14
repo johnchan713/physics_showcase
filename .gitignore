@@ -15,6 +15,7 @@ nonsmooth_algorithms_demo
 advanced_subdifferentials_demo
 fourier_analysis_demo
 differential_algebra_demo
+differential_algebra_advanced_demo
 
 # CMake
 build/
