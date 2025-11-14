@@ -10,6 +10,12 @@ A comprehensive C++ library implementing fundamental mathematics and physics con
   - [Linear Algebra](#linear-algebra)
   - [Probability & Statistics](#probability--statistics)
   - [Transforms](#transforms)
+  - [Topology](#topology)
+  - [Analysis](#analysis)
+  - [Optimization](#optimization)
+  - [Financial Mathematics](#financial-mathematics)
+  - [Actuarial Science](#actuarial-science)
+  - [Econometrics](#econometrics)
 - [Physics](#physics)
   - [Basic Mechanics](#basic-mechanics)
   - [Advanced Physics](#advanced-physics)
@@ -315,6 +321,128 @@ A comprehensive C++ library implementing fundamental mathematics and physics con
 #### Window Functions
 - `WindowFunctions::rectangular()`, `hann()`, `hamming()`
 - `purpose()` - Reduce spectral leakage
+
+---
+
+## Financial Mathematics
+
+**Location**: `include/maths/finance/`
+
+Quantitative finance and derivatives pricing.
+
+### Black-Scholes Model (`black_scholes.hpp`)
+
+#### Option Pricing
+- `BlackScholes::callPrice(S, K, r, sigma, T)` - European call price
+- `BlackScholes::putPrice(S, K, r, sigma, T)` - European put price
+- `d1()`, `d2()` - Black-Scholes parameters
+- `normalCDF()`, `normalPDF()` - Standard normal distribution functions
+- `putCallParity()` - C - P = S - K·e^(-rT)
+- `assumptions()` - Model assumptions and limitations
+
+#### The Greeks - Option Sensitivities
+- `Greeks::callDelta()`, `putDelta()` - ∂V/∂S (hedge ratio)
+- `gamma()` - ∂²V/∂S² (delta sensitivity, convexity)
+- `vega()` - ∂V/∂σ (volatility sensitivity)
+- `callTheta()`, `putTheta()` - ∂V/∂t (time decay)
+- `callRho()`, `putRho()` - ∂V/∂r (interest rate sensitivity)
+- `description()` - Interpretation of each Greek
+
+#### Implied Volatility
+- `ImpliedVolatility::calculate()` - Newton-Raphson method to invert price
+- Market calibration from observed option prices
+- `volatilitySmile()` - Smile/skew phenomena in equity and FX markets
+
+#### Binomial Tree Model
+- `BinomialTree::price()` - Cox-Ross-Rubinstein binomial pricing
+- Handles both American and European options
+- Parameters: u (up factor), d (down factor), p (risk-neutral probability)
+- `description()` - Algorithm and convergence to Black-Scholes
+
+#### Risk-Neutral Valuation
+- `RiskNeutralValuation::principle()` - Fundamental theorem of asset pricing
+- `martingale()` - Martingale property under Q measure
+- Relationship between physical measure P and risk-neutral measure Q
+
+---
+
+## Actuarial Science
+
+**Location**: `include/maths/actuarial/`
+
+Life contingencies, insurance mathematics, and premium calculation.
+
+### Life Tables and Survival Analysis (`life_tables.hpp`)
+
+#### Mortality Functions
+- `MortalityFunctions::survivalFunction()` - S(x) = P(T > x)
+- `deathPDF()` - Probability density of death
+- `nYearSurvival()` - ₙp_x = probability of n-year survival
+- `nYearDeath()` - ₙq_x = probability of death within n years
+- `deferredDeath()` - ₘ|ₙq_x (survive m years, die in next n)
+- `relationships()` - Fundamental mortality identities
+- Standard laws: Gompertz, Makeham, Weibull
+
+#### Life Expectancy
+- `LifeExpectancy::completeExpectation()` - e̊ₓ = E[T_x]
+- `curtateExpectation()` - eₓ = E[K_x] (complete future years)
+- `temporaryExpectation()` - e̊ₓ:n̅| (capped at n years)
+
+#### Actuarial Present Values
+- `ActuarialPresentValue::wholeLifeInsurance()` - Āₓ (payment at death)
+- `termLifeInsurance()` - Āₓ:n̅| (n-year term)
+- `endowmentInsurance()` - Āₓ:n̅| (death or survival benefit)
+- `wholeLifeAnnuity()` - äₓ (payments while alive)
+- `temporaryAnnuity()` - äₓ:n̅| (n-year annuity)
+- `deferredAnnuity()` - ₘ|äₓ (starts after m years)
+- `notation()` - Standard actuarial notation and relationships
+
+#### Premium Calculation
+- `PremiumCalculation::netSinglePremium()` - Lump sum at inception
+- `netLevelPremium()` - Equal periodic payments (equivalence principle)
+- `grossPremium()` - Including expense and profit loadings
+- `principles()` - Expected value, variance, percentile principles
+
+#### Reserves
+- `Reserves::prospectiveMethod()` - E[PV(Future Benefits - Premiums)]
+- `retrospectiveMethod()` - Accumulated (Premiums - Claims)
+- Thiele's differential equation for reserve dynamics
+
+---
+
+## Econometrics
+
+**Location**: `include/maths/econometrics/`
+
+Statistical methods for economic data analysis.
+
+### Regression Analysis (`regression.hpp`)
+
+#### Simple Linear Regression
+- `SimpleLinearRegression::fit(x, y)` - OLS estimation: y = α + βx + ε
+- `predict(x)` - Prediction for new values
+- Fitted parameters: `intercept`, `slope`, `r_squared`, `residual_std_error`
+- `olsFormulas()` - OLS estimators and Gauss-Markov theorem
+
+#### Hypothesis Testing
+- `HypothesisTesting::tStatistic()` - t = β̂ / SE(β̂)
+- `pValue()` - Two-tailed p-value from t-statistic
+- `isSignificant()` - Test at significance level α
+- `framework()` - Null hypothesis testing, confidence intervals, F-tests
+
+#### Goodness of Fit
+- `GoodnessOfFit::rSquared()` - Coefficient of determination
+- `adjustedRSquared()` - Penalized for additional variables
+- `aic()` - Akaike Information Criterion
+- `bic()` - Bayesian Information Criterion
+- `criteria()` - Model selection and comparison
+
+#### Time Series Models
+- `TimeSeries::autoregressive()` - AR(p) models, stationarity conditions
+- `movingAverage()` - MA(q) models, invertibility
+- `arma()` - ARMA(p,q) combined models
+- `stationarity()` - Weak vs strong stationarity, unit root tests
+- Box-Jenkins methodology for identification and estimation
 
 ---
 

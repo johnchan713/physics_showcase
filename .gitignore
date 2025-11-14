@@ -8,6 +8,7 @@ scientific_demo
 matrix_demo
 matrix_advanced
 topology_demo
+finance_demo
 
 # CMake
 build/
