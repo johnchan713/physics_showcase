@@ -27,7 +27,8 @@ physics_showcase/
 │   │   │   ├── analysis/          # Fourier analysis & subdifferentials
 │   │   │   ├── geometry/          # Variational calculus & Lagrangians
 │   │   │   ├── stochastic/        # Monte Carlo & MCMC methods
-│   │   │   └── probability/       # Probability distributions & statistics
+│   │   │   ├── probability/       # Probability distributions & statistics
+│   │   │   └── dynamical_systems/ # ODEs, chaos theory, bifurcations
 │   │   ├── finance/               # Financial mathematics
 │   │   ├── actuarial/             # Actuarial science
 │   │   └── econometrics/          # Econometric models
@@ -238,14 +239,45 @@ physics_showcase/
 
 **Applications:** Classical mechanics, field theory, optimal control, integrable systems
 
+### Differential Equations and Dynamical Systems (`maths/advanced/dynamical_systems/ode_dynamical_systems.hpp`)
+**~1500 lines | Comprehensive ODE theory and chaos**
+
+**Part 1 - Classical Theory (Chapters 1-5):**
+- **Newton's Equations**: Second-order to first-order conversion, autonomous equations, equilibria
+- **Initial Value Problems**: Euler, Heun, RK4 methods, Picard iteration, Lipschitz continuity
+- **Linear Systems**: Matrix exponential, fundamental matrices, Floquet theory for periodic systems
+- **Complex Domain**: Frobenius method, indicial equations, Bessel's equation
+- **Boundary Value Problems**: Sturm-Liouville theory foundation
+
+**Part 2 - Dynamical Systems (Chapters 6-9):**
+- **Dynamical Systems**: Flows φ_t(x), fixed points, Liapunov functions, stability analysis
+- **Local Behavior**: Jacobian analysis, eigenvalues, classification (nodes, saddles, spirals, centers)
+- **Hartman-Grobman Theorem**: Linearization near hyperbolic fixed points
+- **Planar Systems**: Poincaré-Bendixson theorem foundation, limit cycles
+- **Higher Dimensions**: Attractors, Lorenz system, Hamiltonian mechanics, KAM theorem
+
+**Part 3 - Chaos Theory (Chapters 10-13):**
+- **Discrete Systems**: Logistic map, period doubling, bifurcation diagrams
+- **Lyapunov Exponents**: λ > 0 ⟹ chaos, numerical computation
+- **Poincaré Maps**: First return maps, periodic orbits
+- **Melnikov Method**: Homoclinic chaos detection
+- **Sarkovskii's Theorem**: Period ordering (3 ⟹ all periods)
+- **Symbolic Dynamics**: Orbit encoding, admissible sequences
+- **Fractals**: Box-counting dimension, strange attractors
+- **Smale Horseshoe**: Stretch and fold, topological chaos
+
+**Applications**: Physics (pendulum, Lorenz), biology (population dynamics), engineering (nonlinear control)
+
 ### Probability & Statistics (`maths/advanced/probability/distributions.hpp`)
-**~650 lines | Comprehensive probability distributions**
+**~920 lines | Comprehensive probability distributions**
 
 **Discrete Distributions:**
 - **Bernoulli**: P(X=1) = p
 - **Binomial**: C(n,k) p^k (1-p)^(n-k)
 - **Poisson**: λ^k e^(-λ) / k!
-- **Geometric**: trials until first success
+- **Geometric**: Trials until first success
+- **Negative Binomial**: Failures before r successes, overdispersion modeling
+- **Hypergeometric**: Sampling without replacement, finite population correction
 
 **Continuous Distributions:**
 - **Uniform**: constant density on [a,b]
@@ -254,6 +286,7 @@ physics_showcase/
 - **Gamma**: shape α, rate β
 - **Beta**: on [0,1], conjugate prior
 - **Chi-squared**: χ²(k) for hypothesis testing
+- **F-Distribution**: Ratio of chi-squared, ANOVA, regression F-tests
 
 **Statistical Functions:**
 - PMF, PDF, CDF for all distributions
@@ -481,21 +514,24 @@ done
 
 ## 📊 Statistics
 
-- **Total Lines**: ~15,000+ lines of computational mathematics and physics
+- **Total Lines**: ~18,000+ lines of computational mathematics and physics
 - **Mathematics Modules**:
   - Basic: 4 modules (calculus, linear algebra, trigonometry, transforms)
-  - Advanced: 7 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, probability)
+  - Advanced: 8 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability)
   - Applied: 3 modules (finance, actuarial, econometrics)
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
   - Advanced: 20+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
 - **Demos**: 7+ comprehensive demonstration programs
+- **Distributions**: 13 probability distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, F-distribution)
 - **Key Algorithms**:
   - DFT, FFT (O(N log N))
   - ISTA, FISTA (O(1/k²) convergence)
   - ADMM, Ritt's algorithm
   - Monte Carlo, MCMC (Metropolis-Hastings, Gibbs, HMC)
   - Euler-Lagrange, Noether's theorem, Legendre transforms
+  - RK4, Picard iteration, Floquet theory
+  - Lyapunov exponents, bifurcation diagrams, fractal dimensions
 
 ## 🎓 Educational Value
 
@@ -503,12 +539,13 @@ Each module serves as both:
 1. **Production-ready code** for numerical computations
 2. **Educational reference** showing how abstract mathematics translates to algorithms
 3. **Research tool** for:
-   - Differential equations and algebraic geometry
+   - Differential equations, dynamical systems, and chaos theory
    - Nonsmooth optimization and variational calculus
    - Signal processing and Fourier analysis
    - Stochastic methods and Monte Carlo simulations
    - Classical and quantum field theory
    - Statistical mechanics and computational physics
+   - Bifurcation analysis and nonlinear dynamics
 
 ## 📝 License
 
