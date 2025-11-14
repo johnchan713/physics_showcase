@@ -4,6 +4,7 @@
 *.exe
 physics_demo
 advanced_demo
+scientific_demo
 
 # CMake
 build/

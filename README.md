@@ -4,7 +4,7 @@ A comprehensive C++ library implementing fundamental physics concepts with well-
 
 ## Overview
 
-This project implements core physics functionality as standalone C++ functions, categorized into twelve comprehensive modules:
+This project implements core physics functionality as standalone C++ functions, categorized into seventeen comprehensive modules:
 
 ### Basic Mechanics
 1. **Newton's Laws of Motion** (`newton_laws.hpp`)
@@ -28,6 +28,21 @@ This project implements core physics functionality as standalone C++ functions, 
 11. **Orbital Mechanics** (`orbital.hpp`) - Satellite motion around Earth
 12. **Universal Gravitation** (`gravitation.hpp`) - Apple and Moon connection, Kepler's Laws
 
+### Thermodynamics and Gases
+13. **Thermodynamics** (`thermodynamics.hpp`) - Boyle's Law, gas laws, pressure, RMS velocity
+
+### Fluids
+14. **Fluid Mechanics** (`fluid_mechanics.hpp`) - Steady flow, continuity, Bernoulli, pipe friction
+
+### Materials and Elasticity
+15. **Elasticity** (`elasticity.hpp`) - Young's modulus, beams, bulk modulus, stress-strain
+
+### Surface Phenomena
+16. **Surface Tension** (`surface_tension.hpp`) - Capillary rise, droplet pressure
+
+### Waves and Acoustics
+17. **Wave Mechanics** (`wave_mechanics.hpp`) - Sound, Doppler effect, string vibrations
+
 All functions are thoroughly documented with parameter descriptions, units, return values, and exception handling.
 
 ## Project Structure
@@ -47,10 +62,16 @@ physics_showcase/
 │       ├── harmonic_motion.hpp     # Simple harmonic motion and pendulums
 │       ├── rotational_dynamics.hpp # Torque, angular momentum, moment of inertia
 │       ├── orbital.hpp             # Motion around Earth (satellites)
-│       └── gravitation.hpp         # Universal gravitation and Kepler's Laws
+│       ├── gravitation.hpp         # Universal gravitation and Kepler's Laws
+│       ├── thermodynamics.hpp      # Boyle's Law, gas laws, RMS velocity
+│       ├── fluid_mechanics.hpp     # Flow, continuity, Bernoulli, pipe friction
+│       ├── elasticity.hpp          # Young's modulus, beams, bulk modulus
+│       ├── surface_tension.hpp     # Capillary rise, droplet/bubble pressure
+│       └── wave_mechanics.hpp      # Sound, Doppler, string vibrations
 ├── examples/
 │   ├── main.cpp                 # Basic mechanics demonstrations
-│   └── advanced_demo.cpp        # Advanced topics demonstrations
+│   ├── advanced_demo.cpp        # Advanced topics demonstrations
+│   └── scientific_demo.cpp      # Scientific applications demonstrations
 ├── Makefile                     # Build system
 ├── CMakeLists.txt              # CMake configuration
 ├── LICENSE
@@ -402,6 +423,194 @@ Newton's synthesis of terrestrial and celestial mechanics:
 - `calculateReducedMass()` - μ = m₁m₂/(m₁ + m₂)
 - `calculateCMDistance()` - Distance from center of mass
 
+### Thermodynamics (`thermodynamics.hpp`)
+
+Gas laws, pressure, and molecular velocities:
+
+#### Boyle's Law and Variations
+- `boylesLaw()` - P₁V₁ = P₂V₂ (isothermal)
+- `charlesLaw()` - V₁/T₁ = V₂/T₂ (isobaric)
+- `gayLussacsLaw()` - P₁/T₁ = P₂/T₂ (isochoric)
+- `combinedGasLaw()` - P₁V₁/T₁ = P₂V₂/T₂
+
+#### Ideal Gas Law
+- `idealGasLawPressure()` / `idealGasLawVolume()` / `idealGasLawTemperature()` - PV = nRT
+- `idealGasLawMoles()` - Calculate number of moles
+
+#### Pressure Measurements
+- `barometerPressure()` - Pressure from mercury column height
+- `altitudeFromPressure()` - Altitude from atmospheric pressure
+
+#### Kinetic Theory of Gases
+- `rmsVelocity()` - Root-mean-square molecular velocity v_rms = √(3kT/m)
+- `averageKineticEnergy()` - Average KE of gas molecules
+- `gasPressureFromKineticTheory()` - P = (1/3)ρv²_rms
+
+#### Elasticity of Gases
+- `isothermalBulkModulus()` - K_T = P (isothermal compression)
+- `adiabaticBulkModulus()` - K_S = γP (adiabatic compression)
+
+### Fluid Mechanics (`fluid_mechanics.hpp`)
+
+Fluid statics, dynamics, and flow in pipes:
+
+#### Fluid Statics
+- `pressureAtDepth()` - P = P₀ + ρgh
+- `gaugePressure()` - Pressure relative to atmospheric
+- `absolutePressure()` - Total pressure including atmospheric
+
+#### Continuity Equation
+- `continuityEquation()` - A₁v₁ = A₂v₂ (mass conservation)
+- `volumeFlowRate()` - Q = Av
+- `massFlowRate()` - ṁ = ρAv
+
+#### Bernoulli's Equation
+- `bernoulliPressure()` - P + ½ρv² + ρgh = constant
+- `bernoulliVelocity()` - Calculate velocity from pressure difference
+- `dynamicPressure()` - q = ½ρv²
+
+#### Torricelli's Theorem (Efflux)
+- `effluxVelocity()` - v = √(2gh) (velocity of jet from orifice)
+- `volumetricEffluxRate()` - Flow rate through orifice
+- `effluxGasIsothermal()` / `effluxGasAdiabatic()` - Gas efflux velocities
+
+#### Jet Motion
+- `horizontalJetRange()` - Range of horizontal jet
+- `jetVelocityFromRange()` - Calculate initial velocity from range
+
+#### Pipe Friction
+- `pipeFrictionPressureDrop()` - Darcy-Weisbach equation ΔP = f(L/D)(½ρv²)
+- `reynoldsNumber()` - Re = vD/ν (flow characterization)
+- `headLoss()` - Energy loss due to friction
+- `powerLoss()` - Power dissipated by friction
+
+### Elasticity (`elasticity.hpp`)
+
+Material deformation under stress:
+
+#### Stress and Strain
+- `calculateStress()` - σ = F/A
+- `calculateStrain()` - ε = ΔL/L₀
+
+#### Young's Modulus (Tensile/Compressive)
+- `calculateYoungsModulus()` - E = σ/ε
+- `calculateElongation()` - ΔL = FL/(AE)
+- `calculateStressFromStrain()` - σ = Eε (Hooke's Law)
+
+#### Bulk Modulus (Volume Elasticity)
+- `calculateBulkModulus()` - K = -ΔP/(ΔV/V₀)
+- `calculateVolumeChange()` - ΔV from applied pressure
+- `calculateCompressibility()` - β = 1/K
+- `calculateVolumetricStrain()` - ε_v = ΔV/V₀
+
+#### Shear Modulus (Rigidity)
+- `calculateShearModulus()` - G = τ/γ
+- `calculateShearStress()` - τ = F/A
+- `calculateShearStrain()` - γ = Δx/h
+
+#### Poisson's Ratio
+- `calculatePoissonsRatio()` - ν = -ε_transverse/ε_axial
+- `calculateTransverseStrain()` - Lateral strain from axial strain
+- `calculateShearModulusFromYoungs()` - G = E/(2(1+ν))
+- `calculateBulkModulusFromYoungs()` - K = E/(3(1-2ν))
+
+#### Beam Bending and Deflection
+- `calculateBeamDeflectionCenterLoad()` - δ = FL³/(48EI) (simply supported)
+- `calculateCantileverDeflection()` - δ = FL³/(3EI)
+- `calculateBeamDeflectionUniformLoad()` - Distributed load deflection
+- `calculateRectangularMomentOfInertia()` - I = bh³/12
+- `calculateCircularMomentOfInertia()` - I = πd⁴/64
+- `calculateBendingStress()` - σ = My/I
+
+#### Elastic Energy
+- `calculateElasticEnergy()` - U = ½k(ΔL)²
+- `calculateEnergyDensity()` - u = σ²/(2E)
+
+### Surface Tension (`surface_tension.hpp`)
+
+Surface phenomena in liquids:
+
+#### Surface Tension Fundamentals
+- `calculateSurfaceTensionForce()` - F = γL
+- `calculateSurfaceEnergy()` - E = γA
+- `calculateWorkInStretching()` - Work to stretch liquid film
+
+#### Pressure Due to Curved Surfaces
+- `calculateDropletPressure()` - ΔP = 2γ/r (spherical droplet)
+- `calculateBubblePressure()` - ΔP = 4γ/r (soap bubble, two surfaces)
+- `calculateCylindricalPressure()` - ΔP = γ/r (liquid jet)
+- `calculateYoungLaplacePressure()` - ΔP = γ(1/R₁ + 1/R₂)
+
+#### Capillary Rise
+- `calculateCapillaryRise()` - h = 2γcosθ/(ρgr)
+- `calculateWaterCapillaryRise()` - Rise in glass tube (perfect wetting)
+- `calculateMercuryCapillaryDepression()` - Depression in glass tube
+- `calculateTubeRadiusFromRise()` - Determine radius from observed rise
+- `calculateCapillaryRiseBetweenPlates()` - Rise between parallel plates
+
+#### Meniscus and Contact Angle
+- `calculateCapillaryLength()` - a = √(γ/(ρg))
+- `calculateContactAngle()` - Young's equation cosθ = (γ_SV - γ_SL)/γ_LV
+
+#### Droplet and Bubble Dynamics
+- `calculateDropletRadius()` - Radius from volume
+- `calculateDropletSplittingEnergy()` - Energy to split droplet
+- `calculateSplitDropletRadius()` - Radius after splitting
+- `calculateBubblePressureDifference()` - ΔP between connected bubbles
+
+#### Applications
+- `calculateMaxSupportedWeight()` - Force supported by surface tension
+- `calculateRingDetachmentForce()` - Force to pull ring from surface
+- `calculateSurfaceTensionFromRise()` - Experimental determination
+
+### Wave Mechanics (`wave_mechanics.hpp`)
+
+Wave phenomena, sound, and vibrations:
+
+#### Wave Fundamentals
+- `calculateWavelength()` - λ = v/f
+- `calculateFrequency()` - f = v/λ
+- `calculateWaveVelocity()` - v = fλ
+- `calculateAngularFrequency()` - ω = 2πf
+- `calculateWaveNumber()` - k = 2π/λ
+- `calculatePeriod()` - T = 1/f
+
+#### Velocity of Sound
+- `newtonsFormulaSound()` - v = √(E/ρ) (for solids/liquids)
+- `laplaceFormulaSound()` - v = √(γP/ρ) (for gases, Laplace correction)
+- `soundVelocityFromTemperature()` - v = √(γRT/M)
+- `soundVelocityInAir()` - v ≈ 331.3 + 0.606T (empirical)
+- `soundVelocityInSolid()` / `soundVelocityInLiquid()` - Speed in different media
+
+#### Sound Intensity
+- `calculateSoundIntensity()` - I = P/A
+- `calculateSoundLevelDecibels()` - β = 10log₁₀(I/I₀)
+- `intensityFromDecibels()` - Convert dB to W/m²
+- `intensityFromPressure()` - I = ΔP²/(2ρv)
+- `sphericalWaveIntensity()` - I = P/(4πr²)
+
+#### Doppler Effect
+- `dopplerFrequency()` - f' = f(v + v_o)/(v - v_s)
+- `dopplerSourceApproaching()` / `dopplerSourceReceding()` - Moving source
+- `dopplerObserverApproaching()` - Moving observer
+- `calculateBeatFrequency()` - f_beat = |f₁ - f₂|
+
+#### String Vibrations
+- `stringWaveVelocity()` - v = √(T/μ)
+- `calculateLinearDensity()` - μ = m/L
+- `stringFundamentalFrequency()` - f₁ = v/(2L)
+- `stringHarmonicFrequency()` - f_n = nf₁
+- `stringHarmonicWavelength()` - λ_n = 2L/n
+- `calculateRequiredTension()` - Tension for desired frequency
+
+#### Standing Waves and Resonance
+- `openTubeResonance()` - f_n = nv/(2L) (both ends open)
+- `closedTubeResonance()` - f_n = nv/(4L) (one end closed, n odd)
+
+#### Wave Energy
+- `waveEnergyDensity()` - u = ½ρω²A²
+- `wavePower()` - Power transmitted by wave
+
 ## Units
 
 All functions use SI units:
@@ -431,21 +640,28 @@ g++ -std=c++11 -I./include examples/main.cpp -o physics_demo
 # Build advanced demo
 g++ -std=c++11 -I./include examples/advanced_demo.cpp -o advanced_demo
 ./advanced_demo
+
+# Build scientific demo
+g++ -std=c++11 -I./include examples/scientific_demo.cpp -o scientific_demo
+./scientific_demo
 ```
 
 ### Option 2: Using Make
 
 ```bash
-# Build both demos
+# Build all demos
 make
 
 # Run basic demo (Newton's Laws, Kinematics, Dynamics)
 make run
 
-# Run advanced demo (Units, Inclined Plane, Energy, Projectiles, Orbits)
+# Run advanced demo (Units, Inclined Plane, Energy, Projectiles, Orbits, Gravitation)
 make run-advanced
 
-# Run both demos sequentially
+# Run scientific demo (Thermodynamics, Fluids, Elasticity, Surface Tension, Waves)
+make run-scientific
+
+# Run all demos sequentially
 make run-all
 ```
 
@@ -462,6 +678,9 @@ make
 
 # Run advanced demo
 ./advanced_demo
+
+# Run scientific demo
+./scientific_demo
 ```
 
 ## Usage Examples
@@ -582,6 +801,11 @@ inline double calculateForce(double mass, double acceleration);
    - `physics::rotational_dynamics` - Rotational mechanics
    - `physics::orbital` - Orbital mechanics
    - `physics::gravitation` - Universal gravitation
+   - `physics::thermodynamics` - Gas laws and thermodynamics
+   - `physics::fluid_mechanics` - Fluid dynamics
+   - `physics::elasticity` - Material deformation
+   - `physics::surface_tension` - Surface phenomena
+   - `physics::wave_mechanics` - Waves and acoustics
 3. **Comprehensive Documentation**: Every function fully documented with units and constraints
 4. **Error Handling**: Input validation with meaningful exception messages
 5. **SI Units**: Consistent use of SI units throughout (with conversion utilities)
@@ -590,29 +814,69 @@ inline double calculateForce(double mass, double acceleration);
 ## Current Features
 
 This showcase currently implements:
+
+**Basic Mechanics:**
 - ✅ Newton's Three Laws of Motion
 - ✅ Kinematics (constant acceleration)
 - ✅ Dynamics (force causing motion)
 - ✅ Unit Conversions (Dyne-Gram relationship, CGS, SI, Imperial)
+
+**Motion and Energy:**
 - ✅ Inclined Plane Mechanics (velocity at foot)
 - ✅ Energy and Momentum (KE/momentum compared)
 - ✅ 2D Projectile Motion
+
+**Circular and Oscillatory Motion:**
 - ✅ Uniform Circular Motion (centripetal force expressions)
 - ✅ Simple Harmonic Motion (SHM, pendulums, vibrating masses)
+
+**Rotational Mechanics:**
 - ✅ Rotational Dynamics (torque, angular momentum, moment of inertia)
+
+**Gravitation:**
 - ✅ Orbital Mechanics (Earth satellites)
 - ✅ Universal Gravitation (Apple-Moon connection, Kepler's Laws)
+
+**Thermodynamics:**
+- ✅ Gas Laws (Boyle's, Charles's, Gay-Lussac's, Ideal Gas Law)
+- ✅ Pressure Measurements (barometer, altitude)
+- ✅ Kinetic Theory (RMS velocity, molecular KE)
+- ✅ Elasticity of Gases
+
+**Fluid Mechanics:**
+- ✅ Fluid Statics (pressure at depth)
+- ✅ Continuity Equation and Flow Rates
+- ✅ Bernoulli's Equation
+- ✅ Torricelli's Theorem (efflux velocity)
+- ✅ Pipe Friction (Darcy-Weisbach)
+
+**Elasticity:**
+- ✅ Young's Modulus (stress-strain)
+- ✅ Bulk Modulus (volume elasticity)
+- ✅ Shear Modulus and Poisson's Ratio
+- ✅ Beam Bending and Deflection
+
+**Surface Tension:**
+- ✅ Capillary Rise and Depression
+- ✅ Droplet and Bubble Pressure
+- ✅ Young-Laplace Equation
+- ✅ Surface Energy
+
+**Wave Mechanics:**
+- ✅ Sound Waves (Newton's formula, Laplace correction)
+- ✅ Sound Intensity and Decibels
+- ✅ Doppler Effect
+- ✅ String Vibrations and Harmonics
+- ✅ Standing Waves and Resonance
 
 ## Future Extensions
 
 This showcase can be further extended with:
 - 3D motion with vectors
-- Non-uniform circular motion (angular acceleration)
-- Rigid body dynamics and rotation
-- Simple harmonic motion and oscillations
-- Wave mechanics
-- Fluid mechanics
-- Thermodynamics and heat transfer
+- Non-uniform circular motion
+- Heat transfer and calorimetry
+- Electromagnetic waves
+- Optics (reflection, refraction, interference)
 - Relativistic mechanics
 - Quantum mechanics basics
 

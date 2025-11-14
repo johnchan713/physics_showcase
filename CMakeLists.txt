@@ -27,8 +27,12 @@ add_executable(advanced_demo
     examples/advanced_demo.cpp
 )
 
+add_executable(scientific_demo
+    examples/scientific_demo.cpp
+)
+
 # Installation rules (optional)
-install(TARGETS physics_demo advanced_demo DESTINATION bin)
+install(TARGETS physics_demo advanced_demo scientific_demo DESTINATION bin)
 install(DIRECTORY include/ DESTINATION include)
 
 # Print build information
