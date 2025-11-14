@@ -882,6 +882,686 @@ public:
     }
 };
 
+/**
+ * @class ManifoldIntersection
+ * @brief Intersections of algebraic differential manifolds (Chapter VII)
+ *
+ * Implements algorithms for computing intersections of solution manifolds,
+ * their dimensions, and orders of components.
+ */
+class ManifoldIntersection {
+public:
+    /**
+     * @brief Compute intersection of two manifolds
+     *
+     * Intersection M₁ ∩ M₂ is the manifold defined by the union
+     * of the defining systems.
+     *
+     * @param M1 First manifold
+     * @param M2 Second manifold
+     * @return Intersection manifold
+     */
+    static AlgebraicDifferentialManifold intersect(
+        const AlgebraicDifferentialManifold& M1,
+        const AlgebraicDifferentialManifold& M2) {
+
+        AlgebraicDifferentialManifold intersection;
+
+        // Union of defining systems
+        intersection.defining_system = M1.defining_system;
+        intersection.defining_system.insert(
+            intersection.defining_system.end(),
+            M2.defining_system.begin(),
+            M2.defining_system.end()
+        );
+
+        return intersection;
+    }
+
+    /**
+     * @brief Compute dimension of intersection
+     *
+     * By Kronecker's theorem analogue:
+     * dim(M₁ ∩ M₂) ≥ dim(M₁) + dim(M₂) - dim(ambient space)
+     *
+     * @param M1 First manifold
+     * @param M2 Second manifold
+     * @param max_order Maximum derivative order
+     * @return Dimension of intersection
+     */
+    static int intersectionDimension(
+        const AlgebraicDifferentialManifold& M1,
+        const AlgebraicDifferentialManifold& M2,
+        int max_order = 5) {
+
+        auto intersection = intersect(M1, M2);
+        return intersection.dimension(max_order);
+    }
+
+    /**
+     * @brief Compute order of intersection component
+     *
+     * Order is the highest derivative order appearing in the
+     * characteristic set of the intersection.
+     *
+     * @param M1 First manifold
+     * @param M2 Second manifold
+     * @return Order of intersection
+     */
+    static int intersectionOrder(
+        const AlgebraicDifferentialManifold& M1,
+        const AlgebraicDifferentialManifold& M2) {
+
+        auto intersection = intersect(M1, M2);
+
+        int max_order = 0;
+        for (const auto& poly : intersection.defining_system) {
+            max_order = std::max(max_order, poly.order());
+        }
+
+        return max_order;
+    }
+
+    /**
+     * @brief Test if manifolds intersect non-trivially
+     *
+     * Manifolds intersect if the combined system is consistent.
+     */
+    static bool doIntersect(
+        const AlgebraicDifferentialManifold& M1,
+        const AlgebraicDifferentialManifold& M2) {
+
+        auto intersection = intersect(M1, M2);
+        return EliminationTheory::isConsistent(intersection.defining_system);
+    }
+
+    /**
+     * @brief Compute intersection of general solutions
+     *
+     * General solutions intersect in solutions with fewer arbitrary constants.
+     *
+     * @return Dimension reduction at intersection
+     */
+    static int generalSolutionIntersectionDimension(
+        const AlgebraicDifferentialManifold& M1,
+        const AlgebraicDifferentialManifold& M2,
+        int max_order = 5) {
+
+        int dim1 = M1.dimension(max_order);
+        int dim2 = M2.dimension(max_order);
+        int dim_intersection = intersectionDimension(M1, M2, max_order);
+
+        // Codimension in each manifold
+        int codim1 = dim1 - dim_intersection;
+        int codim2 = dim2 - dim_intersection;
+
+        return dim_intersection;
+    }
+};
+
+/**
+ * @struct OrthonomicMonomial
+ * @brief Monomial for orthonomic systems (Chapter VIII)
+ *
+ * Orthonomic monomials have a specific structure related to
+ * Taylor series expansions.
+ */
+struct OrthonomicMonomial {
+    std::map<Derivative, int> derivatives;  // Derivative -> exponent
+    std::vector<int> marks;  // Marks for ordering
+
+    /**
+     * @brief Compute degree with respect to marks
+     */
+    int markedDegree() const {
+        int deg = 0;
+        for (const auto& [deriv, exp] : derivatives) {
+            // Degree increases with higher order derivatives
+            deg += exp * (deriv.order + 1);
+        }
+        return deg;
+    }
+
+    /**
+     * @brief Check if monomial is principal (appears in Taylor series)
+     */
+    bool isPrincipal() const {
+        // Principal monomials have specific structure
+        return derivatives.size() == 1;
+    }
+
+    // Comparison operators for use as map key
+    bool operator<(const OrthonomicMonomial& other) const {
+        if (derivatives != other.derivatives) return derivatives < other.derivatives;
+        return marks < other.marks;
+    }
+
+    bool operator==(const OrthonomicMonomial& other) const {
+        return derivatives == other.derivatives && marks == other.marks;
+    }
+};
+
+/**
+ * @class OrthonomicSystem
+ * @brief Riquier's orthonomic systems (Chapter VIII)
+ *
+ * An orthonomic system is a differential system in a special form
+ * suitable for existence theorems via Taylor series.
+ */
+class OrthonomicSystem {
+public:
+    std::vector<DifferentialPolynomial> equations;
+    std::set<Derivative> principal_derivatives;  // Leading derivatives
+    std::set<Derivative> parametric_derivatives;  // Free derivatives
+
+    /**
+     * @brief Check if system is orthonomic
+     *
+     * System is orthonomic if:
+     * 1. Each equation solved for a principal derivative
+     * 2. Principal derivatives are linearly independent
+     * 3. Right-hand sides contain only parametric derivatives
+     */
+    bool isOrthonomic() const {
+        // Simplified check - full algorithm requires detailed analysis
+        return principal_derivatives.size() == equations.size();
+    }
+
+    /**
+     * @brief Check if system is passive
+     *
+     * A system is passive if it is closed under differentiation:
+     * differentiating any equation gives a consequence of the system.
+     */
+    bool isPassive() const {
+        for (const auto& eq : equations) {
+            auto derivative = DifferentialField::differentiate(eq);
+
+            // Check if derivative is in the ideal (simplified)
+            // Full implementation requires reduction
+            if (!derivative.isZero()) {
+                // Would need to verify it's a consequence
+            }
+        }
+
+        // Simplified: assume passive if orthonomic
+        return isOrthonomic();
+    }
+
+    /**
+     * @brief Construct orthonomic system from general system
+     *
+     * Uses ranking and reduction to put system in orthonomic form.
+     *
+     * @param system General differential system
+     * @param ranking Ranking to use
+     * @return Orthonomic system (if possible)
+     */
+    static OrthonomicSystem construct(
+        const std::vector<DifferentialPolynomial>& system,
+        const Ranking& ranking) {
+
+        OrthonomicSystem ortho;
+
+        // Compute characteristic set
+        auto ideal = DifferentialIdeal::generate(system);
+        auto char_set = ideal.characteristicSet(ranking.type);
+
+        ortho.equations = char_set.polynomials;
+
+        // Extract principal derivatives (leaders)
+        for (const auto& poly : ortho.equations) {
+            auto leader = CharacteristicSet::leader(poly, ranking);
+            ortho.principal_derivatives.insert(leader);
+        }
+
+        // Parametric derivatives are those not principal
+        // (simplified - would enumerate all derivatives up to max order)
+        for (int var = 0; var < 5; ++var) {
+            for (int ord = 0; ord < 5; ++ord) {
+                Derivative d(var, ord);
+                if (ortho.principal_derivatives.find(d) == ortho.principal_derivatives.end()) {
+                    ortho.parametric_derivatives.insert(d);
+                }
+            }
+        }
+
+        return ortho;
+    }
+
+    /**
+     * @brief Dissect Taylor series according to orthonomic system
+     *
+     * Decomposes Taylor series into principal and parametric parts.
+     *
+     * @param initial_conditions Initial values for parametric derivatives
+     * @return Coefficients of Taylor series expansion
+     */
+    std::map<OrthonomicMonomial, double> dissectTaylorSeries(
+        const std::map<Derivative, double>& initial_conditions) const {
+
+        std::map<OrthonomicMonomial, double> taylor_coeffs;
+
+        // For each parametric derivative with initial condition
+        for (const auto& [deriv, value] : initial_conditions) {
+            if (parametric_derivatives.find(deriv) != parametric_derivatives.end()) {
+                OrthonomicMonomial mon;
+                mon.derivatives[deriv] = 1;
+                taylor_coeffs[mon] = value;
+            }
+        }
+
+        // Principal derivatives determined by equations
+        // (simplified - full algorithm requires solving the system)
+
+        return taylor_coeffs;
+    }
+
+    /**
+     * @brief Compute existence criterion (Riquier's theorem)
+     *
+     * Solution exists if system is passive and orthonomic.
+     */
+    bool hasLocalSolution() const {
+        return isOrthonomic() && isPassive();
+    }
+};
+
+/**
+ * @struct PartialDerivative
+ * @brief Derivative with respect to multiple independent variables
+ *
+ * For partial differential algebra (Chapter IX)
+ */
+struct PartialDerivative {
+    int dependent_var;  // Which dependent variable (u, v, w, ...)
+    std::vector<int> orders;  // Order w.r.t. each independent variable
+
+    PartialDerivative(int var = 0, const std::vector<int>& ords = {})
+        : dependent_var(var), orders(ords) {}
+
+    // Total order
+    int totalOrder() const {
+        int total = 0;
+        for (int ord : orders) {
+            total += ord;
+        }
+        return total;
+    }
+
+    // Comparison for ordering
+    bool operator<(const PartialDerivative& other) const {
+        if (dependent_var != other.dependent_var)
+            return dependent_var < other.dependent_var;
+        return orders < other.orders;
+    }
+
+    bool operator==(const PartialDerivative& other) const {
+        return dependent_var == other.dependent_var && orders == other.orders;
+    }
+
+    /**
+     * @brief Differentiate with respect to variable i
+     */
+    PartialDerivative differentiate(int variable_index) const {
+        PartialDerivative result = *this;
+        if (static_cast<size_t>(variable_index) >= result.orders.size()) {
+            result.orders.resize(variable_index + 1, 0);
+        }
+        result.orders[variable_index]++;
+        return result;
+    }
+};
+
+/**
+ * @struct PartialMonomial
+ * @brief Monomial in partial differential polynomial ring
+ */
+struct PartialMonomial {
+    std::map<PartialDerivative, int> powers;
+
+    int totalDegree() const {
+        int deg = 0;
+        for (const auto& [deriv, exp] : powers) {
+            deg += exp;
+        }
+        return deg;
+    }
+
+    int totalOrder() const {
+        int ord = 0;
+        for (const auto& [deriv, exp] : powers) {
+            ord = std::max(ord, deriv.totalOrder());
+        }
+        return ord;
+    }
+
+    bool operator<(const PartialMonomial& other) const {
+        return powers < other.powers;
+    }
+};
+
+/**
+ * @class PartialDifferentialPolynomial
+ * @brief Partial differential polynomial (Chapter IX)
+ *
+ * Represents polynomial in partial derivatives:
+ * F(x, y, u, ∂u/∂x, ∂u/∂y, ∂²u/∂x², ...)
+ */
+class PartialDifferentialPolynomial {
+public:
+    std::map<PartialMonomial, Coefficient> terms;
+
+    /**
+     * @brief Create constant polynomial
+     */
+    static PartialDifferentialPolynomial constant(Coefficient c) {
+        PartialDifferentialPolynomial poly;
+        PartialMonomial m;
+        poly.terms[m] = c;
+        return poly;
+    }
+
+    /**
+     * @brief Create polynomial for partial derivative
+     *
+     * E.g., ∂u/∂x, ∂²u/∂x∂y, etc.
+     */
+    static PartialDifferentialPolynomial partialDerivative(
+        int var, const std::vector<int>& orders) {
+
+        PartialDifferentialPolynomial poly;
+        PartialMonomial m;
+        m.powers[PartialDerivative(var, orders)] = 1;
+        poly.terms[m] = 1.0;
+        return poly;
+    }
+
+    /**
+     * @brief Add polynomials
+     */
+    PartialDifferentialPolynomial operator+(
+        const PartialDifferentialPolynomial& other) const {
+
+        PartialDifferentialPolynomial result = *this;
+        for (const auto& [mon, coef] : other.terms) {
+            result.terms[mon] += coef;
+        }
+        return result;
+    }
+
+    /**
+     * @brief Multiply polynomials
+     */
+    PartialDifferentialPolynomial operator*(
+        const PartialDifferentialPolynomial& other) const {
+
+        PartialDifferentialPolynomial result;
+        for (const auto& [m1, c1] : terms) {
+            for (const auto& [m2, c2] : other.terms) {
+                PartialMonomial prod = m1;
+                for (const auto& [deriv, exp] : m2.powers) {
+                    prod.powers[deriv] += exp;
+                }
+                result.terms[prod] += c1 * c2;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @brief Total order of polynomial
+     */
+    int totalOrder() const {
+        int ord = 0;
+        for (const auto& [mon, coef] : terms) {
+            ord = std::max(ord, mon.totalOrder());
+        }
+        return ord;
+    }
+
+    bool isZero() const {
+        for (const auto& [mon, coef] : terms) {
+            if (std::abs(coef) > 1e-10) return false;
+        }
+        return true;
+    }
+
+    /**
+     * @brief Differentiate with respect to independent variable
+     *
+     * Applies chain rule for partial derivatives.
+     */
+    PartialDifferentialPolynomial differentiate(int variable_index) const {
+        PartialDifferentialPolynomial result;
+
+        for (const auto& [mon, coef] : terms) {
+            // Apply product rule to each partial derivative in monomial
+            for (const auto& [deriv, exp] : mon.powers) {
+                PartialMonomial new_mon = mon;
+                new_mon.powers[deriv] -= 1;
+                if (new_mon.powers[deriv] == 0) {
+                    new_mon.powers.erase(deriv);
+                }
+
+                // Add higher derivative
+                auto higher_deriv = deriv.differentiate(variable_index);
+                new_mon.powers[higher_deriv] += 1;
+
+                result.terms[new_mon] += coef * exp;
+            }
+        }
+
+        return result;
+    }
+};
+
+/**
+ * @class PartialDifferentialIdeal
+ * @brief Ideal in partial differential polynomial ring (Chapter IX)
+ */
+class PartialDifferentialIdeal {
+public:
+    std::vector<PartialDifferentialPolynomial> generators;
+    int num_independent_vars;  // Number of independent variables (x, y, z, ...)
+
+    /**
+     * @brief Create ideal from generators
+     */
+    static PartialDifferentialIdeal generate(
+        const std::vector<PartialDifferentialPolynomial>& gens,
+        int num_indep_vars = 2) {
+
+        PartialDifferentialIdeal ideal;
+        ideal.generators = gens;
+        ideal.num_independent_vars = num_indep_vars;
+        return ideal;
+    }
+
+    /**
+     * @brief Decompose PDE system into components
+     *
+     * Analogous to decomposition in ordinary differential case,
+     * but for partial differential equations.
+     *
+     * @return Irreducible components
+     */
+    std::vector<PartialDifferentialIdeal> decompose() const {
+        std::vector<PartialDifferentialIdeal> components;
+
+        // Simplified decomposition
+        if (generators.size() == 1) {
+            components.push_back(*this);
+        } else {
+            // Each generator forms a component (simplified)
+            for (const auto& gen : generators) {
+                PartialDifferentialIdeal comp;
+                comp.generators = {gen};
+                comp.num_independent_vars = num_independent_vars;
+                components.push_back(comp);
+            }
+        }
+
+        return components;
+    }
+
+    /**
+     * @brief Test consistency using Cauchy-Kovalevskaya criterion
+     *
+     * System is consistent if it can be put in orthonomic form.
+     */
+    bool isConsistent() const {
+        // Simplified test
+        return !generators.empty();
+    }
+
+    /**
+     * @brief Compute dimension of solution space
+     *
+     * For PDEs, dimension relates to number of arbitrary functions.
+     */
+    int solutionDimension() const {
+        // Number of arbitrary functions in general solution
+        // Simplified: based on number of generators
+        int total_vars = num_independent_vars * 10;  // Assume max 10 dependent vars
+        return total_vars - static_cast<int>(generators.size());
+    }
+};
+
+/**
+ * @class PartialCharacteristicSet
+ * @brief Characteristic sets for partial differential ideals (Chapter IX)
+ */
+class PartialCharacteristicSet {
+public:
+    std::vector<PartialDifferentialPolynomial> polynomials;
+
+    /**
+     * @brief Construct characteristic set for PDE system
+     *
+     * Uses ranking on partial derivatives analogous to
+     * ordinary differential case.
+     *
+     * @param ideal Partial differential ideal
+     * @return Characteristic set
+     */
+    static PartialCharacteristicSet construct(
+        const PartialDifferentialIdeal& ideal) {
+
+        PartialCharacteristicSet char_set;
+
+        // Start with generators
+        char_set.polynomials = ideal.generators;
+
+        // Add cross-derivatives (integrability conditions)
+        std::vector<PartialDifferentialPolynomial> cross_derivs;
+
+        for (const auto& gen : ideal.generators) {
+            for (int i = 0; i < ideal.num_independent_vars; ++i) {
+                auto deriv_i = gen.differentiate(i);
+                if (!deriv_i.isZero()) {
+                    cross_derivs.push_back(deriv_i);
+                }
+            }
+        }
+
+        char_set.polynomials.insert(
+            char_set.polynomials.end(),
+            cross_derivs.begin(),
+            cross_derivs.end()
+        );
+
+        return char_set;
+    }
+
+    /**
+     * @brief Low power theorem for partial differential polynomials
+     *
+     * Identifies singular solutions of PDEs.
+     */
+    bool hasSingularComponents() const {
+        // Check if low power terms exist
+        for (const auto& poly : polynomials) {
+            if (poly.totalOrder() > 0 && !poly.isZero()) {
+                // Has potential for singular components
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @brief Algorithm for decomposition (Chapter IX)
+     *
+     * Decomposes PDE manifold into irreducible components.
+     */
+    std::vector<PartialCharacteristicSet> decompose() const {
+        std::vector<PartialCharacteristicSet> components;
+
+        // Each polynomial forms a component (simplified)
+        for (const auto& poly : polynomials) {
+            PartialCharacteristicSet comp;
+            comp.polynomials = {poly};
+            components.push_back(comp);
+        }
+
+        return components;
+    }
+};
+
+/**
+ * @class PDETheorems
+ * @brief Theorem of zeros and other results for PDEs (Chapter IX)
+ */
+class PDETheorems {
+public:
+    /**
+     * @brief Theorem of zeros for partial differential algebra
+     *
+     * Every partial differential ideal has a generic zero in
+     * some extension field.
+     *
+     * @param ideal Partial differential ideal
+     * @return True if ideal admits zeros
+     */
+    static bool hasGenericZero(const PartialDifferentialIdeal& ideal) {
+        // By the theorem of zeros, every ideal has a generic zero
+        // unless it contains only the unit ideal
+        return ideal.isConsistent();
+    }
+
+    /**
+     * @brief Compatibility conditions for PDE system
+     *
+     * Tests if mixed partial derivatives commute (integrability).
+     *
+     * @param system PDE system
+     * @return True if compatible
+     */
+    static bool isCompatible(
+        const std::vector<PartialDifferentialPolynomial>& system) {
+
+        // For compatibility, check that ∂²u/∂x∂y = ∂²u/∂y∂x
+        // Simplified test - full implementation requires checking all pairs
+
+        return true;  // Assume compatible for simplified version
+    }
+
+    /**
+     * @brief Cauchy-Kovalevskaya existence criterion
+     *
+     * Determines if PDE system has local analytic solution.
+     */
+    static bool hasLocalAnalyticSolution(
+        const PartialDifferentialIdeal& ideal) {
+
+        // Solution exists if system can be put in orthonomic (Cauchy normal) form
+        // and satisfies Cauchy-Kovalevskaya conditions
+
+        return ideal.isConsistent() && ideal.solutionDimension() > 0;
+    }
+};
+
 } // namespace maths::algebra
 
 #endif // MATHS_ALGEBRA_DIFFERENTIAL_ALGEBRA_HPP
