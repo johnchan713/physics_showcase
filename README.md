@@ -1,1243 +1,646 @@
-# Physics Showcase - C++ Implementation
+# Mathematics & Physics Showcase - C++ Implementation
 
-A comprehensive C++ library implementing fundamental physics concepts with well-documented standalone functions. This showcase demonstrates classical mechanics principles through clean, reusable code organized in header-only libraries.
+A comprehensive C++ library implementing fundamental mathematics and physics concepts with well-documented standalone functions. This showcase demonstrates mathematical foundations and physical principles through clean, reusable code organized in header-only libraries.
 
-## Overview
+## Table of Contents
 
-This project implements core physics functionality as standalone C++ functions, categorized into thirty-one comprehensive modules:
+- [Mathematics](#mathematics)
+  - [Calculus](#calculus)
+  - [Trigonometry](#trigonometry)
+  - [Linear Algebra](#linear-algebra)
+  - [Probability & Statistics](#probability--statistics)
+  - [Transforms](#transforms)
+- [Physics](#physics)
+  - [Basic Mechanics](#basic-mechanics)
+  - [Advanced Physics](#advanced-physics)
+- [Building and Running](#building-and-running)
 
-### Basic Mechanics
-1. **Newton's Laws of Motion** (`newton_laws.hpp`)
-2. **Kinematics** - Motion with constant acceleration (`kinematics.hpp`)
-3. **Dynamics** - Force causing rectilinear motion (`dynamics.hpp`)
+---
 
-### Motion and Energy
-4. **Unit Conversions** (`units.hpp`) - CGS, SI, Imperial conversions (Dyne-Gram relation)
-5. **Inclined Plane** (`inclined_plane.hpp`) - Velocity at foot, friction effects
-6. **Energy & Momentum** (`energy_momentum.hpp`) - KE/momentum compared
-7. **Projectile Motion** (`projectile.hpp`) - 2D parabolic trajectories
+# Mathematics
 
-### Circular and Oscillatory Motion
-8. **Circular Motion** (`circular_motion.hpp`) - Centripetal force expressions
-9. **Simple Harmonic Motion** (`harmonic_motion.hpp`) - SHM, pendulums, vibrating masses
+## Calculus
 
-### Rotational Mechanics
-10. **Rotational Dynamics** (`rotational_dynamics.hpp`) - Torque, angular momentum, moments of inertia
+**Location**: `include/maths/calculus/`
 
-### Gravitation and Orbits
-11. **Orbital Mechanics** (`orbital.hpp`) - Satellite motion around Earth
-12. **Universal Gravitation** (`gravitation.hpp`) - Apple and Moon connection, Kepler's Laws
+### Fundamental Theorems (`theorems.hpp`)
 
-### Thermodynamics and Gases
-13. **Thermodynamics** (`thermodynamics.hpp`) - Boyle's Law, gas laws, pressure, RMS velocity
+#### Intermediate Value Theorem (IVT)
+- `IntermediateValueTheorem::statement()` - Formal statement
+- `checkConditions()` - Verify IVT applicability
+- `findRoot()` - Find c such that f(c) = k (bisection method)
+- `proofSqrt2Exists()` - Demonstrate √2 existence
 
-### Fluids
-14. **Fluid Mechanics** (`fluid_mechanics.hpp`) - Steady flow, continuity, Bernoulli, pipe friction
+#### Mean Value Theorem (MVT)
+- `MeanValueTheorem::statement()` - Formal statement
+- `averageRateOfChange()` - Calculate (f(b) - f(a))/(b - a)
+- `findMVTPoint()` - Find c where f'(c) = average rate
+- `geometricInterpretation()` - Tangent parallel to secant
 
-### Materials and Elasticity
-15. **Elasticity** (`elasticity.hpp`) - Young's modulus, beams, bulk modulus, stress-strain
+#### Rolle's Theorem
+- `RollesTheorem::statement()` - Special case of MVT
+- `checkConditions()` - Verify f(a) = f(b)
+- `findCriticalPoint()` - Find c where f'(c) = 0
+- `relationshipToMVT()` - How Rolle's relates to MVT
 
-### Surface Phenomena
-16. **Surface Tension** (`surface_tension.hpp`) - Capillary rise, droplet pressure
+#### Extreme Value Theorem (EVT)
+- `ExtremeValueTheorem::statement()` - Guarantees max/min exist
+- `findExtremes()` - Numerically find extreme values
+- `importanceOfClosedInterval()` - Why [a,b] is essential
 
-### Waves and Acoustics
-17. **Wave Mechanics** (`wave_mechanics.hpp`) - Sound, Doppler effect, string vibrations
+#### Fundamental Theorem of Calculus
+- `firstFundamentalTheorem()` - d/dx[∫ₐˣ f(t)dt] = f(x)
+- `secondFundamentalTheorem()` - ∫ₐᵇ f(x)dx = F(b) - F(a)
+- `integrate()` - Numerical integration (trapezoidal rule)
 
-### Thermal Physics
-18. **Thermal Expansion** (`thermal_expansion.hpp`) - Linear/volume expansion, coefficients, thermal stress
-19. **Calorimetry** (`calorimetry.hpp`) - Heat capacity, method of mixtures, phase changes
-20. **Heat Transfer** (`heat_transfer.hpp`) - Conduction, radiation, heat engines, Carnot cycle
+#### L'Hôpital's Rule
+- `LHopitalsRule::statement()` - For indeterminate forms
+- `indeterminateForms()` - 0/0, ∞/∞, etc.
+- Example applications
+
+---
+
+## Trigonometry
+
+**Location**: `include/maths/trigonometry/`
+
+### Trigonometric Functions (`identities.hpp`)
+
+#### Basic Functions
+- `sine()`, `cosine()`, `tangent()` - Primary trig functions
+- `cotangent()`, `secant()`, `cosecant()` - Reciprocal functions
+- `degreesToRadians()` / `radiansToDegrees()` - Angle conversions
+- `unitCircleDefinitions()` - Definitions from unit circle
+- `specialAngles()` - Exact values for 0°, 30°, 45°, 60°, 90°
+
+#### Pythagorean Identities
+- `fundamentalIdentity()` - sin²θ + cos²θ = 1
+- `tangentIdentity()` - 1 + tan²θ = sec²θ
+- `cotangentIdentity()` - 1 + cot²θ = csc²θ
+- `verifyFundamental()` - Numerical verification
+
+#### Angle Formulas
+- `sineSum()` / `sineDifference()` - sin(α ± β)
+- `cosineSum()` / `cosineDifference()` - cos(α ± β)
+- `tangentSum()` / `tangentDifference()` - tan(α ± β)
+- `doubleAngleFormulas()` - sin(2α), cos(2α), tan(2α)
+- `halfAngleFormulas()` - sin(α/2), cos(α/2), tan(α/2)
+- `tripleAngleFormulas()` - sin(3α), cos(3α), tan(3α)
+
+#### Product-Sum Formulas
+- `productToSum()` - Convert sin·sin, cos·cos to sums
+- `sumToProduct()` - Convert sin+sin to products
+- `powerReduction()` - sin²α, cos²α in terms of cos(2α)
+
+#### Inverse Trigonometric Functions
+- `arcsin()`, `arccos()`, `arctan()` - Inverse functions
+- `arctan2()` - Two-argument arctangent
+- `domainsAndRanges()` - Valid inputs/outputs
+- `inverseIdentities()` - Relationships between inverses
+- `derivatives()` - d/dx of inverse trig functions
+
+#### Laws of Triangles
+- `lawOfSines()` - a/sin(A) = b/sin(B) = c/sin(C)
+- `lawOfCosines()` - c² = a² + b² - 2ab·cos(C)
+- `solveWithSines()` - Solve triangle using law of sines
+- `solveWithCosines()` - Solve triangle using law of cosines
+- `areaFormulas()` - Triangle area (Heron's formula, etc.)
+
+---
+
+## Linear Algebra
+
+**Location**: `include/maths/linear_algebra/`
+
+### Vectors (`vectors.hpp`)
+
+#### Vector Class
+- `Vector(components)` - Construct vector
+- `dimension()` - Get vector dimension
+- `operator[]` - Access components
+- `operator+`, `operator-` - Vector addition/subtraction
+- `operator*` - Scalar multiplication
+
+#### Vector Operations
+- `dot()` - Dot product v·w
+- `norm()` - Euclidean norm ‖v‖
+- `normalize()` - Unit vector v̂ = v/‖v‖
+- `distance()` - Distance between vectors
+- `isZero()` - Check if zero vector
+
+#### Cross Product (3D)
+- `CrossProduct::compute()` - v × w
+- `properties()` - Anticommutative, perpendicular
+- `geometricMeaning()` - Parallelogram area
+
+#### Projections
+- `VectorProjection::scalarProjection()` - comp_w(v)
+- `vectorProjection()` - proj_w(v)
+- `orthogonalComponent()` - perp_w(v) = v - proj_w(v)
+- `verifyDecomposition()` - v = proj + perp
+
+#### Orthogonality
+- `Orthogonality::areOrthogonal()` - Check v ⊥ w
+- `isUnitVector()` - Check ‖v‖ = 1
+- `areOrthonormal()` - Check pairwise orthogonal + unit
+- `gramSchmidt()` - Orthogonalization process
+- `gramSchmidtOrthonormal()` - Orthonormal basis
+- `standardBasis()` - e₁, e₂, ..., eₙ
+
+#### Linear Independence
+- `LinearIndependence::areIndependent()` - Check linear independence
+- `spanDimension()` - Dimension of span
+- `extractIndependentSet()` - Find independent subset
+
+### Matrices (`matrices.hpp`)
+
+#### Matrix Class
+- `Matrix(rows, cols)` - Construct m×n matrix
+- `operator()` - Access elements
+- `operator+`, `operator-` - Matrix addition/subtraction
+- `operator*` (scalar) - Scalar multiplication
+- `operator*` (matrix) - Matrix multiplication
+- `operator*` (vector) - Matrix-vector product
+
+#### Matrix Operations
+- `transpose()` - Aᵀ
+- `trace()` - Sum of diagonal elements
+- `determinant()` - det(A) (Laplace expansion)
+- `minor()` - Submatrix (remove row/column)
+- `identity()` - Identity matrix I
+
+#### Matrix Properties
+- `isSquare()`, `isSymmetric()`, `isDiagonal()`, `isIdentity()`
+- `determinantProperties()` - det(AB) = det(A)det(B), etc.
+- `traceProperties()` - tr(AB) = tr(BA), etc.
+- `transposeProperties()` - (AB)ᵀ = BᵀAᵀ, etc.
+- `invertibilityConditions()` - When is A invertible?
+
+#### Special Matrices
+- `SpecialMatrices::diagonal()` - Diagonal matrix from vector
+- `symmetricMatrices()` - A = Aᵀ properties
+- `orthogonalMatrices()` - QᵀQ = I properties
+- `positiveDefiniteMatrices()` - xᵀAx > 0 conditions
+- `triangularMatrices()` - Upper/lower triangular
+
+#### Matrix Decompositions
+- `luDecomposition()` - A = LU
+- `qrDecomposition()` - A = QR
+- `svd()` - A = UΣVᵀ
+- `eigenvalueDecomposition()` - A = PDP⁻¹
+- `choleskyDecomposition()` - A = LLᵀ
+
+#### Linear Transformations
+- `LinearTransformations::definition()` - T(x) = Ax
+- `kernel()` - Null space {x : Ax = 0}
+- `range()` - Column space {Ax : x ∈ ℝⁿ}
+- `rankNullityTheorem()` - rank + nullity = n
+
+---
+
+## Probability & Statistics
+
+**Location**: `include/maths/probability/`
+
+### Probability Distributions (`distributions.hpp`)
+
+#### Discrete Distributions
+- `BernoulliDistribution::pmf()` - P(X=x), x ∈ {0,1}
+- `BinomialDistribution::pmf()` - C(n,k)p^k(1-p)^(n-k)
+- `PoissonDistribution::pmf()` - λ^k e^(-λ) / k!
+- `binomialCoefficient()` - C(n,k) = n!/(k!(n-k)!)
+
+#### Continuous Distributions
+- `UniformDistribution::pdf()` - 1/(b-a) on [a,b]
+- `UniformDistribution::cdf()` - (x-a)/(b-a)
+- `NormalDistribution::pdf()` - Gaussian distribution
+- `NormalDistribution::cdf()` - Using error function
+- `standardPDF()`, `standardCDF()` - Standard normal (μ=0, σ=1)
+- `ExponentialDistribution::pdf()` - λe^(-λx)
+- `ExponentialDistribution::cdf()` - 1 - e^(-λx)
+
+#### Distribution Properties
+- `mean()`, `variance()`, `stddev()` - For all distributions
+- `empiricalRule()` - 68-95-99.7 rule (normal)
+- `memorylessProperty()` - Exponential distribution
+
+#### Statistical Functions
+- `StatisticalFunctions::mean()` - Sample mean
+- `variance()` - Sample variance (unbiased)
+- `stddev()` - Sample standard deviation
+- `median()` - Middle value
+- `covariance()` - Cov(X,Y)
+- `correlation()` - Pearson's r
+- `zScore()` - Standardize value
+
+#### Fundamental Theorems
+- `centralLimitTheorem()` - X̄ → N(μ, σ²/n)
+- `lawOfLargeNumbers()` - X̄ₙ → μ
+
+#### Bayesian Inference
+- `BayesianInference::bayesTheorem()` - P(A|B) = P(B|A)P(A)/P(B)
+- `statement()` - Posterior, likelihood, prior
+- `totalProbability()` - Law of total probability
+
+---
+
+## Transforms
+
+**Location**: `include/maths/transforms/`
+
+### Polar & Coordinate Transformations (`polar.hpp`)
+
+#### 2D Polar Coordinates
+- `PolarCoordinates::fromCartesian()` - (x,y) → (r,θ)
+- `toCartesian()` - (r,θ) → (x,y)
+- `distance()` - Distance between polar points
+- `areaElement()` - dA = r dr dθ
+- `jacobian()` - |∂(x,y)/∂(r,θ)| = r
+
+#### Cylindrical Coordinates (3D)
+- `CylindricalCoordinates::fromCartesian()` - (x,y,z) → (r,θ,z)
+- `toCartesian()` - (r,θ,z) → (x,y,z)
+- `volumeElement()` - dV = r dr dθ dz
+- `jacobian()` - r
+
+#### Spherical Coordinates (3D)
+- `SphericalCoordinates::fromCartesian()` - (x,y,z) → (ρ,θ,φ)
+- `toCartesian()` - (ρ,θ,φ) → (x,y,z)
+- `volumeElement()` - dV = ρ² sin(φ) dρ dθ dφ
+- `jacobian()` - ρ² sin(φ)
+- `convention()` - Physics vs mathematics notation
+
+#### Complex Numbers in Polar Form
+- `ComplexPolarForm::toPolar()` - z → (r, θ)
+- `fromPolar()` - (r, θ) → z = re^(iθ)
+- `eulersFormula()` - e^(iθ) = cos θ + i sin θ
+- `multiplicationRule()` - Multiply moduli, add arguments
+- `deMoivresTheorem()` - (e^(iθ))^n = e^(inθ)
+- `nthRoots()` - All nth roots of complex number
+- `rootsOfUnity()` - nth roots of 1
+
+#### Polar Curves
+- `circle()`, `cardioid()`, `rose()`, `spiral()`, `lemniscate()`
+- `areaFormula()` - A = ½∫r²dθ
+- `arcLength()` - s = ∫√(r² + (dr/dθ)²) dθ
+
+### Fourier Transforms (`fourier.hpp`)
+
+#### Fourier Series
+- `FourierSeries::definition()` - f(x) = a₀/2 + Σ[aₙcos(nx) + bₙsin(nx)]
+- `complexForm()` - f(x) = Σ cₙe^(inx)
+- `computeA0()`, `computeAn()`, `computeBn()` - Coefficients
+- `dirichletConditions()` - Convergence conditions
+- `parsevalTheorem()` - Energy conservation
+
+#### Fourier Transform
+- `FourierTransform::definition()` - F(ω) = ∫f(t)e^(-iωt)dt
+- `properties()` - Linearity, shift, scaling, convolution
+- `commonPairs()` - δ(t) ↔ 1, e^(-at) ↔ 1/(a+iω), etc.
+- `uncertaintyPrinciple()` - Δt·Δω ≥ 1/2
+- `convolutionTheorem()` - f*g ↔ F·G
+
+#### Discrete Fourier Transform (DFT)
+- `DiscreteFourierTransform::definition()` - X[k] = Σx[n]e^(-i2πkn/N)
+- `compute()` - Naive O(N²) DFT
+- `inverse()` - Inverse DFT
+- `magnitudeSpectrum()`, `phaseSpectrum()`
+- `nyquistTheorem()` - f_sample ≥ 2f_max
+
+#### Fast Fourier Transform (FFT)
+- `FastFourierTransform::algorithm()` - O(N log N) Cooley-Tukey
+- `compute()` - Recursive FFT (power-of-2 sizes)
+- `applications()` - Audio, images, communications
+
+#### Window Functions
+- `WindowFunctions::rectangular()`, `hann()`, `hamming()`
+- `purpose()` - Reduce spectral leakage
+
+---
+
+# Physics
+
+## Basic Mechanics
+
+**Location**: `include/physics/`
+
+The physics library contains 31 comprehensive modules covering classical mechanics, thermodynamics, electromagnetism, and modern physics. All functions use SI units and include detailed documentation.
+
+### Core Modules
+
+1. **Newton's Laws** (`newton_laws.hpp`)
+   - First Law (inertia), Second Law (F=ma), Third Law (action-reaction)
+
+2. **Kinematics** (`kinematics.hpp`)
+   - Motion with constant acceleration, all kinematic equations
+
+3. **Dynamics** (`dynamics.hpp`)
+   - Force-motion integration, friction, work, power
+
+4. **Energy & Momentum** (`energy_momentum.hpp`)
+   - KE, PE, momentum, impulse, conservation laws
+
+5. **Projectile Motion** (`projectile.hpp`)
+   - 2D parabolic trajectories
+
+6. **Circular Motion** (`circular_motion.hpp`)
+   - Centripetal force, angular velocity, period
+
+7. **Simple Harmonic Motion** (`harmonic_motion.hpp`)
+   - SHM, pendulums, vibrating masses, energy
+
+8. **Rotational Dynamics** (`rotational_dynamics.hpp`)
+   - Torque, angular momentum, moment of inertia
+
+9. **Gravitation** (`gravitation.hpp`)
+   - Universal gravitation, Kepler's laws
+
+10. **Orbital Mechanics** (`orbital.hpp`)
+    - Satellite motion, escape velocity
+
+### Thermodynamics
+
+11. **Thermodynamics** (`thermodynamics.hpp`)
+    - Gas laws, kinetic theory, RMS velocity
+
+12. **Thermal Expansion** (`thermal_expansion.hpp`)
+    - Linear, area, volume expansion
+
+13. **Calorimetry** (`calorimetry.hpp`)
+    - Heat capacity, phase changes
+
+14. **Heat Transfer** (`heat_transfer.hpp`)
+    - Conduction, radiation, heat engines, Carnot cycle
+
+### Fluids and Materials
+
+15. **Fluid Mechanics** (`fluid_mechanics.hpp`)
+    - Continuity, Bernoulli, pipe friction
+
+16. **Elasticity** (`elasticity.hpp`)
+    - Young's modulus, beam bending
+
+17. **Surface Tension** (`surface_tension.hpp`)
+    - Capillary rise, droplet/bubble pressure
+
+### Waves and Optics
+
+18. **Wave Mechanics** (`wave_mechanics.hpp`)
+    - Sound, Doppler effect, string vibrations
+
+19. **Electromagnetic Waves** (`electromagnetic_waves.hpp`)
+    - EM wave propagation, radiation pressure
+
+20. **Optics** (`optics.hpp`)
+    - Refraction, lenses, mirrors, telescopes
 
 ### Electricity and Magnetism
-21. **Electrostatics** (`electrostatics.hpp`) - Coulomb's law, electric field, potential, capacitance
-22. **Magnetism** (`magnetism.hpp`) - Magnetic fields, forces, moments, Gauss method
-23. **Electric Circuits** (`electric_circuits.hpp`) - Ohm's law, resistance, power, cell arrangements
-24. **Electromagnetic Induction** (`electromagnetic_induction.hpp`) - Faraday's law, motors, generators, transformers
-25. **Electromagnetic Waves** (`electromagnetic_waves.hpp`) - EM wave propagation, energy, radiation pressure
 
-### Optics and Advanced Topics
-26. **Optics** (`optics.hpp`) - Refraction, lenses, mirrors, telescopes, Brewster's law
-27. **Advanced Mechanics** (`advanced_mechanics.hpp`) - Orbital dynamics, Kepler's laws, Lagrangian mechanics
+21. **Electrostatics** (`electrostatics.hpp`)
+    - Coulomb's law, electric field, capacitance
 
-### Advanced Physics
-28. **Oscillations** (`oscillations.hpp`) - Damped, forced, and coupled oscillators, RLC circuits, resonance
-29. **Maxwell Equations** (`maxwell_equations.hpp`) - Electromagnetic fields, Poynting vector, radiation
-30. **Special Relativity** (`special_relativity.hpp`) - Lorentz transformations, relativistic energy/momentum
-31. **Quantum Mechanics Basics** (`quantum_basics.hpp`) - de Broglie, Compton, uncertainty, Bohr model, tunneling
+22. **Magnetism** (`magnetism.hpp`)
+    - Magnetic forces and fields
 
-All functions are thoroughly documented with parameter descriptions, units, return values, and exception handling.
+23. **Electric Circuits** (`electric_circuits.hpp`)
+    - Ohm's law, resistance, power
+
+24. **Electromagnetic Induction** (`electromagnetic_induction.hpp`)
+    - Faraday's law, motors, generators, transformers
+
+25. **Maxwell Equations** (`maxwell_equations.hpp`)
+    - Maxwell's four equations, Poynting vector
+
+### Advanced Topics
+
+26. **Advanced Mechanics** (`advanced_mechanics.hpp`)
+    - Lagrangian, Hamiltonian mechanics
+
+27. **Oscillations** (`oscillations.hpp`)
+    - Damped, forced, coupled oscillators, resonance
+
+28. **Special Relativity** (`special_relativity.hpp`)
+    - Lorentz transformations, relativistic mechanics
+
+29. **Quantum Basics** (`quantum_basics.hpp`)
+    - de Broglie, Compton, uncertainty, Bohr model
+
+30. **Unit Conversions** (`units.hpp`)
+    - CGS, SI, Imperial conversions
+
+31. **Inclined Plane** (`inclined_plane.hpp`)
+    - Forces and motion on slopes
+
+## Advanced Physics
+
+**Location**: `include/physics/advanced/`
+
+### Particle Physics & QFT (`qft/`)
+- Standard Model particles (quarks, leptons, bosons)
+- Spin-statistics theorem
+- Supersymmetry (SUSY, MSSM)
+- Antiparticles and CP violation
+- Quark-gluon plasma
+- Interaction cross sections
+- Decay rates and resonances
+
+### Cosmology (`cosmology/`)
+- Hubble expansion and redshift
+- Friedmann equations
+- Energy density components (matter, dark energy, radiation)
+- Early universe (CMB, BBN, baryogenesis)
+- Thermal history
+
+### Gauge Theory (`gauge_theory/`)
+- Discrete symmetries (P, C, T, CPT)
+- Helicity and chirality
+- Gauge transformations (U(1), SU(2), SU(3))
+- Higgs mechanism
+- Running couplings
+- CP violation in kaons and B mesons
+
+### Fluid Dynamics (`fluid_dynamics/`)
+- Governing equations (continuity, Euler, Navier-Stokes)
+- Dimensionless numbers (Reynolds, Mach, Froude)
+- Vorticity and circulation
+- Turbulence models
+
+---
 
 ## Project Structure
 
 ```
-physics_showcase/
+maths_physics_showcase/
 ├── include/
+│   ├── maths/
+│   │   ├── calculus/
+│   │   │   └── theorems.hpp
+│   │   ├── trigonometry/
+│   │   │   └── identities.hpp
+│   │   ├── linear_algebra/
+│   │   │   ├── vectors.hpp
+│   │   │   └── matrices.hpp
+│   │   ├── probability/
+│   │   │   └── distributions.hpp
+│   │   └── transforms/
+│   │       ├── polar.hpp
+│   │       └── fourier.hpp
+│   │
 │   └── physics/
-│       ├── newton_laws.hpp         # Newton's three laws of motion
-│       ├── kinematics.hpp          # Motion with constant acceleration
-│       ├── dynamics.hpp            # Force and motion integration
-│       ├── units.hpp               # Unit conversions (Dyne-Gram, CGS, SI)
-│       ├── inclined_plane.hpp      # Velocity at foot of inclined plane
-│       ├── energy_momentum.hpp     # Energy and momentum comparisons
-│       ├── projectile.hpp          # Projectile motion (2D)
-│       ├── circular_motion.hpp     # Circular motion + centripetal force expressions
-│       ├── harmonic_motion.hpp     # Simple harmonic motion and pendulums
-│       ├── rotational_dynamics.hpp # Torque, angular momentum, moment of inertia
-│       ├── orbital.hpp             # Motion around Earth (satellites)
-│       ├── gravitation.hpp         # Universal gravitation and Kepler's Laws
-│       ├── thermodynamics.hpp      # Boyle's Law, gas laws, RMS velocity
-│       ├── fluid_mechanics.hpp     # Flow, continuity, Bernoulli, pipe friction
-│       ├── elasticity.hpp          # Young's modulus, beams, bulk modulus
-│       ├── surface_tension.hpp     # Capillary rise, droplet/bubble pressure
-│       ├── wave_mechanics.hpp      # Sound, Doppler, string vibrations
-│       ├── thermal_expansion.hpp   # Linear/volume expansion, thermal stress
-│       ├── calorimetry.hpp         # Heat capacity, method of mixtures
-│       ├── heat_transfer.hpp       # Conduction, radiation, heat engines
-│       ├── electrostatics.hpp      # Coulomb's law, electric field, capacitance
-│       ├── magnetism.hpp           # Magnetic fields, forces, moments
-│       ├── electric_circuits.hpp   # Ohm's law, resistance, power
-│       ├── electromagnetic_induction.hpp  # Faraday's law, motors, generators
-│       ├── electromagnetic_waves.hpp      # EM waves, radiation pressure
-│       ├── optics.hpp              # Refraction, lenses, Brewster's law
-│       ├── advanced_mechanics.hpp  # Orbital dynamics, Kepler, Lagrangian
-│       ├── oscillations.hpp        # Damped, forced, coupled oscillators
-│       ├── maxwell_equations.hpp   # Maxwell's equations, EM fields
-│       ├── special_relativity.hpp  # Lorentz transformations, relativistic mechanics
-│       └── quantum_basics.hpp      # de Broglie, Compton, Bohr model, tunneling
+│       ├── [31 basic physics modules]
+│       └── advanced/
+│           ├── qft/          # Particle physics
+│           ├── cosmology/    # Cosmology
+│           ├── gauge_theory/ # Gauge theories
+│           └── fluid_dynamics/ # Advanced fluids
+│
 ├── examples/
-│   ├── main.cpp                 # Basic mechanics demonstrations
-│   ├── advanced_demo.cpp        # Advanced topics demonstrations
-│   └── scientific_demo.cpp      # Scientific applications demonstrations
-├── Makefile                     # Build system
-├── CMakeLists.txt              # CMake configuration
-├── LICENSE
+│   ├── main.cpp
+│   ├── advanced_demo.cpp
+│   └── scientific_demo.cpp
+│
+├── Makefile
+├── CMakeLists.txt
 └── README.md
 ```
 
-## Features
-
-### Newton's Laws of Motion (`newton_laws.hpp`)
-
-#### First Law - Law of Inertia
-- `isInEquilibrium()` - Check if object is in equilibrium
-- `calculateNetForce()` - Calculate net force from multiple forces
-
-#### Second Law - F = ma
-- `calculateForce()` - Calculate force from mass and acceleration
-- `calculateAcceleration()` - Calculate acceleration from force and mass
-- `calculateMass()` - Calculate mass from force and acceleration
-- `calculateWeight()` - Calculate gravitational force
-
-#### Third Law - Action-Reaction
-- `calculateReactionForce()` - Get reaction force for given action
-- `verifyActionReactionPair()` - Verify if two forces form valid pair
-
-### Kinematics (`kinematics.hpp`)
-
-Motion in a straight line with constant acceleration using all kinematic equations:
-
-#### First Equation: v = v₀ + at
-- `calculateFinalVelocity()` - Calculate final velocity
-- `calculateAccelerationFromVelocities()` - Calculate acceleration
-- `calculateTimeFromVelocities()` - Calculate time required
-
-#### Second Equation: s = v₀t + ½at²
-- `calculateDisplacement()` - Calculate displacement
-- `calculateAccelerationFromDisplacement()` - Calculate acceleration
-
-#### Third Equation: v² = v₀² + 2as
-- `calculateFinalVelocityFromDisplacement()` - Calculate final velocity
-- `calculateAccelerationFromVelocitySquared()` - Calculate acceleration
-- `calculateDisplacementFromVelocities()` - Calculate displacement
-
-#### Fourth Equation: s = ((v + v₀) / 2) × t
-- `calculateDisplacementFromAverageVelocity()` - Using average velocity
-- `calculateAverageVelocity()` - Calculate average velocity
-- `calculateTimeFromAverageVelocity()` - Calculate time
-
-#### Utility Functions
-- `calculateDistance()` - Calculate distance traveled (always positive)
-- `calculateStoppingDistance()` - Distance required to stop
-- `calculateStoppingTime()` - Time required to stop
-
-### Dynamics (`dynamics.hpp`)
-
-Integration of forces with motion - how forces cause acceleration and resulting motion:
-
-#### Force-Acceleration Relationships
-- `calculateNetForce()` - Sum multiple forces
-- `calculateAccelerationFromForce()` - F = ma → a = F/m
-- `calculateRequiredForce()` - Force needed for desired acceleration
-
-#### Force-Motion Integration: Velocity
-- `calculateFinalVelocityFromForce()` - Final velocity after force acts
-- `calculateVelocityChange()` - Change in velocity (Δv)
-- `calculateTimeForVelocityChange()` - Time for velocity change
-
-#### Force-Motion Integration: Displacement
-- `calculateDisplacementFromForce()` - Displacement when force acts
-- `calculateFinalVelocityFromForceAndDisplacement()` - Final velocity from force and displacement
-
-#### Stopping Problems
-- `calculateBrakingForce()` - Force needed to stop in given distance
-- `calculateStoppingDistanceFromForce()` - Distance to stop with given force
-- `calculateStoppingTimeFromForce()` - Time to stop with given force
-
-#### Friction
-- `calculateFrictionForce()` - Frictional force (f = μN)
-- `calculateAccelerationWithFriction()` - Net acceleration with friction
-- `calculateMinimumForceToOvercomeFriction()` - Minimum force to start motion
-
-#### Work and Power
-- `calculateWork()` - Work done by force (W = F·s)
-- `calculatePower()` - Power (rate of work, P = F·v)
-
-### Unit Conversions (`units.hpp`)
-
-Convert between different unit systems (CGS, SI, Imperial):
-
-#### Force and Mass
-- `newtonsToДynes()` / `dynesToNewtons()` - Force conversions (1 N = 10⁵ Dynes)
-- `kilogramsToGrams()` / `gramsToKilograms()` - Mass conversions
-- `calculateForceDynes()` - Calculate force in Dynes from grams and cm/s²
-
-#### Length and Velocity
-- `metersToCentimeters()` / `centimetersToMeters()` - Length conversions
-- `metersToFeet()` / `feetToMeters()` - Metric to Imperial
-- `mpsToKmph()` / `kmphToMps()` - Velocity conversions
-- `mpsToMph()` / `mphToMps()` - m/s to miles per hour
-
-#### Energy and Angles
-- `joulesToErgs()` / `ergsToJoules()` - Energy conversions (1 J = 10⁷ ergs)
-- `degreesToRadians()` / `radiansToDegrees()` - Angle conversions
-
-### Inclined Plane (`inclined_plane.hpp`)
-
-Analyze motion on inclined surfaces:
-
-#### Forces on Incline
-- `calculateParallelForce()` - Force component down the slope (mg sin θ)
-- `calculateNormalForce()` - Force perpendicular to slope (mg cos θ)
-
-#### Acceleration and Velocity
-- `calculateAccelerationFrictionless()` - a = g sin θ
-- `calculateAccelerationWithFriction()` - a = g(sin θ - μ cos θ)
-- `calculateVelocityAtFootFrictionless()` - Speed at bottom (frictionless)
-- `calculateVelocityAtFootWithFriction()` - Speed at bottom (with friction)
-- `calculateVelocityAtFootFromHeight()` - Using energy: v = √(2gh)
-
-#### Additional Analysis
-- `calculateMinimumAngleToSlide()` - Minimum angle to overcome static friction
-- `calculateTimeToSlide()` - Time to slide down
-- `calculateWorkAgainstFriction()` - Energy lost to friction
-
-### Energy and Momentum (`energy_momentum.hpp`)
-
-Compare and analyze kinetic energy and momentum:
-
-#### Kinetic Energy
-- `calculateKineticEnergy()` - KE = (1/2)mv²
-- `calculateVelocityFromKE()` - v = √(2KE/m)
-
-#### Momentum
-- `calculateMomentum()` - p = mv
-- `calculateVelocityFromMomentum()` - v = p/m
-
-#### Relationships
-- `calculateKEFromMomentum()` - KE = p²/(2m)
-- `calculateMomentumFromKE()` - p = √(2m·KE)
-- `kineticEnergyRatioConstantMomentum()` - How mass affects KE for same p
-- `momentumRatioConstantKE()` - How mass affects p for same KE
-
-#### Potential Energy
-- `calculatePotentialEnergy()` - PE = mgh
-- `calculateSpringPotentialEnergy()` - PE = (1/2)kx²
-- `velocityFromFall()` - Final velocity from height (energy conservation)
-
-#### Impulse
-- `calculateImpulse()` - Change in momentum (Δp = mΔv)
-- `calculateChangeInKE()` - Change in kinetic energy
-- `calculateAverageForceFromImpulse()` - F = Impulse/Δt
-
-### Projectile Motion (`projectile.hpp`)
-
-Analyze 2D motion under gravity:
-
-#### Initial Components
-- `calculateHorizontalVelocity()` - v₀ₓ = v₀ cos θ
-- `calculateVerticalVelocity()` - v₀ᵧ = v₀ sin θ
-
-#### Flight Parameters
-- `calculateRange()` - Horizontal range: R = v₀² sin(2θ) / g
-- `calculateMaxHeight()` - Maximum height: H = (v₀ sin θ)² / (2g)
-- `calculateTimeOfFlight()` - Total flight time
-- `calculateTimeToMaxHeight()` - Time to reach peak
-
-#### Position and Velocity
-- `calculateHorizontalPosition()` - x(t) = v₀ₓ × t
-- `calculateVerticalPosition()` - y(t) = v₀ᵧt - (1/2)gt²
-- `getVerticalVelocityAtTime()` - vᵧ(t) = v₀ᵧ - gt
-- `calculateSpeedAtTime()` - |v(t)| = √(vₓ² + vᵧ²)
-
-#### Trajectory Analysis
-- `calculateHeightAtDistance()` - y(x) parabolic trajectory equation
-- `getAngleForMaxRange()` - Returns 45° for maximum range
-- `calculateMaximumRange()` - Maximum range at 45°
-- `calculateLaunchAngleForRange()` - Find angle for desired range
-
-### Circular Motion (`circular_motion.hpp`)
-
-Motion in a circle with constant speed:
-
-#### Centripetal Quantities
-- `calculateCentripetalAcceleration()` - a_c = v²/r
-- `calculateCentripetalForce()` - F_c = mv²/r
-- `calculateVelocityFromAcceleration()` - v = √(a_c × r)
-
-#### Other Expressions for Centripetal Force
-- `calculateCentripetalForceAngular()` - F_c = mω²r
-- `calculateCentripetalForceFromPeriod()` - F_c = 4π²mr/T²
-- `calculateCentripetalForceFromFrequency()` - F_c = 4π²mf²r
-
-#### Angular Motion
-- `calculateAngularVelocity()` - ω = v/r
-- `calculateTangentialVelocity()` - v = ωr
-- `calculateCentripetalAccelFromAngular()` - a_c = ω²r
-
-#### Period and Frequency
-- `calculatePeriod()` - T = 2πr/v
-- `calculateFrequency()` - f = v/(2πr)
-- `calculateAngularVelocityFromPeriod()` - ω = 2π/T
-- `rpmToRadPerSec()` / `radPerSecToRpm()` - RPM conversions
-
-#### Applications
-- `calculateBankingAngle()` - Banked curve angle for frictionless turn
-- `calculateMinVelocityTopOfLoop()` - Minimum speed at top of vertical loop
-- `calculateTensionAtBottom()` / `calculateTensionAtTop()` - String tension in vertical circle
-
-### Orbital Mechanics (`orbital.hpp`)
-
-Motion around Earth and celestial bodies:
-
-#### Gravitational Force
-- `calculateGravitationalForce()` - F = GMm/r²
-- `calculateGravitationalAcceleration()` - g = GM/r²
-
-#### Orbital Velocity and Period
-- `calculateOrbitalVelocity()` - v = √(GM/r)
-- `calculateOrbitalVelocityFromAltitude()` - Velocity at height above surface
-- `calculateOrbitalPeriod()` - T = 2π√(r³/GM) (Kepler's 3rd Law)
-- `calculateGeostationaryOrbitRadius()` - Radius for 24-hour period
-
-#### Escape Velocity
-- `calculateEscapeVelocity()` - v_esc = √(2GM/r)
-- `calculateEscapeVelocityFromSurface()` - Earth surface escape velocity
-- `escapeToOrbitalVelocityRatio()` - Verify v_esc = √2 × v_orbital
-
-#### Orbital Energy
-- `calculateOrbitalPotentialEnergy()` - PE = -GMm/r
-- `calculateOrbitalKineticEnergy()` - KE = GMm/(2r)
-- `calculateTotalOrbitalEnergy()` - E = -GMm/(2r)
-
-#### Special Orbits
-- `calculateLEOVelocity()` - Low Earth Orbit parameters
-- `calculateWeightInOrbit()` - Gravitational force in orbit
-
-### Simple Harmonic Motion (`harmonic_motion.hpp`)
-
-Oscillatory motion with restoring force proportional to displacement:
-
-#### Acceleration and Force
-- `calculateAcceleration()` - a = -ω²x
-- `calculateMaxAcceleration()` - a_max = ω²A
-- `calculateRestoringForce()` - F = -kx (Hooke's Law)
-- `calculateMaxForce()` - F_max = kA
-
-#### Angular Frequency and Period
-- `calculateAngularFrequency()` - ω = √(k/m)
-- `calculatePeriod()` - T = 2π√(m/k)
-- `calculateFrequency()` - f = (1/2π)√(k/m)
-
-#### Energy of Vibrating Mass
-- `calculateKineticEnergy()` - KE = (1/2)k(A² - x²)
-- `calculatePotentialEnergy()` - PE = (1/2)kx²
-- `calculateTotalEnergy()` - E_total = (1/2)kA²
-- `verifyEnergyConservation()` - Check KE + PE = constant
-
-#### Displacement and Velocity
-- `calculateDisplacement()` - x(t) = A cos(ωt + φ)
-- `calculateVelocity()` - v(t) = -Aω sin(ωt + φ)
-- `calculateMaxVelocity()` - v_max = Aω
-- `calculateVelocityAtDisplacement()` - v = ω√(A² - x²)
-
-#### Simple Pendulum
-- `calculatePendulumPeriod()` - T = 2π√(L/g)
-- `calculatePendulumFrequency()` - f = (1/2π)√(g/L)
-- `calculatePendulumLength()` - L for desired period
-- `calculatePendulumMaxVelocity()` - v_max = θ₀√(gL)
-- `calculatePendulumEnergy()` - E = (1/2)mgLθ₀²
-
-### Rotational Dynamics (`rotational_dynamics.hpp`)
-
-Rotational analogs of linear motion:
-
-#### Angular Acceleration
-- `calculateAngularAcceleration()` - α = Δω/Δt
-- `calculateFinalAngularVelocity()` - ω_f = ω_i + αt
-- `calculateAngularDisplacement()` - θ = ω₀t + (1/2)αt²
-- `calculateTangentialAcceleration()` - a_t = rα
-
-#### Torque
-- `calculateTorque()` - τ = rF (perpendicular force)
-- `calculateTorqueWithAngle()` - τ = rF sin(θ)
-
-#### Angular Acceleration Caused by Torque
-- `calculateAngularAccelFromTorque()` - α = τ/I
-- `calculateRequiredTorque()` - τ = Iα
-
-#### Angular Momentum
-- `calculateAngularMomentum()` - L = Iω
-- `calculatePointMassAngularMomentum()` - L = mvr
-- `calculateAngularMomentumChange()` - ΔL = τ·Δt
-
-#### Kinetic Energy of Rotating Body
-- `calculateRotationalKE()` - KE = (1/2)Iω²
-- `calculateAngularVelocityFromKE()` - ω = √(2KE/I)
-
-#### Formulas for Moment of Inertia
-- `momentOfInertiaPointMass()` - I = mr²
-- `momentOfInertiaRodCenter()` - I = (1/12)ML² (rod about center)
-- `momentOfInertiaRodEnd()` - I = (1/3)ML² (rod about end)
-- `momentOfInertiaCylinder()` - I = (1/2)MR² (solid cylinder)
-- `momentOfInertiaHollowCylinder()` - I = MR²
-- `momentOfInertiaSolidSphere()` - I = (2/5)MR²
-- `momentOfInertiaHollowSphere()` - I = (2/3)MR²
-- `momentOfInertiaDisk()` - I = (1/2)MR²
-- `momentOfInertiaHoop()` - I = MR²
-
-#### Moment of Inertia about Parallel Axis
-- `parallelAxisTheorem()` - I = I_cm + Md²
-
-#### Compound Pendulum
-- `calculateCompoundPendulumPeriod()` - T = 2π√(I/(mgd))
-- `calculateEquivalentLength()` - L_eq = I/(md)
-
-#### Center of Percussion
-- `calculateCenterOfPercussion()` - Sweet spot location
-- `calculateRodCenterOfPercussion()` - For uniform rod: (2/3)L
-
-### Universal Gravitation (`gravitation.hpp`)
-
-Newton's synthesis of terrestrial and celestial mechanics:
-
-#### Universal Gravitation
-- `universalGravitationForce()` - F = Gm₁m₂/r²
-- `gravitationalFieldStrength()` - g = GM/r²
-
-#### Moon's Motions Connected with Fall of Apple
-- `calculateSurfaceGravity()` - g at Earth's surface
-- `calculateMoonCentripetalAccel()` - Moon's orbital acceleration
-- `verifyInverseSquareLaw()` - g_surface/g_moon = (r_moon/R_earth)²
-- `calculateDistanceRatio()` - r_moon/R_earth ≈ 60
-
-#### Mass of the Earth
-- `calculateEarthMass()` - From surface gravity: M = gR²/G
-- `calculateEarthMassFromMoon()` - From Moon's orbit
-- `calculateCentralMassFromOrbit()` - General formula for any satellite
-
-#### Significance of Kepler's Third Law
-- `calculatePeriodKeplerThird()` - T² = (4π²/GM)r³
-- `calculateKeplerConstant()` - K = 4π²/(GM), same for all satellites
-- `verifyKeplerThirdLaw()` - Check if orbit obeys law
-- `compareSatellitePeriods()` - T₁/T₂ = (r₁/r₂)^(3/2)
-
-#### Gravitational Potential Energy
-- `gravitationalPotentialEnergy()` - U = -GMm/r
-- `calculateEscapeVelocity()` - v_esc = √(2GM/R)
-
-#### Binary Systems
-- `calculateReducedMass()` - μ = m₁m₂/(m₁ + m₂)
-- `calculateCMDistance()` - Distance from center of mass
-
-### Thermodynamics (`thermodynamics.hpp`)
-
-Gas laws, pressure, and molecular velocities:
-
-#### Boyle's Law and Variations
-- `boylesLaw()` - P₁V₁ = P₂V₂ (isothermal)
-- `charlesLaw()` - V₁/T₁ = V₂/T₂ (isobaric)
-- `gayLussacsLaw()` - P₁/T₁ = P₂/T₂ (isochoric)
-- `combinedGasLaw()` - P₁V₁/T₁ = P₂V₂/T₂
-
-#### Ideal Gas Law
-- `idealGasLawPressure()` / `idealGasLawVolume()` / `idealGasLawTemperature()` - PV = nRT
-- `idealGasLawMoles()` - Calculate number of moles
-
-#### Pressure Measurements
-- `barometerPressure()` - Pressure from mercury column height
-- `altitudeFromPressure()` - Altitude from atmospheric pressure
-
-#### Kinetic Theory of Gases
-- `rmsVelocity()` - Root-mean-square molecular velocity v_rms = √(3kT/m)
-- `averageKineticEnergy()` - Average KE of gas molecules
-- `gasPressureFromKineticTheory()` - P = (1/3)ρv²_rms
-
-#### Elasticity of Gases
-- `isothermalBulkModulus()` - K_T = P (isothermal compression)
-- `adiabaticBulkModulus()` - K_S = γP (adiabatic compression)
-
-### Fluid Mechanics (`fluid_mechanics.hpp`)
-
-Fluid statics, dynamics, and flow in pipes:
-
-#### Fluid Statics
-- `pressureAtDepth()` - P = P₀ + ρgh
-- `gaugePressure()` - Pressure relative to atmospheric
-- `absolutePressure()` - Total pressure including atmospheric
-
-#### Continuity Equation
-- `continuityEquation()` - A₁v₁ = A₂v₂ (mass conservation)
-- `volumeFlowRate()` - Q = Av
-- `massFlowRate()` - ṁ = ρAv
-
-#### Bernoulli's Equation
-- `bernoulliPressure()` - P + ½ρv² + ρgh = constant
-- `bernoulliVelocity()` - Calculate velocity from pressure difference
-- `dynamicPressure()` - q = ½ρv²
-
-#### Torricelli's Theorem (Efflux)
-- `effluxVelocity()` - v = √(2gh) (velocity of jet from orifice)
-- `volumetricEffluxRate()` - Flow rate through orifice
-- `effluxGasIsothermal()` / `effluxGasAdiabatic()` - Gas efflux velocities
-
-#### Jet Motion
-- `horizontalJetRange()` - Range of horizontal jet
-- `jetVelocityFromRange()` - Calculate initial velocity from range
-
-#### Pipe Friction
-- `pipeFrictionPressureDrop()` - Darcy-Weisbach equation ΔP = f(L/D)(½ρv²)
-- `reynoldsNumber()` - Re = vD/ν (flow characterization)
-- `headLoss()` - Energy loss due to friction
-- `powerLoss()` - Power dissipated by friction
-
-### Elasticity (`elasticity.hpp`)
-
-Material deformation under stress:
-
-#### Stress and Strain
-- `calculateStress()` - σ = F/A
-- `calculateStrain()` - ε = ΔL/L₀
-
-#### Young's Modulus (Tensile/Compressive)
-- `calculateYoungsModulus()` - E = σ/ε
-- `calculateElongation()` - ΔL = FL/(AE)
-- `calculateStressFromStrain()` - σ = Eε (Hooke's Law)
-
-#### Bulk Modulus (Volume Elasticity)
-- `calculateBulkModulus()` - K = -ΔP/(ΔV/V₀)
-- `calculateVolumeChange()` - ΔV from applied pressure
-- `calculateCompressibility()` - β = 1/K
-- `calculateVolumetricStrain()` - ε_v = ΔV/V₀
-
-#### Shear Modulus (Rigidity)
-- `calculateShearModulus()` - G = τ/γ
-- `calculateShearStress()` - τ = F/A
-- `calculateShearStrain()` - γ = Δx/h
-
-#### Poisson's Ratio
-- `calculatePoissonsRatio()` - ν = -ε_transverse/ε_axial
-- `calculateTransverseStrain()` - Lateral strain from axial strain
-- `calculateShearModulusFromYoungs()` - G = E/(2(1+ν))
-- `calculateBulkModulusFromYoungs()` - K = E/(3(1-2ν))
-
-#### Beam Bending and Deflection
-- `calculateBeamDeflectionCenterLoad()` - δ = FL³/(48EI) (simply supported)
-- `calculateCantileverDeflection()` - δ = FL³/(3EI)
-- `calculateBeamDeflectionUniformLoad()` - Distributed load deflection
-- `calculateRectangularMomentOfInertia()` - I = bh³/12
-- `calculateCircularMomentOfInertia()` - I = πd⁴/64
-- `calculateBendingStress()` - σ = My/I
-
-#### Elastic Energy
-- `calculateElasticEnergy()` - U = ½k(ΔL)²
-- `calculateEnergyDensity()` - u = σ²/(2E)
-
-### Surface Tension (`surface_tension.hpp`)
-
-Surface phenomena in liquids:
-
-#### Surface Tension Fundamentals
-- `calculateSurfaceTensionForce()` - F = γL
-- `calculateSurfaceEnergy()` - E = γA
-- `calculateWorkInStretching()` - Work to stretch liquid film
-
-#### Pressure Due to Curved Surfaces
-- `calculateDropletPressure()` - ΔP = 2γ/r (spherical droplet)
-- `calculateBubblePressure()` - ΔP = 4γ/r (soap bubble, two surfaces)
-- `calculateCylindricalPressure()` - ΔP = γ/r (liquid jet)
-- `calculateYoungLaplacePressure()` - ΔP = γ(1/R₁ + 1/R₂)
-
-#### Capillary Rise
-- `calculateCapillaryRise()` - h = 2γcosθ/(ρgr)
-- `calculateWaterCapillaryRise()` - Rise in glass tube (perfect wetting)
-- `calculateMercuryCapillaryDepression()` - Depression in glass tube
-- `calculateTubeRadiusFromRise()` - Determine radius from observed rise
-- `calculateCapillaryRiseBetweenPlates()` - Rise between parallel plates
-
-#### Meniscus and Contact Angle
-- `calculateCapillaryLength()` - a = √(γ/(ρg))
-- `calculateContactAngle()` - Young's equation cosθ = (γ_SV - γ_SL)/γ_LV
-
-#### Droplet and Bubble Dynamics
-- `calculateDropletRadius()` - Radius from volume
-- `calculateDropletSplittingEnergy()` - Energy to split droplet
-- `calculateSplitDropletRadius()` - Radius after splitting
-- `calculateBubblePressureDifference()` - ΔP between connected bubbles
-
-#### Applications
-- `calculateMaxSupportedWeight()` - Force supported by surface tension
-- `calculateRingDetachmentForce()` - Force to pull ring from surface
-- `calculateSurfaceTensionFromRise()` - Experimental determination
-
-### Wave Mechanics (`wave_mechanics.hpp`)
-
-Wave phenomena, sound, and vibrations:
-
-#### Wave Fundamentals
-- `calculateWavelength()` - λ = v/f
-- `calculateFrequency()` - f = v/λ
-- `calculateWaveVelocity()` - v = fλ
-- `calculateAngularFrequency()` - ω = 2πf
-- `calculateWaveNumber()` - k = 2π/λ
-- `calculatePeriod()` - T = 1/f
-
-#### Velocity of Sound
-- `newtonsFormulaSound()` - v = √(E/ρ) (for solids/liquids)
-- `laplaceFormulaSound()` - v = √(γP/ρ) (for gases, Laplace correction)
-- `soundVelocityFromTemperature()` - v = √(γRT/M)
-- `soundVelocityInAir()` - v ≈ 331.3 + 0.606T (empirical)
-- `soundVelocityInSolid()` / `soundVelocityInLiquid()` - Speed in different media
-
-#### Sound Intensity
-- `calculateSoundIntensity()` - I = P/A
-- `calculateSoundLevelDecibels()` - β = 10log₁₀(I/I₀)
-- `intensityFromDecibels()` - Convert dB to W/m²
-- `intensityFromPressure()` - I = ΔP²/(2ρv)
-- `sphericalWaveIntensity()` - I = P/(4πr²)
-
-#### Doppler Effect
-- `dopplerFrequency()` - f' = f(v + v_o)/(v - v_s)
-- `dopplerSourceApproaching()` / `dopplerSourceReceding()` - Moving source
-- `dopplerObserverApproaching()` - Moving observer
-- `calculateBeatFrequency()` - f_beat = |f₁ - f₂|
-
-#### String Vibrations
-- `stringWaveVelocity()` - v = √(T/μ)
-- `calculateLinearDensity()` - μ = m/L
-- `stringFundamentalFrequency()` - f₁ = v/(2L)
-- `stringHarmonicFrequency()` - f_n = nf₁
-- `stringHarmonicWavelength()` - λ_n = 2L/n
-- `calculateRequiredTension()` - Tension for desired frequency
-
-#### Standing Waves and Resonance
-- `openTubeResonance()` - f_n = nv/(2L) (both ends open)
-- `closedTubeResonance()` - f_n = nv/(4L) (one end closed, n odd)
-
-#### Wave Energy
-- `waveEnergyDensity()` - u = ½ρω²A²
-- `wavePower()` - Power transmitted by wave
-
-### Thermal Expansion (`thermal_expansion.hpp`)
-
-Thermal expansion of solids and liquids:
-
-#### Linear Expansion
-- `calculateLengthChange()` - ΔL = αL₀ΔT
-- `calculateFinalLength()` - L = L₀(1 + αΔT)
-- `calculateLinearExpansionCoefficient()` - α = ΔL/(L₀ΔT)
-
-#### Area Expansion
-- `calculateAreaChange()` - ΔA = 2αA₀ΔT
-- `calculateFinalArea()` - A = A₀(1 + 2αΔT)
-
-#### Volume Expansion
-- `calculateVolumeChange()` - ΔV = βV₀ΔT
-- `calculateFinalVolume()` - V = V₀(1 + βΔT)
-- `volumeFromLinearCoefficient()` - β ≈ 3α
-- `calculateDensityAfterExpansion()` - ρ = ρ₀/(1 + βΔT)
-
-#### Practical Applications
-- `calculateThermalStress()` - σ = EαΔT (constrained expansion)
-- `calculateExpansionGap()` - Required gap for thermal expansion joint
-- `calculateLiquidOverflow()` - Overflow from heated liquid in container
-- `bimetallicStripCurvature()` - Radius of curvature for bimetallic strip
-
-### Calorimetry (`calorimetry.hpp`)
-
-Heat transfer and temperature change:
-
-#### Heat Capacity
-- `calculateHeat()` - Q = mcΔT
-- `calculateSpecificHeat()` - c = Q/(mΔT)
-- `calculateTemperatureChange()` - ΔT = Q/(mc)
-
-#### Method of Mixtures
-- `equilibriumTemperature()` - Final temperature when mixing substances
-- `calculateHotMass()` / `calculateColdMass()` - Unknown mass from equilibrium
-- `calculateUnknownSpecificHeat()` - Specific heat from mixture
-
-#### Phase Changes
-- `calculateLatentHeat()` - Q = mL
-- `calculateLatentHeatCoefficient()` - L = Q/m
-- `totalHeatWithPhaseChange()` - Q for heating + phase change + heating
-
-#### Electrical Calorimeter
-- `electricalHeatGenerated()` - Q = VIt
-- `waterEquivalent()` - Effective water mass for calorimeter
-- `calculateCalorimeterHeatCapacity()` - Heat capacity from electrical heating
-
-### Heat Transfer (`heat_transfer.hpp`)
-
-Conduction, radiation, and thermodynamic engines:
-
-#### Thermal Conduction
-- `conductionHeatRate()` - Q/t = kA(T₁-T₂)/d (Fourier's law)
-- `thermalResistance()` - R = d/(kA)
-- `temperatureDifference()` - ΔT from heat flow
-
-#### Radiation
-- `stefanBoltzmannRadiation()` - P = εσAT⁴
-- `netRadiationExchange()` - Heat exchange between two surfaces
-- `wiensDisplacementLaw()` - λmax = b/T
-- `planckRadiation()` - Planck's blackbody radiation formula
-- `photonEnergy()` - E = hf
-
-#### Heat Engines
-- `carnotEfficiency()` - η = 1 - Tc/Th
-- `heatEngineWork()` - W = Q_h - Q_c
-- `heatEnginePower()` - P = W/t
-- `refrigeratorCOP()` - COP = Q_c/W
-- `heatPumpCOP()` - COP = Q_h/W
-
-#### Cooling
-- `newtonCoolingRate()` - dT/dt = -k(T - T∞)
-- `temperatureAfterCooling()` - T(t) = T∞ + (T₀ - T∞)e^(-t/τ)
-
-### Electrostatics (`electrostatics.hpp`)
-
-Electric forces, fields, and capacitance:
-
-#### Coulomb's Law
-- `coulombForce()` - F = k|q₁q₂|/r²
-- `electricField()` - E = kq/r²
-- `electricFieldFromForce()` - E = F/q
-
-#### Electric Potential
-- `electricPotential()` - V = kq/r
-- `potentialEnergy()` - U = kq₁q₂/r
-- `workDoneByElectricField()` - W = qΔV
-
-#### Capacitance
-- `parallelPlateCapacitance()` - C = ε₀A/d
-- `sphericalCapacitance()` - C = 4πε₀R
-- `concentricSpheresCapacitance()` - C for spherical capacitor
-- `cylindricalCapacitance()` - C for cylindrical capacitor
-- `capacitorEnergy()` - U = ½CV²
-- `seriesCapacitance()` / `parallelCapacitance()` - Combinations
-
-### Magnetism (`magnetism.hpp`)
-
-Magnetic fields, forces, and moments:
-
-#### Magnetic Forces
-- `magneticForceOnCharge()` - F = qvB sin(θ) (Lorentz force)
-- `cyclotronRadius()` - r = mv/(qB)
-- `forceOnWire()` - F = BIL sin(θ)
-- `forceBetweenWires()` - F/L = μ₀I₁I₂/(2πd)
-
-#### Magnetic Fields
-- `fieldFromStraightWire()` - B = μ₀I/(2πr)
-- `fieldFromCircularLoop()` - B = μ₀I/(2R) (at center)
-- `fieldInsideSolenoid()` - B = μ₀nI
-
-#### Magnetic Moments
-- `magneticMoment()` - μ = IA
-- `torqueOnDipole()` - τ = μB sin(θ)
-- `forceBetweenPoles()` - F = (μ₀/4π)(m₁m₂/r²)
-- `magnetArmatureForce()` - F = B²A/(2μ₀)
-- `horizontalFieldGaussMethod()` - BH = 4π²I/(MT²)
-
-### Electric Circuits (`electric_circuits.hpp`)
-
-Circuit analysis and power calculations:
-
-#### Ohm's Law
-- `ohmsLawVoltage()` / `ohmsLawCurrent()` / `ohmsLawResistance()` - V = IR
-
-#### Resistance
-- `wireResistance()` - R = ρL/A
-- `resistanceAtTemperature()` - R_T = R₀(1 + α(T - T₀))
-- `seriesResistance()` / `parallelResistance()` - Combinations
-
-#### Power and Energy
-- `electricalPower()` - P = VI
-- `powerFromCurrent()` - P = I²R
-- `powerFromVoltage()` - P = V²/R
-- `jouleHeating()` - E = I²Rt
-
-#### Cells and Batteries
-- `terminalVoltage()` - V = ε - Ir
-- `cellCurrent()` - I = ε/(R + r)
-- `identicalCellsSeriesCurrent()` / `identicalCellsParallelCurrent()` - Cell arrangements
-- `maximumPowerTransfer()` - P_max = ε²/(4r)
-
-### Electromagnetic Induction (`electromagnetic_induction.hpp`)
-
-Induced EMF, motors, and generators:
-
-#### Faraday's Law
-- `inducedEMF()` - ε = -N(dΦ/dt)
-- `magneticFlux()` - Φ = BA cos(θ)
-- `motionalEMF()` - ε = BLv
-
-#### Self-Inductance
-- `solenoidInductance()` - L = μ₀n²Al
-- `backEMF()` - ε = -L(dI/dt)
-- `inductorEnergy()` - U = ½LI²
-- `rlTimeConstant()` - τ = L/R
-
-#### Motors and Generators
-- `generatorEMF()` - ε = NBAω
-- `motorMechanicalPower()` - P = ε_back × I
-- `motorEfficiency()` - η = ε_back/V
-- `motorTorque()` - τ = P/ω
-
-#### Transformers
-- `transformerSecondaryVoltage()` - V_s/V_p = N_s/N_p
-- `transformerSecondaryCurrent()` - I_s/I_p = N_p/N_s
-- `transformerEfficiency()` - η = P_out/P_in
-
-### Electromagnetic Waves (`electromagnetic_waves.hpp`)
-
-EM wave propagation and energy:
-
-#### Wave Speed
-- `speedOfLight()` - c = 1/√(μ₀ε₀)
-- `speedInMedium()` - v = c/n
-- `refractiveIndex()` - n = √(ε_r × μ_r)
-
-#### Wavelength and Frequency
-- `wavelengthFromFrequency()` - λ = c/f
-- `photonEnergy()` - E = hf
-- `photonMomentum()` - p = h/λ
-
-#### Energy and Intensity
-- `waveIntensity()` - I = ½cε₀E₀²
-- `poyntingVector()` - S = EB/μ₀
-- `radiationPressureAbsorption()` - P = I/c
-- `radiationPressureReflection()` - P = 2I/c
-
-#### EM Spectrum
-- `isVisible()` - Check if wavelength is visible light
-- `spectrumRegion()` - Determine region (gamma, X-ray, UV, visible, IR, microwave, radio)
-
-### Optics (`optics.hpp`)
-
-Refraction, lenses, and optical instruments:
-
-#### Refraction
-- `snellsLaw()` - n₁ sin(θ₁) = n₂ sin(θ₂)
-- `criticalAngle()` - θ_c = arcsin(n₂/n₁)
-- `brewstersAngle()` - tan(θ_B) = n₂/n₁
-
-#### Lenses
-- `lensFormula()` - 1/f = 1/v - 1/u
-- `lensmakersEquation()` - 1/f = (n-1)(1/R₁ - 1/R₂)
-- `linearMagnification()` - m = v/u
-- `lensPower()` - P = 1/f (diopters)
-
-#### Mirrors
-- `mirrorFocalLength()` - f = R/2
-- `mirrorFormula()` - 1/f = 1/v + 1/u
-
-#### Optical Instruments
-- `simpleMicroscopeMagnification()` - M = 1 + D/f
-- `telescopeMagnification()` - M = f_o/f_e
-- `telescopeResolvingPower()` - R = D/(1.22λ)
-
-### Advanced Mechanics (`advanced_mechanics.hpp`)
-
-Orbital dynamics and variational mechanics:
-
-#### Polar Coordinates
-- `cartesianToPolar()` / `polarToCartesian()` - Coordinate conversions
-- `radialAcceleration()` - a_r = d²r/dt² - r(dθ/dt)²
-- `tangentialAcceleration()` - a_θ = r(d²θ/dt²) + 2(dr/dt)(dθ/dt)
-
-#### Conservative Forces
-- `gravitationalPotential()` - U = -GMm/r
-- `escapeVelocity()` - v_esc = √(2GM/r)
-- `mechanicalEnergy()` - E = K + U
-
-#### Orbital Mechanics
-- `circularOrbitVelocity()` - v = √(GM/r)
-- `circularOrbitPeriod()` - T = 2π√(r³/GM)
-- `visVivaEquation()` - v² = GM(2/r - 1/a)
-
-#### Kepler's Laws
-- `keplersThirdLaw()` - T² = (4π²/GM)a³
-- `eccentricity()` - e = (r_a - r_p)/(r_a + r_p)
-- `orbitalRadius()` - r = a(1-e²)/(1+e cos(ν))
-
-#### Virial Theorem
-- `virialTheoremKinetic()` - ⟨K⟩ = -⟨U⟩/2
-- `verifyVirialTheorem()` - Check 2K + U ≈ 0
-
-#### Variational Mechanics
-- `lagrangian()` - L = T - V
-- `hamiltonian()` - H = T + V
-- `canonicalMomentum()` - p = ∂L/∂v
-
-## Units
-
-All functions use SI units:
-- **Mass**: kilograms (kg)
-- **Distance/Displacement**: meters (m)
-- **Time**: seconds (s)
-- **Velocity**: meters per second (m/s)
-- **Acceleration**: meters per second squared (m/s²)
-- **Force**: Newtons (N)
-- **Work/Energy**: Joules (J)
-- **Power**: Watts (W)
+---
 
 ## Building and Running
 
 ### Prerequisites
 - C++ compiler with C++11 support or later (g++, clang++, MSVC)
-- Make (optional, for using Makefile)
-- CMake 3.10+ (optional, for using CMake)
+- Make (optional)
+- CMake 3.10+ (optional)
 
 ### Option 1: Direct Compilation
 
 ```bash
-# Build basic demo
-g++ -std=c++11 -I./include examples/main.cpp -o physics_demo
-./physics_demo
-
-# Build advanced demo
-g++ -std=c++11 -I./include examples/advanced_demo.cpp -o advanced_demo
-./advanced_demo
-
-# Build scientific demo
-g++ -std=c++11 -I./include examples/scientific_demo.cpp -o scientific_demo
-./scientific_demo
+# Compile with math and physics headers
+g++ -std=c++11 -I./include your_program.cpp -o program
+./program
 ```
 
 ### Option 2: Using Make
 
 ```bash
-# Build all demos
 make
-
-# Run basic demo (Newton's Laws, Kinematics, Dynamics)
 make run
-
-# Run advanced demo (Units, Inclined Plane, Energy, Projectiles, Orbits, Gravitation)
-make run-advanced
-
-# Run scientific demo (Thermodynamics, Fluids, Elasticity, Surface Tension, Waves)
-make run-scientific
-
-# Run all demos sequentially
-make run-all
 ```
 
 ### Option 3: Using CMake
 
 ```bash
-mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 make
-
-# Run basic demo
-./physics_demo
-
-# Run advanced demo
-./advanced_demo
-
-# Run scientific demo
-./scientific_demo
 ```
+
+---
 
 ## Usage Examples
 
-### Example 1: Newton's Second Law
+### Mathematics Examples
 
+#### Calculus - Mean Value Theorem
+```cpp
+#include "maths/calculus/theorems.hpp"
+
+auto f = [](double x) { return x * x; };  // f(x) = x²
+auto df = [](double x) { return 2.0 * x; }; // f'(x) = 2x
+
+double c = maths::calculus::MeanValueTheorem::findMVTPoint(f, df, 0.0, 2.0);
+// Result: c = 1.0, where f'(c) = average slope
+```
+
+#### Linear Algebra - Vector Operations
+```cpp
+#include "maths/linear_algebra/vectors.hpp"
+
+using namespace maths::linear_algebra;
+
+Vector v({3.0, 4.0});
+Vector w({1.0, 2.0});
+
+double dot_product = v.dot(w);  // Result: 11.0
+double v_norm = v.norm();        // Result: 5.0
+Vector v_hat = v.normalize();    // Unit vector
+
+Vector cross = CrossProduct::compute(v, w);  // 3D only
+```
+
+#### Fourier Transform - FFT
+```cpp
+#include "maths/transforms/fourier.hpp"
+
+std::vector<std::complex<double>> signal = {...};
+auto spectrum = maths::transforms::FastFourierTransform::compute(signal);
+auto magnitude = maths::transforms::DiscreteFourierTransform::magnitudeSpectrum(spectrum);
+```
+
+### Physics Examples
+
+#### Newton's Second Law
 ```cpp
 #include "physics/newton_laws.hpp"
 
-// Calculate force required to accelerate 10kg object at 5 m/s²
-double mass = 10.0;           // kg
-double acceleration = 5.0;    // m/s²
-double force = physics::newton::calculateForce(mass, acceleration);
-// Result: 50.0 N
+double force = physics::newton::calculateForce(10.0, 5.0);
+// F = ma = 10 kg × 5 m/s² = 50 N
 ```
 
-### Example 2: Kinematics - Free Fall
-
+#### Projectile Motion
 ```cpp
-#include "physics/kinematics.hpp"
+#include "physics/projectile.hpp"
 
-// Object dropped from rest, falling for 3 seconds
-double initialVelocity = 0.0;     // m/s
-double gravity = 9.81;             // m/s²
-double time = 3.0;                 // s
-
-double finalVelocity = physics::kinematics::calculateFinalVelocity(
-    initialVelocity, gravity, time);
-// Result: 29.43 m/s
-
-double distance = physics::kinematics::calculateDisplacement(
-    initialVelocity, gravity, time);
-// Result: 44.145 m
+double range = physics::projectile::calculateRange(20.0, 45.0 * M_PI/180.0, 9.81);
+// 45° gives maximum range
 ```
 
-### Example 3: Dynamics - Braking Force
-
-```cpp
-#include "physics/dynamics.hpp"
-
-// Calculate braking force to stop 1500kg car in 40m
-double mass = 1500.0;           // kg
-double speed = 25.0;            // m/s (90 km/h)
-double distance = 40.0;         // m
-
-double brakingForce = physics::dynamics::calculateBrakingForce(
-    mass, speed, distance);
-// Result: -11718.75 N (negative = opposite to motion)
-```
-
-### Example 4: Motion with Friction
-
-```cpp
-#include "physics/dynamics.hpp"
-
-// Box pushed across floor with friction
-double mass = 20.0;                  // kg
-double appliedForce = 100.0;         // N
-double frictionCoefficient = 0.25;   // dimensionless
-
-double acceleration = physics::dynamics::calculateAccelerationWithFriction(
-    mass, appliedForce, frictionCoefficient);
-// Result: 2.5475 m/s²
-```
-
-## Error Handling
-
-All functions validate input parameters and throw `std::invalid_argument` exceptions for invalid inputs:
-- Mass must be greater than zero
-- Time must be non-negative
-- Certain denominators must be non-zero
-- Physical constraints (e.g., v² cannot be negative in real solutions)
-
-Example:
-```cpp
-try {
-    double force = physics::newton::calculateForce(-10.0, 5.0);
-} catch (const std::invalid_argument& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-    // Output: "Error: Mass must be greater than zero"
-}
-```
-
-## Function Documentation
-
-All functions include detailed Doxygen-style comments:
-- **@brief**: Brief description of what the function does
-- **@param**: Description of each parameter with units
-- **@return**: Description of return value with units
-- **@throws**: Exceptions that may be thrown
-
-Example:
-```cpp
-/**
- * @brief Calculate force using Newton's Second Law: F = ma
- *
- * @param mass Mass of the object (in kilograms, must be > 0)
- * @param acceleration Acceleration of the object (in m/s²)
- * @return Force acting on the object (in Newtons)
- * @throws std::invalid_argument if mass <= 0
- */
-inline double calculateForce(double mass, double acceleration);
-```
+---
 
 ## Design Principles
 
-1. **Header-Only Library**: All functions are inline in headers for easy integration
-2. **Namespace Organization**: Functions organized in logical namespaces:
-   - `physics::newton` - Newton's laws
-   - `physics::kinematics` - Motion equations
-   - `physics::dynamics` - Force and motion
-   - `physics::units` - Unit conversions
-   - `physics::inclined_plane` - Inclined plane mechanics
-   - `physics::energy_momentum` - Energy and momentum
-   - `physics::projectile` - Projectile motion
-   - `physics::circular_motion` - Circular motion
-   - `physics::harmonic_motion` - Simple harmonic motion
-   - `physics::rotational_dynamics` - Rotational mechanics
-   - `physics::orbital` - Orbital mechanics
-   - `physics::gravitation` - Universal gravitation
-   - `physics::thermodynamics` - Gas laws and thermodynamics
-   - `physics::fluid_mechanics` - Fluid dynamics
-   - `physics::elasticity` - Material deformation
-   - `physics::surface_tension` - Surface phenomena
-   - `physics::wave_mechanics` - Waves and acoustics
-   - `physics::thermal_expansion` - Thermal expansion
-   - `physics::calorimetry` - Heat and calorimetry
-   - `physics::heat_transfer` - Heat transfer and engines
-   - `physics::electrostatics` - Electric forces and fields
-   - `physics::magnetism` - Magnetic forces and fields
-   - `physics::electric_circuits` - Circuit analysis
-   - `physics::electromagnetic_induction` - Induction and motors
-   - `physics::electromagnetic_waves` - EM waves
-   - `physics::optics` - Optics and instruments
-   - `physics::advanced_mechanics` - Advanced mechanics and orbits
-   - `physics::oscillations` - Oscillations and resonance
-   - `physics::maxwell` - Maxwell's equations and EM fields
-   - `physics::special_relativity` - Special relativity
-   - `physics::quantum_basics` - Quantum mechanics basics
-3. **Comprehensive Documentation**: Every function fully documented with units and constraints
-4. **Error Handling**: Input validation with meaningful exception messages
-5. **SI Units**: Consistent use of SI units throughout (with conversion utilities)
-6. **Pure Functions**: No side effects, easy to test and reason about
+1. **Header-Only**: All implementations in headers for easy integration
+2. **Namespace Organization**: `maths::` and `physics::` with subnamespaces
+3. **Comprehensive Documentation**: Doxygen-style comments
+4. **Error Handling**: Input validation with exceptions
+5. **SI Units**: Consistent unit system (physics)
+6. **Pure Functions**: No side effects
+7. **Modern C++**: C++11/14/17 features where appropriate
 
-## Current Features
-
-This showcase currently implements:
-
-**Basic Mechanics:**
-- ✅ Newton's Three Laws of Motion
-- ✅ Kinematics (constant acceleration)
-- ✅ Dynamics (force causing motion)
-- ✅ Unit Conversions (Dyne-Gram relationship, CGS, SI, Imperial)
-
-**Motion and Energy:**
-- ✅ Inclined Plane Mechanics (velocity at foot)
-- ✅ Energy and Momentum (KE/momentum compared)
-- ✅ 2D Projectile Motion
-
-**Circular and Oscillatory Motion:**
-- ✅ Uniform Circular Motion (centripetal force expressions)
-- ✅ Simple Harmonic Motion (SHM, pendulums, vibrating masses)
-
-**Rotational Mechanics:**
-- ✅ Rotational Dynamics (torque, angular momentum, moment of inertia)
-
-**Gravitation:**
-- ✅ Orbital Mechanics (Earth satellites)
-- ✅ Universal Gravitation (Apple-Moon connection, Kepler's Laws)
-
-**Thermodynamics:**
-- ✅ Gas Laws (Boyle's, Charles's, Gay-Lussac's, Ideal Gas Law)
-- ✅ Pressure Measurements (barometer, altitude)
-- ✅ Kinetic Theory (RMS velocity, molecular KE)
-- ✅ Elasticity of Gases
-
-**Fluid Mechanics:**
-- ✅ Fluid Statics (pressure at depth)
-- ✅ Continuity Equation and Flow Rates
-- ✅ Bernoulli's Equation
-- ✅ Torricelli's Theorem (efflux velocity)
-- ✅ Pipe Friction (Darcy-Weisbach)
-
-**Elasticity:**
-- ✅ Young's Modulus (stress-strain)
-- ✅ Bulk Modulus (volume elasticity)
-- ✅ Shear Modulus and Poisson's Ratio
-- ✅ Beam Bending and Deflection
-
-**Surface Tension:**
-- ✅ Capillary Rise and Depression
-- ✅ Droplet and Bubble Pressure
-- ✅ Young-Laplace Equation
-- ✅ Surface Energy
-
-**Wave Mechanics:**
-- ✅ Sound Waves (Newton's formula, Laplace correction)
-- ✅ Sound Intensity and Decibels
-- ✅ Doppler Effect
-- ✅ String Vibrations and Harmonics
-- ✅ Standing Waves and Resonance
-
-**Thermal Physics:**
-- ✅ Thermal Expansion (linear, volume, area, coefficients)
-- ✅ Calorimetry (heat capacity, method of mixtures, phase changes)
-- ✅ Heat Transfer (conduction, radiation, heat engines, Carnot cycle)
-- ✅ Blackbody Radiation (Stefan-Boltzmann, Wien's law, Planck's formula)
-
-**Electricity and Magnetism:**
-- ✅ Electrostatics (Coulomb's law, electric fields, potential, capacitance)
-- ✅ Magnetism (magnetic forces, fields, moments, Gauss method)
-- ✅ Electric Circuits (Ohm's law, resistance, power, cell arrangements)
-- ✅ Electromagnetic Induction (Faraday's law, motors, generators, transformers)
-- ✅ Electromagnetic Waves (wave propagation, energy, radiation pressure)
-
-**Optics:**
-- ✅ Refraction (Snell's law, critical angle, Brewster's law)
-- ✅ Lenses (thin lens equation, lensmaker's equation, magnification)
-- ✅ Mirrors (focal length, magnification)
-- ✅ Optical Instruments (microscopes, telescopes, resolving power)
-
-**Advanced Topics:**
-- ✅ Polar Coordinates (conversions, accelerations)
-- ✅ Orbital Mechanics (Kepler's laws, vis-viva equation, eccentricity)
-- ✅ Conservative Force Fields (potential energy, escape velocity)
-- ✅ Virial Theorem (energy relationships in bound systems)
-- ✅ Variational Mechanics (Lagrangian, Hamiltonian, action principle)
-
-**Advanced Physics:**
-- ✅ Oscillations (damped, forced, coupled oscillators, RLC circuits, quality factor)
-- ✅ Maxwell's Equations (Gauss, Faraday, Ampère-Maxwell, Poynting vector)
-- ✅ Special Relativity (Lorentz factor, time dilation, relativistic energy/momentum)
-- ✅ Quantum Basics (de Broglie, Compton, uncertainty principle, Bohr model, tunneling)
-
-## Future Extensions
-
-This showcase can be further extended with:
-- 3D motion with full vector support
-- Non-uniform circular motion
-- Quantum mechanics (wavefunctions, operators, uncertainty principle)
-- Special relativity (Lorentz transformations, relativistic energy)
-- Advanced quantum topics (perturbation theory, scattering)
-- Statistical mechanics (partition functions, ensembles)
-- Fluid dynamics (Navier-Stokes equations)
-- General relativity basics
+---
 
 ## License
 
 This project is licensed under the terms specified in the LICENSE file.
 
-## Contributing
-
-When adding new physics functions:
-1. Follow the existing documentation style
-2. Include parameter descriptions with units
-3. Add input validation with appropriate exceptions
-4. Use SI units consistently
-5. Add usage examples to the main.cpp
-6. Update this README with new functionality
+---
 
 ## References
 
-The physics equations implemented are based on standard classical mechanics:
-- Newton's Laws of Motion
-- Kinematic equations for constant acceleration
-- Dynamics combining forces and motion
-- Inclined plane mechanics
-- Energy and momentum conservation
-- Projectile motion (parabolic trajectories)
-- Uniform circular motion and centripetal force
-- Kepler's Laws of Planetary Motion
-- Universal Law of Gravitation
-- SI unit system and CGS unit system
+**Mathematics:**
+- Calculus (Stewart, Spivak)
+- Linear Algebra (Strang, Axler)
+- Probability Theory (Ross, Feller)
+- Fourier Analysis (Bracewell, Oppenheim & Schafer)
+
+**Physics:**
+- Classical Mechanics (Goldstein, Marion & Thornton)
+- Electromagnetism (Griffiths, Jackson)
+- Quantum Mechanics (Griffiths, Sakurai)
+- Particle Physics (Griffiths, Peskin & Schroeder)
+- Cosmology (Weinberg, Dodelson)
+
+---
+
+## Statistics
+
+- **Total Files**: 60+ header files
+- **Total Lines**: ~31,000+ lines of code
+- **Mathematics Modules**: 7 modules
+- **Physics Modules**: 31 basic + 4 advanced categories
+- **Zero Dependencies**: Header-only, no external libraries required
+
+---
+
+*This showcase demonstrates both the mathematical foundations and physical applications, providing a comprehensive toolkit for scientific computing in C++.*
