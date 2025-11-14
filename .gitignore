@@ -12,6 +12,7 @@ finance_demo
 calculus_demo
 nonsmooth_demo
 nonsmooth_algorithms_demo
+advanced_subdifferentials_demo
 
 # CMake
 build/
