@@ -13,6 +13,7 @@
  * 8. Plasma Physics (Transport, Collision-Radiative)
  * 9. Advanced Quantum (Clebsch-Gordan, Group Theory)
  * 10. Quantum Field Theory (Interaction Picture, Renormalization)
+ * 11. Fluid Dynamics (Navier-Stokes, Boundary Layer, Turbulence, Compressible)
  *
  * Compile with:
  *   g++ -std=c++17 -O3 -I./include -I/usr/include/eigen3 advanced_main.cpp -o advanced_physics
@@ -32,6 +33,15 @@
 #include "physics/advanced/classical/hamiltonian.hpp"
 #include "physics/advanced/classical/phase_space.hpp"
 #include "physics/advanced/classical/liouville.hpp"
+
+// Category 11: Fluid Dynamics
+#include "physics/advanced/fluid_dynamics/governing_equations.hpp"
+#include "physics/advanced/fluid_dynamics/dimensionless_numbers.hpp"
+#include "physics/advanced/fluid_dynamics/flow_types.hpp"
+#include "physics/advanced/fluid_dynamics/boundary_layer.hpp"
+#include "physics/advanced/fluid_dynamics/turbulence.hpp"
+#include "physics/advanced/fluid_dynamics/vorticity.hpp"
+#include "physics/advanced/fluid_dynamics/compressible_flow.hpp"
 
 using namespace physics::advanced;
 
@@ -334,6 +344,273 @@ void demonstrate_category_1() {
 }
 
 // ============================================================================
+// CATEGORY 11: FLUID DYNAMICS
+// ============================================================================
+
+void demo_governing_equations() {
+    printSection("Governing Equations & Dimensionless Numbers");
+
+    std::cout << "1. Pipe Flow Analysis (Poiseuille Flow)\n";
+
+    // Water properties
+    double density = 1000.0;      // kg/m³
+    double dyn_viscosity = 1e-3;  // Pa·s (water at 20°C)
+
+    // Pipe parameters
+    double pipe_radius = 0.05;    // 5 cm radius
+    double pipe_length = 10.0;    // 10 m
+    double pressure_drop = 5000;  // 5 kPa
+    double velocity = 2.0;        // m/s average
+
+    // Reynolds number
+    double Re = fluid_dynamics::DimensionlessNumbers::reynoldsNumber(
+        density, velocity, 2.0 * pipe_radius, dyn_viscosity
+    );
+
+    auto regime = fluid_dynamics::DimensionlessNumbers::classifyFlowRegime(Re);
+
+    std::cout << "   Reynolds number: Re = " << Re << "\n";
+    std::cout << "   Flow regime: ";
+    switch (regime) {
+        case fluid_dynamics::DimensionlessNumbers::FlowRegime::LAMINAR:
+            std::cout << "Laminar"; break;
+        case fluid_dynamics::DimensionlessNumbers::FlowRegime::TURBULENT:
+            std::cout << "Turbulent"; break;
+        case fluid_dynamics::DimensionlessNumbers::FlowRegime::TRANSITION:
+            std::cout << "Transition"; break;
+        default: std::cout << "Stokes";
+    }
+    std::cout << "\n\n";
+
+    // Flow rate using Hagen-Poiseuille
+    double Q = fluid_dynamics::PoiseuilleFlow::flowRate(
+        pipe_radius, pressure_drop, pipe_length, dyn_viscosity
+    );
+
+    std::cout << "   Flow rate: Q = " << Q * 1000 << " L/s\n";
+    std::cout << "   Wall shear stress: τ_w = "
+              << fluid_dynamics::PoiseuilleFlow::wallShearStress(
+                     pipe_radius, pressure_drop, pipe_length) << " Pa\n\n";
+
+    std::cout << "2. Bernoulli's Equation (Venturi Meter)\n";
+
+    Eigen::Vector3d v1(5.0, 0, 0);  // 5 m/s
+    Eigen::Vector3d v2(10.0, 0, 0); // 10 m/s (throat)
+
+    double p1 = 101325.0;  // 1 atm
+    double p2 = fluid_dynamics::BernoulliEquation::pressureFromVelocity(
+        p1, density, v1, v2, 0.0, 0.0, 9.81
+    );
+
+    std::cout << "   Inlet velocity: " << v1.norm() << " m/s at " << p1/1000 << " kPa\n";
+    std::cout << "   Throat velocity: " << v2.norm() << " m/s at " << p2/1000 << " kPa\n";
+    std::cout << "   Pressure drop: Δp = " << (p1 - p2)/1000 << " kPa\n\n";
+}
+
+void demo_boundary_layer() {
+    printSection("Boundary Layer Theory");
+
+    std::cout << "Flat Plate Boundary Layer (Blasius Solution)\n\n";
+
+    double U_inf = 10.0;          // m/s freestream velocity
+    double nu = 1.5e-5;           // m²/s air kinematic viscosity
+    double x = 1.0;               // m from leading edge
+
+    // Reynolds number
+    double Re_x = U_inf * x / nu;
+
+    std::cout << "   Freestream velocity: U∞ = " << U_inf << " m/s\n";
+    std::cout << "   Position: x = " << x << " m\n";
+    std::cout << "   Reynolds number: Re_x = " << Re_x << "\n\n";
+
+    // Blasius solution
+    double delta = fluid_dynamics::BlasiusSolution::thickness(x, U_inf, nu);
+    double delta_star = fluid_dynamics::BlasiusSolution::displacementThickness(x, U_inf, nu);
+    double theta = fluid_dynamics::BlasiusSolution::momentumThickness(x, U_inf, nu);
+    double H = fluid_dynamics::BlasiusSolution::shapeFactor(delta_star, theta);
+    double Cf = fluid_dynamics::BlasiusSolution::skinFrictionCoefficient(Re_x);
+
+    std::cout << "   Boundary layer thickness: δ₉₉ = " << delta * 1000 << " mm\n";
+    std::cout << "   Displacement thickness: δ* = " << delta_star * 1000 << " mm\n";
+    std::cout << "   Momentum thickness: θ = " << theta * 1000 << " mm\n";
+    std::cout << "   Shape factor: H = δ*/θ = " << H << " (theory: 2.59)\n";
+    std::cout << "   Skin friction coefficient: Cf = " << Cf << "\n\n";
+
+    // Velocity profile at a few points
+    std::cout << "   Velocity Profile:\n";
+    std::cout << "   y/δ     u/U∞\n";
+    std::cout << "   ----    ----\n";
+
+    for (double y_frac = 0.0; y_frac <= 1.2; y_frac += 0.2) {
+        double y = y_frac * delta;
+        double eta = fluid_dynamics::BlasiusSolution::similarityVariable(y, x, U_inf, nu);
+        double u_ratio = fluid_dynamics::BlasiusSolution::velocityProfile(eta);
+        std::cout << "   " << std::fixed << std::setprecision(2) << y_frac
+                  << "      " << u_ratio << "\n";
+    }
+    std::cout << "\n";
+}
+
+void demo_turbulence() {
+    printSection("Turbulence Modeling (k-ε)");
+
+    std::cout << "k-ε Turbulence Model Parameters\n\n";
+
+    double rho = 1.2;             // kg/m³ air density
+    double k = 1.5;               // m²/s² turbulent kinetic energy
+    double epsilon = 10.0;        // m²/s³ dissipation rate
+    double nu = 1.5e-5;           // m²/s kinematic viscosity
+
+    fluid_dynamics::KEpsilonModel::Constants constants;
+
+    // Calculate derived quantities
+    double mu_t = fluid_dynamics::KEpsilonModel::eddyViscosity(rho, k, epsilon, constants);
+    double l_t = fluid_dynamics::KEpsilonModel::turbulentLengthScale(k, epsilon);
+    double tau_t = fluid_dynamics::KEpsilonModel::turbulentTimeScale(k, epsilon);
+    double eta = fluid_dynamics::KEpsilonModel::kolmogorovLengthScale(nu, epsilon);
+    double Re_t = fluid_dynamics::KEpsilonModel::turbulentReynolds(k, nu, epsilon);
+
+    std::cout << "   Turbulent kinetic energy: k = " << k << " m²/s²\n";
+    std::cout << "   Dissipation rate: ε = " << epsilon << " m²/s³\n\n";
+
+    std::cout << "   Derived Quantities:\n";
+    std::cout << "   Eddy viscosity: μ_t = " << mu_t << " Pa·s\n";
+    std::cout << "   Turbulent length scale: l_t = " << l_t << " m\n";
+    std::cout << "   Turbulent time scale: τ_t = " << tau_t << " s\n";
+    std::cout << "   Kolmogorov length scale: η = " << eta * 1e6 << " μm\n";
+    std::cout << "   Turbulent Reynolds number: Re_t = " << Re_t << "\n\n";
+
+    // Reynolds stress calculation
+    std::cout << "   Model Constants (Standard k-ε):\n";
+    std::cout << "   C_μ = " << constants.C_mu << "\n";
+    std::cout << "   C_ε1 = " << constants.C_eps1 << "\n";
+    std::cout << "   C_ε2 = " << constants.C_eps2 << "\n";
+    std::cout << "   σ_k = " << constants.sigma_k << "\n";
+    std::cout << "   σ_ε = " << constants.sigma_eps << "\n\n";
+}
+
+void demo_vorticity() {
+    printSection("Vorticity Dynamics & Circulation");
+
+    std::cout << "1. Point Vortex and Biot-Savart Law\n\n";
+
+    double circulation = 10.0;  // m²/s
+    double radius = 1.0;        // m
+
+    double u_theta = fluid_dynamics::BiotSavartLaw::velocityStraightVortex(
+        circulation, radius
+    );
+
+    std::cout << "   Circulation: Γ = " << circulation << " m²/s\n";
+    std::cout << "   Tangential velocity at r = " << radius << " m: u_θ = "
+              << u_theta << " m/s\n\n";
+
+    std::cout << "2. Vortex Ring Self-Velocity\n\n";
+
+    double ring_radius = 0.1;   // m
+    double core_radius = 0.01;  // m
+
+    double U_ring = fluid_dynamics::BiotSavartLaw::vortexRingSelfVelocity(
+        circulation, ring_radius, core_radius
+    );
+
+    std::cout << "   Ring radius: R = " << ring_radius << " m\n";
+    std::cout << "   Core radius: a = " << core_radius << " m\n";
+    std::cout << "   Translation velocity: U = " << U_ring << " m/s\n\n";
+
+    std::cout << "3. Rankine Vortex Profile\n\n";
+
+    double a = 0.05;  // m core radius
+
+    std::cout << "   r/a     u (m/s)\n";
+    std::cout << "   ----    -------\n";
+
+    for (double r_ratio = 0.0; r_ratio <= 3.0; r_ratio += 0.5) {
+        double r = r_ratio * a;
+        double u = fluid_dynamics::VortexDynamics::rankineVortex(r, a, circulation);
+        std::cout << "   " << std::fixed << std::setprecision(1) << r_ratio
+                  << "      " << std::setprecision(3) << u << "\n";
+    }
+    std::cout << "\n";
+}
+
+void demo_compressible_flow() {
+    printSection("Compressible Flow (Shocks & Expansions)");
+
+    double gamma = 1.4;  // Air
+
+    std::cout << "1. Normal Shock Relations\n\n";
+
+    double M1 = 2.0;  // Supersonic upstream Mach
+
+    double M2 = fluid_dynamics::NormalShock::downstreamMach(M1, gamma);
+    double p_ratio = fluid_dynamics::NormalShock::pressureRatio(M1, gamma);
+    double rho_ratio = fluid_dynamics::NormalShock::densityRatio(M1, gamma);
+    double T_ratio = fluid_dynamics::NormalShock::temperatureRatio(M1, gamma);
+    double p0_ratio = fluid_dynamics::NormalShock::stagnationPressureRatio(M1, gamma);
+
+    std::cout << "   Upstream Mach: M₁ = " << M1 << "\n";
+    std::cout << "   Downstream Mach: M₂ = " << M2 << "\n\n";
+
+    std::cout << "   Pressure ratio: p₂/p₁ = " << p_ratio << "\n";
+    std::cout << "   Density ratio: ρ₂/ρ₁ = " << rho_ratio << "\n";
+    std::cout << "   Temperature ratio: T₂/T₁ = " << T_ratio << "\n";
+    std::cout << "   Stagnation pressure ratio: p₀₂/p₀₁ = " << p0_ratio << "\n\n";
+
+    std::cout << "2. Isentropic Flow (Stagnation Properties)\n\n";
+
+    double T_static = 300.0;  // K
+    double p_static = 101325.0;  // Pa
+    double M = 0.8;
+
+    double T0 = fluid_dynamics::StagnationProperties::temperature(T_static, M, gamma);
+    double p0 = fluid_dynamics::StagnationProperties::pressure(p_static, M, gamma);
+
+    std::cout << "   Static conditions: T = " << T_static << " K, p = " << p_static/1000 << " kPa\n";
+    std::cout << "   Mach number: M = " << M << "\n";
+    std::cout << "   Stagnation temperature: T₀ = " << T0 << " K\n";
+    std::cout << "   Stagnation pressure: p₀ = " << p0/1000 << " kPa\n\n";
+
+    std::cout << "3. Prandtl-Meyer Expansion\n\n";
+
+    double M_initial = 2.0;
+    double deflection_angle = 10.0 * M_PI / 180.0;  // 10 degrees
+
+    double nu1 = fluid_dynamics::PrandtlMeyerExpansion::prandtlMeyerAngle(M_initial, gamma);
+    double M_final = fluid_dynamics::PrandtlMeyerExpansion::downstreamMach(
+        M_initial, deflection_angle, gamma
+    );
+
+    std::cout << "   Initial Mach: M₁ = " << M_initial << "\n";
+    std::cout << "   Deflection angle: θ = " << deflection_angle * 180.0 / M_PI << "°\n";
+    std::cout << "   Final Mach: M₂ = " << M_final << "\n";
+    std::cout << "   Prandtl-Meyer angle: ν₁ = " << nu1 * 180.0 / M_PI << "°\n\n";
+}
+
+void demonstrate_category_11() {
+    printHeader("Fluid Dynamics", 11);
+
+    std::cout << "Comprehensive CFD demonstration covering:\n";
+    std::cout << "  • Governing equations (Navier-Stokes, Euler, Bernoulli)\n";
+    std::cout << "  • Dimensionless numbers (Reynolds, Mach, Prandtl, etc.)\n";
+    std::cout << "  • Flow types (Poiseuille, Couette, Stokes, Potential)\n";
+    std::cout << "  • Boundary layer theory (Blasius solution)\n";
+    std::cout << "  • Turbulence modeling (k-ε, RANS)\n";
+    std::cout << "  • Vorticity dynamics (circulation, Biot-Savart)\n";
+    std::cout << "  • Compressible flow (shocks, expansions)\n\n";
+
+    demo_governing_equations();
+    demo_boundary_layer();
+    demo_turbulence();
+    demo_vorticity();
+    demo_compressible_flow();
+
+    std::cout << "\n" << std::string(70, '=') << "\n";
+    std::cout << "✓ Category 11 demonstrations complete!\n";
+    std::cout << std::string(70, '=') << "\n";
+}
+
+// ============================================================================
 // OTHER CATEGORIES (STUBS)
 // ============================================================================
 
@@ -408,14 +685,14 @@ void demonstrate_category_10() {
 int main(int argc, char* argv[]) {
     std::cout << "╔════════════════════════════════════════════════════════════════╗\n";
     std::cout << "║        ADVANCED PHYSICS SHOWCASE - Comprehensive Demo         ║\n";
-    std::cout << "║                 10 Categories, 100+ Topics                    ║\n";
+    std::cout << "║                 11 Categories, 110+ Topics                    ║\n";
     std::cout << "╚════════════════════════════════════════════════════════════════╝\n\n";
 
     std::string category = (argc > 1) ? argv[1] : "1";
 
     try {
         if (category == "all") {
-            for (int i = 1; i <= 10; ++i) {
+            for (int i = 1; i <= 11; ++i) {
                 switch (i) {
                     case 1: demonstrate_category_1(); break;
                     case 2: demonstrate_category_2(); break;
@@ -427,6 +704,7 @@ int main(int argc, char* argv[]) {
                     case 8: demonstrate_category_8(); break;
                     case 9: demonstrate_category_9(); break;
                     case 10: demonstrate_category_10(); break;
+                    case 11: demonstrate_category_11(); break;
                 }
             }
         } else {
@@ -442,8 +720,9 @@ int main(int argc, char* argv[]) {
                 case 8: demonstrate_category_8(); break;
                 case 9: demonstrate_category_9(); break;
                 case 10: demonstrate_category_10(); break;
+                case 11: demonstrate_category_11(); break;
                 default:
-                    std::cerr << "Invalid category. Choose 1-10 or 'all'\n";
+                    std::cerr << "Invalid category. Choose 1-11 or 'all'\n";
                     return 1;
             }
         }
