@@ -4,7 +4,7 @@ A comprehensive C++ library implementing fundamental physics concepts with well-
 
 ## Overview
 
-This project implements core physics functionality as standalone C++ functions, categorized into seventeen comprehensive modules:
+This project implements core physics functionality as standalone C++ functions, categorized into twenty-seven comprehensive modules:
 
 ### Basic Mechanics
 1. **Newton's Laws of Motion** (`newton_laws.hpp`)
@@ -43,6 +43,22 @@ This project implements core physics functionality as standalone C++ functions, 
 ### Waves and Acoustics
 17. **Wave Mechanics** (`wave_mechanics.hpp`) - Sound, Doppler effect, string vibrations
 
+### Thermal Physics
+18. **Thermal Expansion** (`thermal_expansion.hpp`) - Linear/volume expansion, coefficients, thermal stress
+19. **Calorimetry** (`calorimetry.hpp`) - Heat capacity, method of mixtures, phase changes
+20. **Heat Transfer** (`heat_transfer.hpp`) - Conduction, radiation, heat engines, Carnot cycle
+
+### Electricity and Magnetism
+21. **Electrostatics** (`electrostatics.hpp`) - Coulomb's law, electric field, potential, capacitance
+22. **Magnetism** (`magnetism.hpp`) - Magnetic fields, forces, moments, Gauss method
+23. **Electric Circuits** (`electric_circuits.hpp`) - Ohm's law, resistance, power, cell arrangements
+24. **Electromagnetic Induction** (`electromagnetic_induction.hpp`) - Faraday's law, motors, generators, transformers
+25. **Electromagnetic Waves** (`electromagnetic_waves.hpp`) - EM wave propagation, energy, radiation pressure
+
+### Optics and Advanced Topics
+26. **Optics** (`optics.hpp`) - Refraction, lenses, mirrors, telescopes, Brewster's law
+27. **Advanced Mechanics** (`advanced_mechanics.hpp`) - Orbital dynamics, Kepler's laws, Lagrangian mechanics
+
 All functions are thoroughly documented with parameter descriptions, units, return values, and exception handling.
 
 ## Project Structure
@@ -67,7 +83,17 @@ physics_showcase/
 │       ├── fluid_mechanics.hpp     # Flow, continuity, Bernoulli, pipe friction
 │       ├── elasticity.hpp          # Young's modulus, beams, bulk modulus
 │       ├── surface_tension.hpp     # Capillary rise, droplet/bubble pressure
-│       └── wave_mechanics.hpp      # Sound, Doppler, string vibrations
+│       ├── wave_mechanics.hpp      # Sound, Doppler, string vibrations
+│       ├── thermal_expansion.hpp   # Linear/volume expansion, thermal stress
+│       ├── calorimetry.hpp         # Heat capacity, method of mixtures
+│       ├── heat_transfer.hpp       # Conduction, radiation, heat engines
+│       ├── electrostatics.hpp      # Coulomb's law, electric field, capacitance
+│       ├── magnetism.hpp           # Magnetic fields, forces, moments
+│       ├── electric_circuits.hpp   # Ohm's law, resistance, power
+│       ├── electromagnetic_induction.hpp  # Faraday's law, motors, generators
+│       ├── electromagnetic_waves.hpp      # EM waves, radiation pressure
+│       ├── optics.hpp              # Refraction, lenses, Brewster's law
+│       └── advanced_mechanics.hpp  # Orbital dynamics, Kepler, Lagrangian
 ├── examples/
 │   ├── main.cpp                 # Basic mechanics demonstrations
 │   ├── advanced_demo.cpp        # Advanced topics demonstrations
@@ -611,6 +637,257 @@ Wave phenomena, sound, and vibrations:
 - `waveEnergyDensity()` - u = ½ρω²A²
 - `wavePower()` - Power transmitted by wave
 
+### Thermal Expansion (`thermal_expansion.hpp`)
+
+Thermal expansion of solids and liquids:
+
+#### Linear Expansion
+- `calculateLengthChange()` - ΔL = αL₀ΔT
+- `calculateFinalLength()` - L = L₀(1 + αΔT)
+- `calculateLinearExpansionCoefficient()` - α = ΔL/(L₀ΔT)
+
+#### Area Expansion
+- `calculateAreaChange()` - ΔA = 2αA₀ΔT
+- `calculateFinalArea()` - A = A₀(1 + 2αΔT)
+
+#### Volume Expansion
+- `calculateVolumeChange()` - ΔV = βV₀ΔT
+- `calculateFinalVolume()` - V = V₀(1 + βΔT)
+- `volumeFromLinearCoefficient()` - β ≈ 3α
+- `calculateDensityAfterExpansion()` - ρ = ρ₀/(1 + βΔT)
+
+#### Practical Applications
+- `calculateThermalStress()` - σ = EαΔT (constrained expansion)
+- `calculateExpansionGap()` - Required gap for thermal expansion joint
+- `calculateLiquidOverflow()` - Overflow from heated liquid in container
+- `bimetallicStripCurvature()` - Radius of curvature for bimetallic strip
+
+### Calorimetry (`calorimetry.hpp`)
+
+Heat transfer and temperature change:
+
+#### Heat Capacity
+- `calculateHeat()` - Q = mcΔT
+- `calculateSpecificHeat()` - c = Q/(mΔT)
+- `calculateTemperatureChange()` - ΔT = Q/(mc)
+
+#### Method of Mixtures
+- `equilibriumTemperature()` - Final temperature when mixing substances
+- `calculateHotMass()` / `calculateColdMass()` - Unknown mass from equilibrium
+- `calculateUnknownSpecificHeat()` - Specific heat from mixture
+
+#### Phase Changes
+- `calculateLatentHeat()` - Q = mL
+- `calculateLatentHeatCoefficient()` - L = Q/m
+- `totalHeatWithPhaseChange()` - Q for heating + phase change + heating
+
+#### Electrical Calorimeter
+- `electricalHeatGenerated()` - Q = VIt
+- `waterEquivalent()` - Effective water mass for calorimeter
+- `calculateCalorimeterHeatCapacity()` - Heat capacity from electrical heating
+
+### Heat Transfer (`heat_transfer.hpp`)
+
+Conduction, radiation, and thermodynamic engines:
+
+#### Thermal Conduction
+- `conductionHeatRate()` - Q/t = kA(T₁-T₂)/d (Fourier's law)
+- `thermalResistance()` - R = d/(kA)
+- `temperatureDifference()` - ΔT from heat flow
+
+#### Radiation
+- `stefanBoltzmannRadiation()` - P = εσAT⁴
+- `netRadiationExchange()` - Heat exchange between two surfaces
+- `wiensDisplacementLaw()` - λmax = b/T
+- `planckRadiation()` - Planck's blackbody radiation formula
+- `photonEnergy()` - E = hf
+
+#### Heat Engines
+- `carnotEfficiency()` - η = 1 - Tc/Th
+- `heatEngineWork()` - W = Q_h - Q_c
+- `heatEnginePower()` - P = W/t
+- `refrigeratorCOP()` - COP = Q_c/W
+- `heatPumpCOP()` - COP = Q_h/W
+
+#### Cooling
+- `newtonCoolingRate()` - dT/dt = -k(T - T∞)
+- `temperatureAfterCooling()` - T(t) = T∞ + (T₀ - T∞)e^(-t/τ)
+
+### Electrostatics (`electrostatics.hpp`)
+
+Electric forces, fields, and capacitance:
+
+#### Coulomb's Law
+- `coulombForce()` - F = k|q₁q₂|/r²
+- `electricField()` - E = kq/r²
+- `electricFieldFromForce()` - E = F/q
+
+#### Electric Potential
+- `electricPotential()` - V = kq/r
+- `potentialEnergy()` - U = kq₁q₂/r
+- `workDoneByElectricField()` - W = qΔV
+
+#### Capacitance
+- `parallelPlateCapacitance()` - C = ε₀A/d
+- `sphericalCapacitance()` - C = 4πε₀R
+- `concentricSpheresCapacitance()` - C for spherical capacitor
+- `cylindricalCapacitance()` - C for cylindrical capacitor
+- `capacitorEnergy()` - U = ½CV²
+- `seriesCapacitance()` / `parallelCapacitance()` - Combinations
+
+### Magnetism (`magnetism.hpp`)
+
+Magnetic fields, forces, and moments:
+
+#### Magnetic Forces
+- `magneticForceOnCharge()` - F = qvB sin(θ) (Lorentz force)
+- `cyclotronRadius()` - r = mv/(qB)
+- `forceOnWire()` - F = BIL sin(θ)
+- `forceBetweenWires()` - F/L = μ₀I₁I₂/(2πd)
+
+#### Magnetic Fields
+- `fieldFromStraightWire()` - B = μ₀I/(2πr)
+- `fieldFromCircularLoop()` - B = μ₀I/(2R) (at center)
+- `fieldInsideSolenoid()` - B = μ₀nI
+
+#### Magnetic Moments
+- `magneticMoment()` - μ = IA
+- `torqueOnDipole()` - τ = μB sin(θ)
+- `forceBetweenPoles()` - F = (μ₀/4π)(m₁m₂/r²)
+- `magnetArmatureForce()` - F = B²A/(2μ₀)
+- `horizontalFieldGaussMethod()` - BH = 4π²I/(MT²)
+
+### Electric Circuits (`electric_circuits.hpp`)
+
+Circuit analysis and power calculations:
+
+#### Ohm's Law
+- `ohmsLawVoltage()` / `ohmsLawCurrent()` / `ohmsLawResistance()` - V = IR
+
+#### Resistance
+- `wireResistance()` - R = ρL/A
+- `resistanceAtTemperature()` - R_T = R₀(1 + α(T - T₀))
+- `seriesResistance()` / `parallelResistance()` - Combinations
+
+#### Power and Energy
+- `electricalPower()` - P = VI
+- `powerFromCurrent()` - P = I²R
+- `powerFromVoltage()` - P = V²/R
+- `jouleHeating()` - E = I²Rt
+
+#### Cells and Batteries
+- `terminalVoltage()` - V = ε - Ir
+- `cellCurrent()` - I = ε/(R + r)
+- `identicalCellsSeriesCurrent()` / `identicalCellsParallelCurrent()` - Cell arrangements
+- `maximumPowerTransfer()` - P_max = ε²/(4r)
+
+### Electromagnetic Induction (`electromagnetic_induction.hpp`)
+
+Induced EMF, motors, and generators:
+
+#### Faraday's Law
+- `inducedEMF()` - ε = -N(dΦ/dt)
+- `magneticFlux()` - Φ = BA cos(θ)
+- `motionalEMF()` - ε = BLv
+
+#### Self-Inductance
+- `solenoidInductance()` - L = μ₀n²Al
+- `backEMF()` - ε = -L(dI/dt)
+- `inductorEnergy()` - U = ½LI²
+- `rlTimeConstant()` - τ = L/R
+
+#### Motors and Generators
+- `generatorEMF()` - ε = NBAω
+- `motorMechanicalPower()` - P = ε_back × I
+- `motorEfficiency()` - η = ε_back/V
+- `motorTorque()` - τ = P/ω
+
+#### Transformers
+- `transformerSecondaryVoltage()` - V_s/V_p = N_s/N_p
+- `transformerSecondaryCurrent()` - I_s/I_p = N_p/N_s
+- `transformerEfficiency()` - η = P_out/P_in
+
+### Electromagnetic Waves (`electromagnetic_waves.hpp`)
+
+EM wave propagation and energy:
+
+#### Wave Speed
+- `speedOfLight()` - c = 1/√(μ₀ε₀)
+- `speedInMedium()` - v = c/n
+- `refractiveIndex()` - n = √(ε_r × μ_r)
+
+#### Wavelength and Frequency
+- `wavelengthFromFrequency()` - λ = c/f
+- `photonEnergy()` - E = hf
+- `photonMomentum()` - p = h/λ
+
+#### Energy and Intensity
+- `waveIntensity()` - I = ½cε₀E₀²
+- `poyntingVector()` - S = EB/μ₀
+- `radiationPressureAbsorption()` - P = I/c
+- `radiationPressureReflection()` - P = 2I/c
+
+#### EM Spectrum
+- `isVisible()` - Check if wavelength is visible light
+- `spectrumRegion()` - Determine region (gamma, X-ray, UV, visible, IR, microwave, radio)
+
+### Optics (`optics.hpp`)
+
+Refraction, lenses, and optical instruments:
+
+#### Refraction
+- `snellsLaw()` - n₁ sin(θ₁) = n₂ sin(θ₂)
+- `criticalAngle()` - θ_c = arcsin(n₂/n₁)
+- `brewstersAngle()` - tan(θ_B) = n₂/n₁
+
+#### Lenses
+- `lensFormula()` - 1/f = 1/v - 1/u
+- `lensmakersEquation()` - 1/f = (n-1)(1/R₁ - 1/R₂)
+- `linearMagnification()` - m = v/u
+- `lensPower()` - P = 1/f (diopters)
+
+#### Mirrors
+- `mirrorFocalLength()` - f = R/2
+- `mirrorFormula()` - 1/f = 1/v + 1/u
+
+#### Optical Instruments
+- `simpleMicroscopeMagnification()` - M = 1 + D/f
+- `telescopeMagnification()` - M = f_o/f_e
+- `telescopeResolvingPower()` - R = D/(1.22λ)
+
+### Advanced Mechanics (`advanced_mechanics.hpp`)
+
+Orbital dynamics and variational mechanics:
+
+#### Polar Coordinates
+- `cartesianToPolar()` / `polarToCartesian()` - Coordinate conversions
+- `radialAcceleration()` - a_r = d²r/dt² - r(dθ/dt)²
+- `tangentialAcceleration()` - a_θ = r(d²θ/dt²) + 2(dr/dt)(dθ/dt)
+
+#### Conservative Forces
+- `gravitationalPotential()` - U = -GMm/r
+- `escapeVelocity()` - v_esc = √(2GM/r)
+- `mechanicalEnergy()` - E = K + U
+
+#### Orbital Mechanics
+- `circularOrbitVelocity()` - v = √(GM/r)
+- `circularOrbitPeriod()` - T = 2π√(r³/GM)
+- `visVivaEquation()` - v² = GM(2/r - 1/a)
+
+#### Kepler's Laws
+- `keplersThirdLaw()` - T² = (4π²/GM)a³
+- `eccentricity()` - e = (r_a - r_p)/(r_a + r_p)
+- `orbitalRadius()` - r = a(1-e²)/(1+e cos(ν))
+
+#### Virial Theorem
+- `virialTheoremKinetic()` - ⟨K⟩ = -⟨U⟩/2
+- `verifyVirialTheorem()` - Check 2K + U ≈ 0
+
+#### Variational Mechanics
+- `lagrangian()` - L = T - V
+- `hamiltonian()` - H = T + V
+- `canonicalMomentum()` - p = ∂L/∂v
+
 ## Units
 
 All functions use SI units:
@@ -806,6 +1083,16 @@ inline double calculateForce(double mass, double acceleration);
    - `physics::elasticity` - Material deformation
    - `physics::surface_tension` - Surface phenomena
    - `physics::wave_mechanics` - Waves and acoustics
+   - `physics::thermal_expansion` - Thermal expansion
+   - `physics::calorimetry` - Heat and calorimetry
+   - `physics::heat_transfer` - Heat transfer and engines
+   - `physics::electrostatics` - Electric forces and fields
+   - `physics::magnetism` - Magnetic forces and fields
+   - `physics::electric_circuits` - Circuit analysis
+   - `physics::electromagnetic_induction` - Induction and motors
+   - `physics::electromagnetic_waves` - EM waves
+   - `physics::optics` - Optics and instruments
+   - `physics::advanced_mechanics` - Advanced mechanics and orbits
 3. **Comprehensive Documentation**: Every function fully documented with units and constraints
 4. **Error Handling**: Input validation with meaningful exception messages
 5. **SI Units**: Consistent use of SI units throughout (with conversion utilities)
@@ -869,16 +1156,43 @@ This showcase currently implements:
 - ✅ String Vibrations and Harmonics
 - ✅ Standing Waves and Resonance
 
+**Thermal Physics:**
+- ✅ Thermal Expansion (linear, volume, area, coefficients)
+- ✅ Calorimetry (heat capacity, method of mixtures, phase changes)
+- ✅ Heat Transfer (conduction, radiation, heat engines, Carnot cycle)
+- ✅ Blackbody Radiation (Stefan-Boltzmann, Wien's law, Planck's formula)
+
+**Electricity and Magnetism:**
+- ✅ Electrostatics (Coulomb's law, electric fields, potential, capacitance)
+- ✅ Magnetism (magnetic forces, fields, moments, Gauss method)
+- ✅ Electric Circuits (Ohm's law, resistance, power, cell arrangements)
+- ✅ Electromagnetic Induction (Faraday's law, motors, generators, transformers)
+- ✅ Electromagnetic Waves (wave propagation, energy, radiation pressure)
+
+**Optics:**
+- ✅ Refraction (Snell's law, critical angle, Brewster's law)
+- ✅ Lenses (thin lens equation, lensmaker's equation, magnification)
+- ✅ Mirrors (focal length, magnification)
+- ✅ Optical Instruments (microscopes, telescopes, resolving power)
+
+**Advanced Topics:**
+- ✅ Polar Coordinates (conversions, accelerations)
+- ✅ Orbital Mechanics (Kepler's laws, vis-viva equation, eccentricity)
+- ✅ Conservative Force Fields (potential energy, escape velocity)
+- ✅ Virial Theorem (energy relationships in bound systems)
+- ✅ Variational Mechanics (Lagrangian, Hamiltonian, action principle)
+
 ## Future Extensions
 
 This showcase can be further extended with:
-- 3D motion with vectors
+- 3D motion with full vector support
 - Non-uniform circular motion
-- Heat transfer and calorimetry
-- Electromagnetic waves
-- Optics (reflection, refraction, interference)
-- Relativistic mechanics
-- Quantum mechanics basics
+- Quantum mechanics (wavefunctions, operators, uncertainty principle)
+- Special relativity (Lorentz transformations, relativistic energy)
+- Advanced quantum topics (perturbation theory, scattering)
+- Statistical mechanics (partition functions, ensembles)
+- Fluid dynamics (Navier-Stokes equations)
+- General relativity basics
 
 ## License
 
