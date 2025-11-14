@@ -604,6 +604,99 @@ Advanced convex analysis including subdifferential calculus rules, convex dualit
 - Common conjugate pairs: quadratic, norm, indicator, exponential
 - `supportFunctions()` - Support functions σ_C(y), normal cones N_C(x)
 
+### Advanced Convex Calculus (`convex_calculus.hpp`)
+
+Comprehensive calculus framework for subdifferentials including fuzzy (approximate) rules, exact rules with qualifications, and mean value theorems.
+
+#### Fuzzy (Approximate) Calculus
+- `FuzzyCalculus::fuzzySum()` - ε-subdifferential sum rule, no qualifications needed
+- `fuzzyChain()` - Chain rule with error accumulation
+- `fuzzyMaximum()` - ε-active index set, approximate convex hull
+- `approximateMinimization()` - Ekeland-type rules, stopping criteria
+
+**Key Insight**: Trade exactness for generality - always valid for lsc functions
+
+#### Exact Calculus with Qualifications
+- `ExactCalculus::exactSum()` - Exact sum rule with constraint qualifications
+- `exactChain()` - Chain rule (smooth outer/inner, linear cases)
+- `exactMaximum()` - Exact maximum rule with regularity
+
+**Constraint Qualifications**: Interior domain intersection, continuity, relative interior
+
+#### Mean Value Theorems
+- `SubdifferentialMVT::convexMVT()` - MVT for convex functions
+- `nonsmoothMVT()` - Lebourg's MVT for locally Lipschitz functions
+- `approximateMVT()` - Approximate MVT inequality with ε-subdifferentials
+
+**Applications**: Convergence analysis, descent lemmas, error bounds
+
+#### Smoothness and Favorable Spaces
+- `SmoothnessNorms::smoothNorms()` - Gâteaux/Fréchet/uniformly smooth norms
+- `favorableSpaces()` - Asplund, Hilbert, reflexive spaces, finite-dimensional
+
+**Examples**: ℓᵖ norms (1<p<∞) smooth, ℓ¹/ℓ∞ non-smooth
+
+### Elementary Subdifferentials (`elementary_subdifferentials.hpp`)
+
+Multiple subdifferential concepts (Fréchet, proximal, limiting, viscosity) with hierarchy and applications to PDEs.
+
+#### Elementary (Fréchet) Subdifferential
+- `ElementarySubdifferentials::frechetSubdifferential()` - ∂_Ff definition with o(‖x-x̄‖) error
+- `proximalSubdifferential()` - ∂_Pf with quadratic lower bound
+- `limitingSubdifferential()` - ∂_Lf (Mordukhovich), sequential closure
+
+**Hierarchy**: ∂_P ⊆ ∂_F ⊆ ∂_L ⊆ ∂_C
+
+**Trade-offs**: Fréchet (local, may be empty) vs Limiting (robust, never empty in Asplund)
+
+#### Coderivatives of Set-Valued Mappings
+- `Coderivatives::frechetCoderivative()` - D*F(x̄,ȳ): Y* → X*
+- `limitingCoderivative()` - D*_LF with closure properties
+- `normalTangentCones()` - Fréchet/limiting normal cones, tangent cones
+
+**Metric Regularity Criterion**: F metrically regular ⟺ D*_LF(x̄,ȳ)(0) = {0}
+
+#### Viscosity Subdifferentials
+- `ViscositySubdifferentials::definition()` - ∂⁻f, ∂⁺f via test functions
+- `viscositySolutions()` - Viscosity solutions of Hamilton-Jacobi PDEs
+
+**Applications**: Optimal control (HJB equations), level set methods, differential games
+
+### Clarke Subdifferentials (`clarke_subdifferentials.hpp`)
+
+Clarke generalized gradient for locally Lipschitz functions with robust calculus.
+
+#### Clarke Generalized Directional Derivative
+- `ClarkeSubdifferential::clarkeDirectionalDerivative()` - f°(x̄;v) via limsup
+- Properties: subadditive, positively homogeneous, Lipschitz in v
+- Convexity: f°(x̄;·) is convex function
+
+#### Clarke Subdifferential
+- `definition()` - ∂_Cf = subdifferential of f°(x̄;·) at 0
+- Alternative: convex hull of limiting gradients
+- Properties: non-empty, convex, weak* compact, bounded
+
+**Optimality**: x̄ local min ⟺ 0 ∈ ∂_Cf(x̄) (necessary and sufficient!)
+
+#### Clarke Calculus Rules
+- `calculusRules()` - Sum rule (always exact!), maximum rule (always exact!)
+- Chain rule, product rule, quotient rule
+- Composition with linear maps (exact)
+
+**Major Advantage**: Robust calculus without qualifications
+
+#### Regularity and Semi-Smoothness
+- `regularity()` - Clarke regular functions: ∂_C = ∂_F
+- Strictly differentiable functions
+- Semi-smooth and p-order semi-smoothness
+- Newton method for semi-smooth equations
+
+#### Applications
+- `ClarkeApplications::nonsmoothOptimization()` - Bundle methods, KKT conditions
+- `variationalInequalities()` - Generalized equations, complementarity problems
+
+**Examples**: |x|, ‖x‖₁ (LASSO), max functions, ReLU (neural networks)
+
 ---
 
 ## Optimization
