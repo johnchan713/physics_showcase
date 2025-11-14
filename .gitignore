@@ -17,6 +17,7 @@ fourier_analysis_demo
 differential_algebra_demo
 differential_algebra_advanced_demo
 stochastic_methods_demo
+variational_calculus_demo
 
 # CMake
 build/
