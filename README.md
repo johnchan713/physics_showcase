@@ -50,7 +50,7 @@ physics_showcase/
 ### Advanced Mathematics
 
 ### Differential Algebra (`maths/advanced/algebra/differential_algebra.hpp`)
-**~1700 lines | Chapters I-IX from Ritt's "Differential Algebra"**
+**Chapters I-IX from Ritt's "Differential Algebra"**
 
 - **Differential Polynomials & Fields (Ch. I)**
   - Polynomial rings with derivation operator D
@@ -100,7 +100,7 @@ physics_showcase/
 - Wave equation: u_tt - c²u_xx = 0
 
 ### Fourier Analysis (`maths/advanced/analysis/fourier_analysis.hpp`)
-**~1200 lines | Discrete & continuous Fourier theory**
+**Discrete & continuous Fourier theory**
 
 - **Discrete & Fast Fourier Transform**
   - DFT: O(N²) naive algorithm
@@ -135,7 +135,7 @@ physics_showcase/
   - Chirp signal detection
 
 ### Advanced Subdifferentials (`maths/advanced/analysis/advanced_subdifferentials.hpp`)
-**~900 lines | Nonsmooth analysis & variational calculus**
+**Nonsmooth analysis & variational calculus**
 
 - **Clarke Subdifferential** ∂_C f(x)
 - **Limiting (Mordukhovich) Subdifferential** ∂_L f(x)
@@ -146,7 +146,7 @@ physics_showcase/
 - **Metric Regularity Criterion**
 
 ### Nonsmooth Algorithms (`maths/advanced/analysis/nonsmooth_algorithms.hpp`)
-**~800 lines | Optimization algorithms**
+**Optimization algorithms**
 
 - **Proximal Operators**
   - Soft thresholding for L1
@@ -167,7 +167,7 @@ physics_showcase/
   - Dual variable updates
 
 ### Stochastic Methods (`maths/advanced/stochastic/monte_carlo.hpp`)
-**~1000 lines | Monte Carlo methods and stochastic algorithms**
+**Monte Carlo methods and stochastic algorithms**
 
 - **Monte Carlo Integration**
   - Basic Monte Carlo integration
@@ -202,7 +202,7 @@ physics_showcase/
 **Applications:** Finance (option pricing), physics (molecular dynamics), Bayesian inference, machine learning
 
 ### Variational Calculus (`maths/advanced/geometry/variational_calculus.hpp`)
-**~1200 lines | Lagrangians, Poincaré-Cartan Forms, and variational principles**
+**Lagrangians, Poincaré-Cartan Forms, and variational principles**
 
 - **Contact Geometry**
   - Contact structures on jet bundles J^1(R,R)
@@ -241,7 +241,7 @@ physics_showcase/
 **Applications:** Classical mechanics, field theory, optimal control, integrable systems
 
 ### Differential Equations and Dynamical Systems (`maths/advanced/dynamical_systems/ode_dynamical_systems.hpp`)
-**~1500 lines | Comprehensive ODE theory and chaos**
+**Comprehensive ODE theory and chaos**
 
 **Classical ODE Theory:**
 - **Newton's Equations**: Second-order to first-order conversion, autonomous equations, equilibria
@@ -270,7 +270,7 @@ physics_showcase/
 **Applications**: Physics (pendulum, Lorenz), biology (population dynamics), engineering (nonlinear control)
 
 ### Partial Differential Equations (`maths/advanced/pde/partial_differential_equations.hpp`)
-**~1500 lines | Classical PDE theory and method of characteristics**
+**Classical PDE theory and method of characteristics**
 
 **PDE Classification and Fundamentals:**
 - **Order and Linearity**: First/second/higher order, linear/quasi-linear/semi-linear/fully nonlinear
@@ -297,7 +297,7 @@ physics_showcase/
 **Applications**: Heat diffusion, wave propagation, fluid mechanics, electrostatics, quantum mechanics, optimal control
 
 ### PDE Solution Methods (`maths/advanced/pde/pde_solution_methods.hpp`)
-**~1500 lines | Classical solution techniques for PDEs**
+**Classical solution techniques for PDEs**
 
 **Linear Equations with Constant Coefficients:**
 - **Inverse Operators**: Differential operator D = d/dx, inverse operator D⁻¹ (integration)
@@ -346,7 +346,7 @@ physics_showcase/
 **Applications**: Vibrating strings, heat conduction, electrostatic potential, quantum mechanics (particle in box), acoustics, diffusion processes
 
 ### PDE Transform Methods (`maths/advanced/pde/pde_transform_methods.hpp`)
-**~1000 lines | Laplace and Fourier transforms for solving PDEs**
+**Laplace and Fourier transforms for solving PDEs**
 
 **Laplace Transforms:**
 - **Definition and Notation**: L{f(t)} = F(s) = ∫₀^∞ e^(-st) f(t) dt
@@ -385,7 +385,7 @@ physics_showcase/
 **Applications**: Transform methods for ODEs, heat equation, wave equation, diffusion problems, signal processing
 
 ### PDE Classification Solutions (`maths/advanced/pde/pde_classification_solutions.hpp`)
-**~1200 lines | Detailed solutions for parabolic, elliptic, and hyperbolic PDEs**
+**Detailed solutions for parabolic, elliptic, and hyperbolic PDEs**
 
 **Parabolic Equations (Heat/Diffusion):**
 - **Heat Equation**: u_t = α u_xx (one-dimensional diffusion)
@@ -425,7 +425,7 @@ physics_showcase/
 **Applications**: Heat conduction, diffusion processes, electrostatics, membrane vibrations, acoustic waves, electromagnetic waves
 
 ### Probability & Statistics (`maths/advanced/probability/distributions.hpp`)
-**~920 lines | Comprehensive probability distributions**
+**Comprehensive probability distributions**
 
 **Discrete Distributions:**
 - **Bernoulli**: P(X=1) = p
@@ -562,7 +562,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Differential Algebra Demos
 
-1. **`differential_algebra_demo`** (~400 lines)
+1. **`differential_algebra_demo`**
    - Basic differential polynomials and fields
    - Characteristic sets and reduction
    - Differential ideals
@@ -570,7 +570,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
    - Elimination theory
    - Low power theorem
 
-2. **`differential_algebra_advanced_demo`** (~350 lines)
+2. **`differential_algebra_advanced_demo`**
    - Manifold intersections (Kronecker's theorem)
    - Orthonomic systems (Riquier)
    - Partial differential algebra
@@ -579,7 +579,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Analysis Demos
 
-3. **`fourier_analysis_demo`** (~350 lines)
+3. **`fourier_analysis_demo`**
    - DFT vs FFT performance (11x speedup on N=256)
    - Circulant matrices and convolution theorem
    - Haar and Daubechies-4 wavelets
@@ -587,14 +587,14 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
    - STFT and spectrogram
    - Chirp signal detection
 
-4. **`nonsmooth_algorithms_demo`** (~500 lines)
+4. **`nonsmooth_algorithms_demo`**
    - Proximal operators (soft thresholding)
    - Subgradient descent
    - ISTA and FISTA comparison
    - ADMM consensus optimization
    - Sparse signal recovery (L1 minimization)
 
-5. **`advanced_subdifferentials_demo`** (~500 lines)
+5. **`advanced_subdifferentials_demo`**
    - Clarke subdifferential computation
    - Normal and tangent cones
    - Limiting subdifferentials
@@ -603,7 +603,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Stochastic Methods Demos
 
-6. **`stochastic_methods_demo`** (~450 lines)
+6. **`stochastic_methods_demo`**
    - Monte Carlo integration (basic, importance, stratified sampling)
    - Markov chains and stationary distributions
    - MCMC sampling (Metropolis-Hastings, Gibbs)
@@ -614,7 +614,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Variational Calculus Demos
 
-7. **`variational_calculus_demo`** (~400 lines)
+7. **`variational_calculus_demo`**
    - Contact geometry and contact structures
    - Lagrangians and Euler-Lagrange equations
    - Poincaré-Cartan forms and integral invariants
@@ -670,7 +670,6 @@ done
 
 ## 📊 Statistics
 
-- **Total Lines**: ~24,000+ lines of computational mathematics and physics
 - **Mathematics Modules**:
   - Basic: 4 modules (calculus, linear algebra, trigonometry, transforms)
   - Advanced: 11 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability, PDEs - classification, solutions, transforms)
