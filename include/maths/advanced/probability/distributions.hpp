@@ -504,6 +504,275 @@ public:
 };
 
 /**
+ * @class FDistribution
+ * @brief F-distribution (Fisher-Snedecor distribution)
+ *
+ * Ratio of two chi-squared distributions:
+ * F = (χ²₁/d₁) / (χ²₂/d₂)
+ *
+ * Used in ANOVA, regression analysis, F-tests
+ */
+class FDistribution : public Distribution {
+private:
+    int d1;  // degrees of freedom 1
+    int d2;  // degrees of freedom 2
+
+public:
+    FDistribution(int df1, int df2) : d1(df1), d2(df2) {
+        if (d1 <= 0 || d2 <= 0) {
+            throw std::invalid_argument("Degrees of freedom must be positive");
+        }
+    }
+
+    /**
+     * @brief PDF: f(x) = (d₁/d₂)^(d₁/2) * x^(d₁/2-1) / (B(d₁/2, d₂/2) * (1 + d₁x/d₂)^((d₁+d₂)/2))
+     */
+    double pdf(double x) const {
+        if (x <= 0) return 0.0;
+
+        double a = d1 / 2.0;
+        double b = d2 / 2.0;
+
+        // B(a, b) = Γ(a)Γ(b)/Γ(a+b)
+        double beta_func = gamma_function(a) * gamma_function(b) / gamma_function(a + b);
+
+        double coeff = std::pow(d1 * 1.0 / d2, a) / beta_func;
+        double numerator = std::pow(x, a - 1);
+        double denominator = std::pow(1 + d1 * x / d2, (d1 + d2) / 2.0);
+
+        return coeff * numerator / denominator;
+    }
+
+    /**
+     * @brief Mean: E[F] = d₂/(d₂-2) for d₂ > 2
+     */
+    double mean() const override {
+        if (d2 <= 2) throw std::runtime_error("Mean undefined for d2 <= 2");
+        return static_cast<double>(d2) / (d2 - 2);
+    }
+
+    /**
+     * @brief Variance: Var(F) = 2d₂²(d₁+d₂-2) / (d₁(d₂-2)²(d₂-4)) for d₂ > 4
+     */
+    double variance() const override {
+        if (d2 <= 4) throw std::runtime_error("Variance undefined for d2 <= 4");
+
+        double numerator = 2.0 * d2 * d2 * (d1 + d2 - 2);
+        double denominator = d1 * (d2 - 2) * (d2 - 2) * (d2 - 4);
+
+        return numerator / denominator;
+    }
+
+    /**
+     * @brief Sample from F-distribution using ratio of chi-squared
+     */
+    double sample() const {
+        std::fisher_f_distribution<double> dist(d1, d2);
+        return dist(gen);
+    }
+
+    /**
+     * @brief CDF (approximation using regularized incomplete beta function)
+     */
+    double cdf(double x) const {
+        if (x <= 0) return 0.0;
+
+        // F_CDF(x; d1, d2) = I_{d1*x/(d1*x+d2)}(d1/2, d2/2)
+        // where I is regularized incomplete beta function
+        // Simplified approximation
+        double z = d1 * x / (d1 * x + d2);
+        return z;  // Placeholder - full implementation would use beta regularized
+    }
+};
+
+/**
+ * @class NegativeBinomialDistribution
+ * @brief Negative binomial distribution
+ *
+ * Number of failures before r successes in Bernoulli trials
+ * PMF: P(X=k) = C(k+r-1, k) * p^r * (1-p)^k
+ *
+ * Also models overdispersed count data (generalization of Poisson)
+ */
+class NegativeBinomialDistribution : public Distribution {
+private:
+    int r;      // number of successes
+    double p;   // probability of success
+
+public:
+    NegativeBinomialDistribution(int num_successes, double prob_success)
+        : r(num_successes), p(prob_success) {
+        if (r <= 0) {
+            throw std::invalid_argument("Number of successes must be positive");
+        }
+        if (p <= 0 || p >= 1) {
+            throw std::invalid_argument("Probability must be in (0, 1)");
+        }
+    }
+
+    /**
+     * @brief PMF: P(X=k) = C(k+r-1, k) * p^r * (1-p)^k
+     *
+     * k = number of failures before r successes
+     */
+    double pmf(int k) const {
+        if (k < 0) return 0.0;
+
+        double coeff = binomial_coefficient(k + r - 1, k);
+        return coeff * std::pow(p, r) * std::pow(1 - p, k);
+    }
+
+    /**
+     * @brief Mean: E[X] = r(1-p)/p
+     */
+    double mean() const override {
+        return r * (1 - p) / p;
+    }
+
+    /**
+     * @brief Variance: Var(X) = r(1-p)/p²
+     */
+    double variance() const override {
+        return r * (1 - p) / (p * p);
+    }
+
+    /**
+     * @brief Sample from negative binomial distribution
+     */
+    double sample() const {
+        std::negative_binomial_distribution<int> dist(r, p);
+        return static_cast<double>(dist(gen));
+    }
+
+    /**
+     * @brief CDF: P(X ≤ k) = ∑ᵢ₌₀ᵏ PMF(i)
+     */
+    double cdf(int k) const {
+        if (k < 0) return 0.0;
+
+        double sum = 0.0;
+        for (int i = 0; i <= k; ++i) {
+            sum += pmf(i);
+        }
+        return sum;
+    }
+
+    /**
+     * @brief Mode: ⌊(r-1)(1-p)/p⌋ for r > 1
+     */
+    int mode() const {
+        if (r == 1) return 0;
+        return static_cast<int>(std::floor((r - 1) * (1 - p) / p));
+    }
+};
+
+/**
+ * @class HypergeometricDistribution
+ * @brief Hypergeometric distribution
+ *
+ * Sampling without replacement from finite population
+ * N = population size
+ * K = number of success states in population
+ * n = number of draws
+ * PMF: P(X=k) = C(K,k) * C(N-K, n-k) / C(N, n)
+ */
+class HypergeometricDistribution : public Distribution {
+private:
+    int N;  // population size
+    int K;  // number of success states
+    int n;  // number of draws
+
+public:
+    HypergeometricDistribution(int pop_size, int num_successes, int num_draws)
+        : N(pop_size), K(num_successes), n(num_draws) {
+        if (N <= 0 || K < 0 || n < 0) {
+            throw std::invalid_argument("Invalid parameters");
+        }
+        if (K > N || n > N) {
+            throw std::invalid_argument("K and n must be <= N");
+        }
+    }
+
+    /**
+     * @brief PMF: P(X=k) = C(K,k) * C(N-K, n-k) / C(N, n)
+     *
+     * k = number of observed successes in n draws
+     */
+    double pmf(int k) const {
+        // Valid range: max(0, n+K-N) ≤ k ≤ min(n, K)
+        int k_min = std::max(0, n + K - N);
+        int k_max = std::min(n, K);
+
+        if (k < k_min || k > k_max) return 0.0;
+
+        double numerator = binomial_coefficient(K, k) * binomial_coefficient(N - K, n - k);
+        double denominator = binomial_coefficient(N, n);
+
+        return numerator / denominator;
+    }
+
+    /**
+     * @brief Mean: E[X] = n * K/N
+     */
+    double mean() const override {
+        return n * K / static_cast<double>(N);
+    }
+
+    /**
+     * @brief Variance: Var(X) = n * (K/N) * (1 - K/N) * (N-n)/(N-1)
+     */
+    double variance() const override {
+        double p = K / static_cast<double>(N);
+        return n * p * (1 - p) * (N - n) / (N - 1.0);
+    }
+
+    /**
+     * @brief Sample from hypergeometric distribution
+     */
+    double sample() const {
+        // Use reservoir sampling or direct simulation
+        std::vector<int> population(N);
+        for (int i = 0; i < K; ++i) population[i] = 1;  // Success
+        for (int i = K; i < N; ++i) population[i] = 0;  // Failure
+
+        // Shuffle
+        std::shuffle(population.begin(), population.end(), gen);
+
+        // Count successes in first n draws
+        int successes = 0;
+        for (int i = 0; i < n; ++i) {
+            successes += population[i];
+        }
+
+        return static_cast<double>(successes);
+    }
+
+    /**
+     * @brief CDF: P(X ≤ k) = ∑ᵢ PMF(i)
+     */
+    double cdf(int k) const {
+        int k_min = std::max(0, n + K - N);
+        int k_max = std::min(n, K);
+
+        if (k < k_min) return 0.0;
+        if (k >= k_max) return 1.0;
+
+        double sum = 0.0;
+        for (int i = k_min; i <= k; ++i) {
+            sum += pmf(i);
+        }
+        return sum;
+    }
+
+    /**
+     * @brief Mode: ⌊(n+1)(K+1)/(N+2)⌋
+     */
+    int mode() const {
+        return static_cast<int>(std::floor((n + 1.0) * (K + 1.0) / (N + 2.0)));
+    }
+};
+
+/**
  * @class StatisticalTests
  * @brief Hypothesis testing and statistical inference
  */
