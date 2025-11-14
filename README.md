@@ -4,7 +4,7 @@ A comprehensive C++ library implementing fundamental physics concepts with well-
 
 ## Overview
 
-This project implements core physics functionality as standalone C++ functions, categorized into twenty-seven comprehensive modules:
+This project implements core physics functionality as standalone C++ functions, categorized into thirty comprehensive modules:
 
 ### Basic Mechanics
 1. **Newton's Laws of Motion** (`newton_laws.hpp`)
@@ -59,6 +59,11 @@ This project implements core physics functionality as standalone C++ functions, 
 26. **Optics** (`optics.hpp`) - Refraction, lenses, mirrors, telescopes, Brewster's law
 27. **Advanced Mechanics** (`advanced_mechanics.hpp`) - Orbital dynamics, Kepler's laws, Lagrangian mechanics
 
+### Advanced Physics
+28. **Oscillations** (`oscillations.hpp`) - Damped, forced, and coupled oscillators, RLC circuits, resonance
+29. **Maxwell Equations** (`maxwell_equations.hpp`) - Electromagnetic fields, Poynting vector, radiation
+30. **Special Relativity** (`special_relativity.hpp`) - Lorentz transformations, relativistic energy/momentum
+
 All functions are thoroughly documented with parameter descriptions, units, return values, and exception handling.
 
 ## Project Structure
@@ -93,7 +98,10 @@ physics_showcase/
 │       ├── electromagnetic_induction.hpp  # Faraday's law, motors, generators
 │       ├── electromagnetic_waves.hpp      # EM waves, radiation pressure
 │       ├── optics.hpp              # Refraction, lenses, Brewster's law
-│       └── advanced_mechanics.hpp  # Orbital dynamics, Kepler, Lagrangian
+│       ├── advanced_mechanics.hpp  # Orbital dynamics, Kepler, Lagrangian
+│       ├── oscillations.hpp        # Damped, forced, coupled oscillators
+│       ├── maxwell_equations.hpp   # Maxwell's equations, EM fields
+│       └── special_relativity.hpp  # Lorentz transformations, relativistic mechanics
 ├── examples/
 │   ├── main.cpp                 # Basic mechanics demonstrations
 │   ├── advanced_demo.cpp        # Advanced topics demonstrations
