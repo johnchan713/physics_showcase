@@ -10,6 +10,12 @@ A comprehensive C++ library implementing fundamental mathematics and physics con
   - [Linear Algebra](#linear-algebra)
   - [Probability & Statistics](#probability--statistics)
   - [Transforms](#transforms)
+  - [Topology](#topology)
+  - [Analysis](#analysis)
+  - [Optimization](#optimization)
+  - [Financial Mathematics](#financial-mathematics)
+  - [Actuarial Science](#actuarial-science)
+  - [Econometrics](#econometrics)
 - [Physics](#physics)
   - [Basic Mechanics](#basic-mechanics)
   - [Advanced Physics](#advanced-physics)
@@ -315,6 +321,287 @@ A comprehensive C++ library implementing fundamental mathematics and physics con
 #### Window Functions
 - `WindowFunctions::rectangular()`, `hann()`, `hamming()`
 - `purpose()` - Reduce spectral leakage
+
+---
+
+## Financial Mathematics
+
+**Location**: `include/maths/finance/`
+
+Quantitative finance and derivatives pricing.
+
+### Black-Scholes Model (`black_scholes.hpp`)
+
+#### Option Pricing
+- `BlackScholes::callPrice(S, K, r, sigma, T)` - European call price
+- `BlackScholes::putPrice(S, K, r, sigma, T)` - European put price
+- `d1()`, `d2()` - Black-Scholes parameters
+- `normalCDF()`, `normalPDF()` - Standard normal distribution functions
+- `putCallParity()` - C - P = S - K·e^(-rT)
+- `assumptions()` - Model assumptions and limitations
+
+#### The Greeks - Option Sensitivities
+- `Greeks::callDelta()`, `putDelta()` - ∂V/∂S (hedge ratio)
+- `gamma()` - ∂²V/∂S² (delta sensitivity, convexity)
+- `vega()` - ∂V/∂σ (volatility sensitivity)
+- `callTheta()`, `putTheta()` - ∂V/∂t (time decay)
+- `callRho()`, `putRho()` - ∂V/∂r (interest rate sensitivity)
+- `description()` - Interpretation of each Greek
+
+#### Implied Volatility
+- `ImpliedVolatility::calculate()` - Newton-Raphson method to invert price
+- Market calibration from observed option prices
+- `volatilitySmile()` - Smile/skew phenomena in equity and FX markets
+
+#### Binomial Tree Model
+- `BinomialTree::price()` - Cox-Ross-Rubinstein binomial pricing
+- Handles both American and European options
+- Parameters: u (up factor), d (down factor), p (risk-neutral probability)
+- `description()` - Algorithm and convergence to Black-Scholes
+
+#### Risk-Neutral Valuation
+- `RiskNeutralValuation::principle()` - Fundamental theorem of asset pricing
+- `martingale()` - Martingale property under Q measure
+- Relationship between physical measure P and risk-neutral measure Q
+
+---
+
+## Actuarial Science
+
+**Location**: `include/maths/actuarial/`
+
+Life contingencies, insurance mathematics, and premium calculation.
+
+### Life Tables and Survival Analysis (`life_tables.hpp`)
+
+#### Mortality Functions
+- `MortalityFunctions::survivalFunction()` - S(x) = P(T > x)
+- `deathPDF()` - Probability density of death
+- `nYearSurvival()` - ₙp_x = probability of n-year survival
+- `nYearDeath()` - ₙq_x = probability of death within n years
+- `deferredDeath()` - ₘ|ₙq_x (survive m years, die in next n)
+- `relationships()` - Fundamental mortality identities
+- Standard laws: Gompertz, Makeham, Weibull
+
+#### Life Expectancy
+- `LifeExpectancy::completeExpectation()` - e̊ₓ = E[T_x]
+- `curtateExpectation()` - eₓ = E[K_x] (complete future years)
+- `temporaryExpectation()` - e̊ₓ:n̅| (capped at n years)
+
+#### Actuarial Present Values
+- `ActuarialPresentValue::wholeLifeInsurance()` - Āₓ (payment at death)
+- `termLifeInsurance()` - Āₓ:n̅| (n-year term)
+- `endowmentInsurance()` - Āₓ:n̅| (death or survival benefit)
+- `wholeLifeAnnuity()` - äₓ (payments while alive)
+- `temporaryAnnuity()` - äₓ:n̅| (n-year annuity)
+- `deferredAnnuity()` - ₘ|äₓ (starts after m years)
+- `notation()` - Standard actuarial notation and relationships
+
+#### Premium Calculation
+- `PremiumCalculation::netSinglePremium()` - Lump sum at inception
+- `netLevelPremium()` - Equal periodic payments (equivalence principle)
+- `grossPremium()` - Including expense and profit loadings
+- `principles()` - Expected value, variance, percentile principles
+
+#### Reserves
+- `Reserves::prospectiveMethod()` - E[PV(Future Benefits - Premiums)]
+- `retrospectiveMethod()` - Accumulated (Premiums - Claims)
+- Thiele's differential equation for reserve dynamics
+
+---
+
+## Econometrics
+
+**Location**: `include/maths/econometrics/`
+
+Statistical methods for economic data analysis.
+
+### Regression Analysis (`regression.hpp`)
+
+#### Simple Linear Regression
+- `SimpleLinearRegression::fit(x, y)` - OLS estimation: y = α + βx + ε
+- `predict(x)` - Prediction for new values
+- Fitted parameters: `intercept`, `slope`, `r_squared`, `residual_std_error`
+- `olsFormulas()` - OLS estimators and Gauss-Markov theorem
+
+#### Hypothesis Testing
+- `HypothesisTesting::tStatistic()` - t = β̂ / SE(β̂)
+- `pValue()` - Two-tailed p-value from t-statistic
+- `isSignificant()` - Test at significance level α
+- `framework()` - Null hypothesis testing, confidence intervals, F-tests
+
+#### Goodness of Fit
+- `GoodnessOfFit::rSquared()` - Coefficient of determination
+- `adjustedRSquared()` - Penalized for additional variables
+- `aic()` - Akaike Information Criterion
+- `bic()` - Bayesian Information Criterion
+- `criteria()` - Model selection and comparison
+
+#### Time Series Models
+- `TimeSeries::autoregressive()` - AR(p) models, stationarity conditions
+- `movingAverage()` - MA(q) models, invertibility
+- `arma()` - ARMA(p,q) combined models
+- `stationarity()` - Weak vs strong stationarity, unit root tests
+- Box-Jenkins methodology for identification and estimation
+
+---
+
+## Topology
+
+**Location**: `include/maths/topology/`
+
+Advanced topological concepts including metric spaces, topological spaces, weak topologies, and set-valued mappings.
+
+### Metric Spaces (`metric_spaces.hpp`)
+
+#### MetricSpace Template Class
+- Generic metric space implementation with custom distance functions
+- `distance(x, y)` - Compute metric between points
+- `converges(sequence, limit)` - Check sequence convergence
+- `isCauchy(sequence)` - Verify Cauchy property
+- `inOpenBall()`, `inClosedBall()`, `onSphere()` - Ball membership
+
+#### Standard Metrics
+- `EuclideanSpace` - ‖x - y‖₂ (Euclidean distance)
+- `TaxicabSpace` - ‖x - y‖₁ (Manhattan distance)
+- `MaximumSpace` - ‖x - y‖∞ (Chebyshev distance)
+- `DiscreteMetricSpace` - d(x,y) = 0 if x=y, 1 otherwise
+
+#### Properties and Theory
+- `MetricSpaceProperties::axioms()` - Four metric axioms
+- `convergence()` - Sequence convergence definition
+- `completeness()` - Complete metric spaces (Cauchy convergence)
+- `openClosedSets()` - Open/closed sets, closure, interior, boundary
+- `compactness()` - Heine-Borel, sequential compactness
+- `continuity()` - Continuous, uniform, Lipschitz continuity
+
+#### Convergence Modes
+- `Convergence::pointwise()` - Pointwise convergence of functions
+- `uniform()` - Uniform convergence, sup norm
+- `comparison()` - Uniform ⇒ pointwise, Dini's theorem
+
+### Topological Spaces (`topological_spaces.hpp`)
+
+#### General Topology
+- `TopologicalSpaceProperties::definition()` - Topology axioms
+- `separationAxioms()` - T₀, T₁, T₂ (Hausdorff), T₃, T₃½, T₄ (Normal)
+- `connectedness()` - Connected and path-connected spaces
+- `basesSubbases()` - Bases and subbases for topologies
+
+#### Weak Topologies
+- `WeakTopology::initialTopology()` - Coarsest topology making maps continuous
+- `finalTopology()` - Finest topology (quotient topology)
+- `weakTopologyBanach()` - Weak and weak* topologies on Banach spaces
+
+#### Semicontinuity
+- `Semicontinuity::lowerSemicontinuous()` - lsc functions, epigraph
+- `upperSemicontinuous()` - usc functions, hypograph
+- `existenceResults()` - Weierstrass theorem, optimization applications
+
+#### Baire Spaces
+- `BaireSpaces::categoryTheorem()` - Baire Category Theorem
+- `uniformBoundedness()` - Banach-Steinhaus Theorem
+- `openMappingTheorem()` - Open Mapping, Inverse Mapping, Closed Graph Theorems
+
+### Set-Valued Mappings (`set_valued_mappings.hpp`)
+
+#### Multimaps/Correspondences
+- `SetValuedMappings::definitions()` - F: X ⇉ Y, domain, graph, preimages
+- `continuityConcepts()` - Upper/lower hemicontinuity, continuity
+- `sequentialCharacterization()` - Sequential characterization in metric spaces
+- `closedGraph()` - Closed graph property, Maximum Theorem
+
+#### Fixed-Point Theorems
+- `FixedPointTheorems::kakutani()` - Kakutani Fixed-Point Theorem
+- `michaelSelection()` - Michael Selection Theorem (lhc → continuous selection)
+- `otherResults()` - Banach, Brouwer, Schauder, Fan-Glicksberg
+
+#### Measurability
+- `Measurability::measurableSelections()` - Measurable multifunctions
+- Kuratowski-Ryll-Nardzewski and Aumann theorems
+
+---
+
+## Analysis
+
+**Location**: `include/maths/analysis/`
+
+Advanced analysis concepts including convex analysis, separation theorems, and conjugate functions.
+
+### Convexity (`convexity.hpp`)
+
+#### Convex Sets
+- `ConvexSets::definition()` - Convex set axioms and properties
+- `interiorClosure()` - Interior, closure, relative interior
+- `extremePoints()` - Extreme points, Krein-Milman Theorem
+- `supportingHyperplanes()` - Supporting hyperplanes, normal cones
+
+#### Separation Theorems
+- `SeparationTheorems::basicSeparation()` - Point-set, set-set separation
+- `hahnBanach()` - Hahn-Banach Theorem (analytic and geometric forms)
+- `farkasLemma()` - Farkas Lemma, theorems of alternatives
+
+#### Convex Functions
+- `ConvexFunctions::definition()` - Convex, strictly convex, strongly convex
+- `jensenInequality()` - Jensen's inequality, AM-GM
+- `subdifferential()` - Subdifferential ∂f(x), optimality conditions
+- `conjugate()` - Fenchel-Legendre conjugate f*(y), Fenchel-Young
+
+---
+
+## Optimization
+
+**Location**: `include/maths/optimization/`
+
+Variational principles, error bounds, and optimization methods.
+
+### Variational Principles (`variational_principles.hpp`)
+
+#### Ekeland's Principle
+- `EkelandPrinciple::statement()` - Ekeland Variational Principle (EVP)
+- `proofSketch()` - Proof using Zorn's Lemma
+- `consequences()` - Approximate minimizers, critical points
+- `applications()` - Optimization, PDEs, fixed-points, game theory
+
+#### Fixed-Point Theorems
+- `CaristiTheorem::statement()` - Caristi Fixed-Point Theorem
+- `comparisonContractions()` - Caristi vs Banach contraction
+
+#### Geometric Principles
+- `GeometricPrinciples::dropTheorem()` - Drop Theorem (Danes)
+- `petalTheorem()` - Petal and Flower Petal Theorems
+
+#### Palais-Smale Condition
+- `PalaisSmale::condition()` - (PS) and (PS)_c conditions
+- `mountainPass()` - Ambrosetti-Rabinowitz Mountain Pass Theorem
+- `deformationLemmas()` - Deformation lemmas, Morse theory
+
+#### Metric Convexity
+- `MetricConvexity::busemannConvexity()` - Geodesic spaces, CAT(0) spaces
+
+### Error Bounds (`error_bounds.hpp`)
+
+#### Error Bounds and Regularity
+- `ErrorBounds::definition()` - Error bounds, Hölder/Lipschitz bounds
+- `hoffman()` - Hoffman's error bound for linear systems
+- `lojasiewicz()` - Łojasiewicz inequality, KŁ property
+- `metricRegularity()` - Metric regularity, Aubin property
+
+#### Decrease Principles
+- `DecreasePrinciple::armijo()` - Armijo rule (sufficient decrease)
+- `wolfe()` - Wolfe conditions (Armijo + curvature)
+- `goldstein()` - Goldstein conditions
+
+#### Penalization Methods
+- `Penalization::exactPenalty()` - ℓ₁ exact penalty methods
+- `quadraticPenalty()` - Quadratic penalty, ill-conditioning
+- `augmentedLagrangian()` - Method of multipliers, ADMM
+- `barrierMethods()` - Logarithmic barriers, interior point methods
+
+#### Robust Optimization
+- `RobustOptimization::robust()` - Worst-case optimization
+- `stabilized()` - Stabilized infima with regularization
+- `tikhonov()` - Tikhonov regularization for ill-posed problems
 
 ---
 

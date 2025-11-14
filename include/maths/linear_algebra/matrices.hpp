@@ -314,6 +314,281 @@ public:
     }
 
     /**
+     * @brief Row swap operation
+     */
+    void swapRows(size_t i, size_t j) {
+        if (i >= rows_ || j >= rows_) {
+            throw std::out_of_range("Row index out of range");
+        }
+        if (i != j) {
+            std::swap(data[i], data[j]);
+        }
+    }
+
+    /**
+     * @brief Row scale operation
+     */
+    void scaleRow(size_t i, double scalar) {
+        if (i >= rows_) {
+            throw std::out_of_range("Row index out of range");
+        }
+        if (std::abs(scalar) < 1e-10) {
+            throw std::invalid_argument("Cannot scale by zero");
+        }
+        for (size_t j = 0; j < cols_; ++j) {
+            data[i][j] *= scalar;
+        }
+    }
+
+    /**
+     * @brief Add scaled row: row[i] += scalar * row[j]
+     */
+    void addScaledRow(size_t i, size_t j, double scalar) {
+        if (i >= rows_ || j >= rows_) {
+            throw std::out_of_range("Row index out of range");
+        }
+        for (size_t k = 0; k < cols_; ++k) {
+            data[i][k] += scalar * data[j][k];
+        }
+    }
+
+    /**
+     * @brief Compute rank using row reduction
+     */
+    size_t rank(double tolerance = 1e-10) const {
+        Matrix temp = *this;  // Make a copy for row reduction
+        size_t rank = 0;
+        size_t current_row = 0;
+
+        for (size_t col = 0; col < cols_ && current_row < rows_; ++col) {
+            // Find pivot
+            size_t pivot_row = current_row;
+            double max_val = std::abs(temp(current_row, col));
+
+            for (size_t row = current_row + 1; row < rows_; ++row) {
+                if (std::abs(temp(row, col)) > max_val) {
+                    max_val = std::abs(temp(row, col));
+                    pivot_row = row;
+                }
+            }
+
+            if (max_val < tolerance) {
+                continue;  // Column is zero, skip
+            }
+
+            // Swap rows
+            if (pivot_row != current_row) {
+                temp.swapRows(current_row, pivot_row);
+            }
+
+            // Eliminate below
+            for (size_t row = current_row + 1; row < rows_; ++row) {
+                double factor = temp(row, col) / temp(current_row, col);
+                temp.addScaledRow(row, current_row, -factor);
+            }
+
+            rank++;
+            current_row++;
+        }
+
+        return rank;
+    }
+
+    /**
+     * @brief Compute matrix inverse using Gauss-Jordan elimination
+     *
+     * Returns the inverse of the matrix if it exists.
+     * Throws if matrix is singular (not invertible).
+     */
+    Matrix inverse(double tolerance = 1e-10) const {
+        if (!isSquare()) {
+            throw std::runtime_error("Only square matrices can be inverted");
+        }
+
+        size_t n = rows_;
+        double det_val = determinant();
+        if (std::abs(det_val) < tolerance) {
+            throw std::runtime_error("Matrix is singular (determinant = 0), cannot invert");
+        }
+
+        // Create augmented matrix [A | I]
+        Matrix aug(n, 2 * n);
+        for (size_t i = 0; i < n; ++i) {
+            for (size_t j = 0; j < n; ++j) {
+                aug(i, j) = data[i][j];
+                aug(i, j + n) = (i == j) ? 1.0 : 0.0;
+            }
+        }
+
+        // Gauss-Jordan elimination
+        for (size_t col = 0; col < n; ++col) {
+            // Find pivot
+            size_t pivot_row = col;
+            double max_val = std::abs(aug(col, col));
+
+            for (size_t row = col + 1; row < n; ++row) {
+                if (std::abs(aug(row, col)) > max_val) {
+                    max_val = std::abs(aug(row, col));
+                    pivot_row = row;
+                }
+            }
+
+            if (max_val < tolerance) {
+                throw std::runtime_error("Matrix is singular, cannot invert");
+            }
+
+            // Swap rows
+            if (pivot_row != col) {
+                aug.swapRows(col, pivot_row);
+            }
+
+            // Scale pivot row
+            double pivot = aug(col, col);
+            aug.scaleRow(col, 1.0 / pivot);
+
+            // Eliminate column
+            for (size_t row = 0; row < n; ++row) {
+                if (row != col) {
+                    double factor = aug(row, col);
+                    aug.addScaledRow(row, col, -factor);
+                }
+            }
+        }
+
+        // Extract inverse from right half
+        Matrix inv(n, n);
+        for (size_t i = 0; i < n; ++i) {
+            for (size_t j = 0; j < n; ++j) {
+                inv(i, j) = aug(i, j + n);
+            }
+        }
+
+        return inv;
+    }
+
+    /**
+     * @brief Compute reduced row echelon form (RREF)
+     */
+    Matrix rref(double tolerance = 1e-10) const {
+        Matrix result = *this;
+        size_t current_row = 0;
+
+        for (size_t col = 0; col < cols_ && current_row < rows_; ++col) {
+            // Find pivot
+            size_t pivot_row = current_row;
+            double max_val = std::abs(result(current_row, col));
+
+            for (size_t row = current_row + 1; row < rows_; ++row) {
+                if (std::abs(result(row, col)) > max_val) {
+                    max_val = std::abs(result(row, col));
+                    pivot_row = row;
+                }
+            }
+
+            if (max_val < tolerance) {
+                continue;  // Column has no pivot
+            }
+
+            // Swap rows
+            if (pivot_row != current_row) {
+                result.swapRows(current_row, pivot_row);
+            }
+
+            // Scale pivot to 1
+            double pivot = result(current_row, col);
+            result.scaleRow(current_row, 1.0 / pivot);
+
+            // Eliminate entire column (both above and below pivot)
+            for (size_t row = 0; row < rows_; ++row) {
+                if (row != current_row) {
+                    double factor = result(row, col);
+                    result.addScaledRow(row, current_row, -factor);
+                }
+            }
+
+            current_row++;
+        }
+
+        // Clean up near-zero entries
+        for (size_t i = 0; i < rows_; ++i) {
+            for (size_t j = 0; j < cols_; ++j) {
+                if (std::abs(result(i, j)) < tolerance) {
+                    result(i, j) = 0.0;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief Solve linear system Ax = b using Gauss elimination
+     *
+     * Returns solution vector x if unique solution exists.
+     * Throws if system has no solution or infinite solutions.
+     */
+    Vector solve(const Vector& b, double tolerance = 1e-10) const {
+        if (!isSquare()) {
+            throw std::runtime_error("Matrix must be square to solve Ax = b");
+        }
+        if (b.dimension() != rows_) {
+            throw std::invalid_argument("Vector b must have same dimension as matrix rows");
+        }
+
+        size_t n = rows_;
+
+        // Create augmented matrix [A | b]
+        Matrix aug(n, n + 1);
+        for (size_t i = 0; i < n; ++i) {
+            for (size_t j = 0; j < n; ++j) {
+                aug(i, j) = data[i][j];
+            }
+            aug(i, n) = b[i];
+        }
+
+        // Forward elimination
+        for (size_t col = 0; col < n; ++col) {
+            // Find pivot
+            size_t pivot_row = col;
+            double max_val = std::abs(aug(col, col));
+
+            for (size_t row = col + 1; row < n; ++row) {
+                if (std::abs(aug(row, col)) > max_val) {
+                    max_val = std::abs(aug(row, col));
+                    pivot_row = row;
+                }
+            }
+
+            if (max_val < tolerance) {
+                throw std::runtime_error("System has no unique solution (matrix is singular)");
+            }
+
+            // Swap rows
+            if (pivot_row != col) {
+                aug.swapRows(col, pivot_row);
+            }
+
+            // Eliminate below
+            for (size_t row = col + 1; row < n; ++row) {
+                double factor = aug(row, col) / aug(col, col);
+                aug.addScaledRow(row, col, -factor);
+            }
+        }
+
+        // Back substitution
+        std::vector<double> x(n);
+        for (int i = n - 1; i >= 0; --i) {
+            double sum = aug(i, n);
+            for (size_t j = i + 1; j < n; ++j) {
+                sum -= aug(i, j) * x[j];
+            }
+            x[i] = sum / aug(i, i);
+        }
+
+        return Vector(x);
+    }
+
+    /**
      * @brief String representation
      */
     std::string toString() const {
