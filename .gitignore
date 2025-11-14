@@ -3,6 +3,7 @@
 *.obj
 *.exe
 physics_demo
+advanced_demo
 
 # CMake
 build/

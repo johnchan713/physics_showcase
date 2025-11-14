@@ -18,13 +18,17 @@ endif()
 # Include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# Add executable
+# Add executables
 add_executable(physics_demo
     examples/main.cpp
 )
 
+add_executable(advanced_demo
+    examples/advanced_demo.cpp
+)
+
 # Installation rules (optional)
-install(TARGETS physics_demo DESTINATION bin)
+install(TARGETS physics_demo advanced_demo DESTINATION bin)
 install(DIRECTORY include/ DESTINATION include)
 
 # Print build information
