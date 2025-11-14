@@ -64,6 +64,40 @@ A comprehensive C++ library implementing fundamental mathematics and physics con
 - `indeterminateForms()` - 0/0, ∞/∞, etc.
 - Example applications
 
+### Differential Calculus (`calculus/differential/`)
+
+Advanced differential calculus in Banach spaces including Fréchet derivatives, Newton's method, and inverse/implicit function theorems.
+
+#### Directional and Fréchet Derivatives (`frechet_calculus.hpp`)
+
+**Directional Derivatives**
+- `DirectionalDerivative::definition()` - f'(x; v) = lim_{t↓0} [f(x+tv)-f(x)]/t
+- `oneSided()` - Right/left derivatives, relationship to subdifferential
+- Gâteaux derivatives: linear functionals
+
+**Fréchet Derivatives**
+- `FrechetDerivative::definition()` - Bounded linear approximation
+- `calculusRules()` - Sum, product, chain rules for composition
+- `meanValueTheorem()` - Mean value theorem in Banach spaces
+- Comparison with directional and Gâteaux derivatives
+
+**Inverse and Implicit Functions**
+- `InverseFunctionTheorem::inverseTheorem()` - Local invertibility via surjectivity
+- `implicitTheorem()` - Implicit function theorem, solution maps
+- `rankTheorem()` - Constant rank theorem
+- Applications to optimization and constraint qualification
+
+**Newton's Method**
+- `NewtonMethod::method()` - Newton iteration for root finding
+- `optimization()` - Newton's method for optimization
+- Kantorovich convergence theorem
+- Quadratic convergence rate
+
+**Legendre Transform**
+- `LegendreTransform::classical()` - Classical Legendre transform
+- `fenchel()` - Legendre-Fenchel (conjugate) transform
+- Connection to thermodynamics and Hamiltonian mechanics
+
 ---
 
 ## Trigonometry
@@ -547,6 +581,29 @@ Advanced analysis concepts including convex analysis, separation theorems, and c
 - `subdifferential()` - Subdifferential ∂f(x), optimality conditions
 - `conjugate()` - Fenchel-Legendre conjugate f*(y), Fenchel-Young
 
+### Subdifferential Calculus (`subdifferential.hpp`)
+
+Advanced convex analysis including subdifferential calculus rules, convex duality theory, and dual optimization algorithms.
+
+#### Subdifferential Calculus Rules
+- `SubdifferentialCalculus::sumRule()` - ∂(f+g) ⊇ ∂f + ∂g with equality conditions
+- `linearComposition()` - Chain rule for linear operators: ∂(f∘A) = A*∂f(Ax)
+- `maximumRule()` - Subdifferential of max{f₁,...,fₘ}, active set convex hull
+- `infimalConvolution()` - (f□g) operations, Moreau envelope, proximal operators
+- `marginalFunctions()` - Subdifferentials of infimal value functions, Danskin's theorem
+
+#### Convex Duality Theory
+- `ConvexDuality::lagrangianDuality()` - Lagrangian dual, KKT conditions
+- `fenchelDuality()` - Fenchel duality for p* = inf[f(x) + g(Ax)]
+- `dualAlgorithms()` - Dual ascent, augmented Lagrangian, ADMM
+- Weak/strong duality, Slater condition, saddle points
+
+#### Conjugate Calculus
+- `ConvexConjugate::conjugateCalculus()` - Calculus rules for f*
+- Biconjugate f** = cl(conv(f))
+- Common conjugate pairs: quadratic, norm, indicator, exponential
+- `supportFunctions()` - Support functions σ_C(y), normal cones N_C(x)
+
 ---
 
 ## Optimization
@@ -602,6 +659,29 @@ Variational principles, error bounds, and optimization methods.
 - `RobustOptimization::robust()` - Worst-case optimization
 - `stabilized()` - Stabilized infima with regularization
 - `tikhonov()` - Tikhonov regularization for ill-posed problems
+
+### Metric Regularity and Stability (`metric_regularity.hpp`)
+
+Advanced regularity concepts for multifunctions, stability analysis, and well-posedness.
+
+#### Metric Regularity
+- `MetricRegularity::definition()` - d(x, F⁻¹(y)) ≤ κ·d(y, F(x))
+- `pseudoLipschitz()` - Aubin property (pseudo-Lipschitz property)
+- `calmness()` - One-sided Lipschitz estimate
+- `relationships()` - Hierarchy: metric regularity ⟺ pseudo-Lipschitz ⇒ calmness
+- Applications: Newton's method convergence, sensitivity analysis
+
+#### Well-Posedness
+- `WellPosedness::tykhonov()` - Tykhonov well-posedness, unique minimizers
+- `levitinPolyak()` - Levitin-Polyak well-posedness, error bounds
+- `stegall()` - Stegall's variational principle
+- `constrainedProblems()` - Well-posedness with constraints (LICQ, MFCQ)
+
+#### Open Mapping Property
+- `OpenMappingProperty::connections()` - Openness and metric regularity
+- `robinsonUrsescu()` - Robinson-Ursescu theorem for convex processes
+- Lyusternik-Graves theorem
+- Applications to implicit functions and constraint systems
 
 ---
 
