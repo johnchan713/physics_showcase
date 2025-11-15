@@ -322,6 +322,17 @@ physics_showcase/
   - Modified Bessel functions Iₙ(x) for imaginary arguments
   - Zeros of Bessel functions for eigenvalue problems
   - Applications to cylindrical boundary value problems
+- **Series of Orthogonal Functions**:
+  - Parseval's identity: ∥f∥² = ∑|cₙ|² (energy conservation)
+  - Bessel's inequality: ∑|cₙ|² ≤ ∥f∥² (completeness criterion)
+  - Convergence rate analysis: cₙ ~ 1/nᵖ decay estimation
+  - Mean square error of partial sum approximations
+- **Eigenfunction Expansions**:
+  - Sturm-Liouville theory: (p(x)u')' + (q(x) + λw(x))u = 0
+  - Eigenvalue computation via shooting method
+  - Eigenfunction orthogonality with weight w(x)
+  - Function expansion: f(x) = ∑ cₙφₙ(x) with cₙ = ⟨f,φₙ⟩/⟨φₙ,φₙ⟩
+  - Standard problems: Fourier sine (λₙ = n²), Bessel (cylindrical), Legendre (spherical)
 
 **Separation of Variables:**
 - **Wave Equation Solutions** (hyperbolic): u_tt = c²u_xx
@@ -710,6 +721,16 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
    - Bäcklund transformations (Sine-Gordon)
    - Field theories (Klein-Gordon, Maxwell, Yang-Mills)
 
+### PDE Solution Methods Demos
+
+8. **`pde_solution_methods_demo`**
+   - Orthogonal polynomials (Legendre, Chebyshev, Hermite, Laguerre)
+   - Bessel functions and zeros
+   - Fourier series and Parseval's identity
+   - Series convergence rate analysis
+   - Sturm-Liouville eigenvalue problems
+   - Eigenfunction expansions
+
 ## 🚀 Building and Running
 
 ### Prerequisites
@@ -763,7 +784,7 @@ done
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
   - Advanced: 20+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
-- **Demos**: 7+ comprehensive demonstration programs
+- **Demos**: 8 comprehensive demonstration programs
 - **Distributions**: 13 probability distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, F-distribution)
 - **Key Algorithms**:
   - DFT, FFT (O(N log N))

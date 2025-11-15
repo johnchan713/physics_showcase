@@ -497,6 +497,350 @@ public:
 };
 
 /**
+ * @class OrthogonalSeriesTheory
+ * @brief Completeness and convergence of orthogonal function series
+ */
+class OrthogonalSeriesTheory {
+public:
+    /**
+     * @brief Parseval's identity for orthogonal series
+     *
+     * For complete orthonormal system {φ_n}, if f = ∑ c_n φ_n, then:
+     * ∥f∥² = ∑ |c_n|² (energy conservation)
+     *
+     * @param coefficients Expansion coefficients c_n
+     * @param norms Norms ∥φ_n∥ of basis functions
+     * @return ∥f∥² computed from series
+     */
+    static double parsevalIdentity(
+        const std::vector<double>& coefficients,
+        const std::vector<double>& norms) {
+
+        double energy = 0.0;
+        for (size_t n = 0; n < coefficients.size() && n < norms.size(); ++n) {
+            energy += coefficients[n] * coefficients[n] * norms[n] * norms[n];
+        }
+        return energy;
+    }
+
+    /**
+     * @brief Bessel's inequality: ∑|c_n|² ≤ ∥f∥²
+     *
+     * Equality holds if and only if {φ_n} is complete
+     *
+     * @return true if series satisfies Bessel's inequality
+     */
+    static bool besselInequality(
+        double f_norm_squared,
+        const std::vector<double>& coefficients,
+        const std::vector<double>& basis_norms) {
+
+        double series_sum = parsevalIdentity(coefficients, basis_norms);
+        return series_sum <= f_norm_squared + 1e-10;  // Numerical tolerance
+    }
+
+    /**
+     * @brief Test completeness via Parseval's equality
+     *
+     * System is complete if ∑|c_n|² = ∥f∥²
+     */
+    static bool isComplete(
+        double f_norm_squared,
+        const std::vector<double>& coefficients,
+        const std::vector<double>& basis_norms,
+        double tolerance = 1e-6) {
+
+        double series_sum = parsevalIdentity(coefficients, basis_norms);
+        return std::abs(series_sum - f_norm_squared) < tolerance;
+    }
+
+    /**
+     * @brief Compute convergence rate of orthogonal series
+     *
+     * For smooth functions, coefficients decay like c_n ~ 1/n^p
+     *
+     * @return Estimated decay exponent p
+     */
+    static double convergenceRate(const std::vector<double>& coefficients) {
+        if (coefficients.size() < 3) return 0.0;
+
+        // Estimate p from log|c_n| ~ -p log(n)
+        // Use linear regression on log-log plot
+        double sum_log_n = 0.0, sum_log_cn = 0.0;
+        double sum_log_n_sq = 0.0, sum_log_n_log_cn = 0.0;
+        int count = 0;
+
+        for (size_t n = 1; n < coefficients.size(); ++n) {
+            if (std::abs(coefficients[n]) > 1e-15) {
+                double log_n = std::log(n + 1);
+                double log_cn = std::log(std::abs(coefficients[n]));
+
+                sum_log_n += log_n;
+                sum_log_cn += log_cn;
+                sum_log_n_sq += log_n * log_n;
+                sum_log_n_log_cn += log_n * log_cn;
+                count++;
+            }
+        }
+
+        if (count < 2) return 0.0;
+
+        // Slope of regression line
+        double slope = (count * sum_log_n_log_cn - sum_log_n * sum_log_cn) /
+                      (count * sum_log_n_sq - sum_log_n * sum_log_n);
+
+        return -slope;  // Decay rate
+    }
+
+    /**
+     * @brief Mean square error of partial sum approximation
+     *
+     * E_N = ∥f - ∑_{n=0}^{N-1} c_n φ_n∥²
+     */
+    static double meanSquareError(
+        std::function<double(double)> f,
+        const std::vector<std::function<double(double)>>& basis,
+        const std::vector<double>& coefficients,
+        std::function<double(double)> weight,
+        double a, double b,
+        int N) {
+
+        // Construct partial sum
+        auto partial_sum = [&](double x) {
+            double sum = 0.0;
+            for (int n = 0; n < N && n < (int)coefficients.size(); ++n) {
+                sum += coefficients[n] * basis[n](x);
+            }
+            return sum;
+        };
+
+        // Compute ∥f - S_N∥²
+        auto error = [f, partial_sum](double x) {
+            double diff = f(x) - partial_sum(x);
+            return diff * diff;
+        };
+
+        return OrthogonalFunctions::innerProduct(
+            [error](double x) { return std::sqrt(error(x)); },
+            [error](double x) { return std::sqrt(error(x)); },
+            weight, a, b);
+    }
+};
+
+/**
+ * @class EigenfunctionExpansions
+ * @brief Sturm-Liouville theory and eigenfunction expansions
+ */
+class EigenfunctionExpansions {
+public:
+    /**
+     * @brief Sturm-Liouville problem: (p(x)u')' + (q(x) + λw(x))u = 0
+     *
+     * Regular Sturm-Liouville problem on [a,b] with boundary conditions:
+     * - α₁u(a) + α₂u'(a) = 0
+     * - β₁u(b) + β₂u'(b) = 0
+     */
+    struct SturmLiouvilleProblem {
+        std::function<double(double)> p;  // Coefficient p(x) > 0
+        std::function<double(double)> q;  // Coefficient q(x)
+        std::function<double(double)> w;  // Weight function w(x) > 0
+        double a, b;  // Domain [a, b]
+
+        // Boundary condition coefficients
+        double alpha1, alpha2, beta1, beta2;
+
+        /**
+         * @brief Compute eigenvalues via shooting method
+         *
+         * Eigenvalues are λ_n such that boundary value problem has nontrivial solution
+         */
+        std::vector<double> computeEigenvalues(int n_eigenvalues) const {
+            std::vector<double> eigenvalues;
+            eigenvalues.reserve(n_eigenvalues);
+
+            // Use shooting method: try different λ values
+            double lambda_min = -10.0;
+            double lambda_max = 100.0;
+            double dlambda = 0.1;
+
+            for (double lambda = lambda_min; lambda < lambda_max && (int)eigenvalues.size() < n_eigenvalues; lambda += dlambda) {
+                // Solve ODE with this λ using RK4
+                // Check if boundary condition at b is satisfied
+
+                // Initial conditions from BC at a
+                double u0 = alpha2;  // If α₁u(a) + α₂u'(a) = 0, choose u(a) = α₂
+                double up0 = -alpha1;  // u'(a) = -α₁
+
+                if (std::abs(alpha2) < 1e-10 && std::abs(alpha1) > 1e-10) {
+                    u0 = 0.0;
+                    up0 = 1.0;
+                }
+
+                // Integrate using simple Euler (for demonstration)
+                int n_steps = 100;
+                double h = (b - a) / n_steps;
+                double x = a;
+                double u = u0;
+                double up = up0;
+
+                for (int i = 0; i < n_steps; ++i) {
+                    double p_val = p(x);
+                    double q_val = q(x);
+                    double w_val = w(x);
+
+                    // u'' = -(q + λw)u/p - p'u'/p (simplified assuming p' computed numerically)
+                    double p_prime = (p(x + 1e-6) - p(x)) / 1e-6;
+                    double upp = -(q_val + lambda * w_val) * u / p_val - p_prime * up / p_val;
+
+                    // Euler step
+                    u += h * up;
+                    up += h * upp;
+                    x += h;
+                }
+
+                // Check if BC at b is satisfied: β₁u(b) + β₂u'(b) ≈ 0
+                double bc_residual = beta1 * u + beta2 * up;
+
+                // Look for sign changes (eigenvalues)
+                static double prev_residual = bc_residual;
+                if (eigenvalues.size() > 0 || lambda > lambda_min + dlambda) {
+                    if (prev_residual * bc_residual < 0) {
+                        // Sign change detected - refine eigenvalue
+                        double lambda_refined = lambda - dlambda * bc_residual / (bc_residual - prev_residual);
+                        eigenvalues.push_back(lambda_refined);
+                    }
+                }
+                prev_residual = bc_residual;
+            }
+
+            return eigenvalues;
+        }
+
+        /**
+         * @brief Compute eigenfunction for given eigenvalue
+         */
+        std::function<double(double)> eigenfunction(double lambda) const {
+            return [this, lambda](double x) {
+                // Solve ODE from a to x with initial conditions
+                double u0 = alpha2;
+                double up0 = -alpha1;
+
+                if (std::abs(alpha2) < 1e-10 && std::abs(alpha1) > 1e-10) {
+                    u0 = 0.0;
+                    up0 = 1.0;
+                }
+
+                int n_steps = 100;
+                double h = (x - a) / n_steps;
+                double xi = a;
+                double u = u0;
+                double up = up0;
+
+                for (int i = 0; i < n_steps; ++i) {
+                    double p_val = p(xi);
+                    double q_val = q(xi);
+                    double w_val = w(xi);
+                    double p_prime = (p(xi + 1e-6) - p(xi)) / 1e-6;
+
+                    double upp = -(q_val + lambda * w_val) * u / p_val - p_prime * up / p_val;
+
+                    u += h * up;
+                    up += h * upp;
+                    xi += h;
+                }
+
+                return u;
+            };
+        }
+
+        /**
+         * @brief Expand function in eigenfunction series
+         *
+         * f(x) = ∑ c_n φ_n(x), where c_n = ⟨f, φ_n⟩ / ⟨φ_n, φ_n⟩
+         */
+        std::vector<double> expandFunction(
+            std::function<double(double)> f,
+            const std::vector<double>& eigenvalues) const {
+
+            std::vector<double> coefficients;
+            coefficients.reserve(eigenvalues.size());
+
+            for (double lambda : eigenvalues) {
+                auto phi = eigenfunction(lambda);
+
+                // c_n = ∫ w(x) f(x) φ_n(x) dx / ∫ w(x) φ_n²(x) dx
+                double numerator = OrthogonalFunctions::innerProduct(f, phi, w, a, b);
+                double denominator = OrthogonalFunctions::innerProduct(phi, phi, w, a, b);
+
+                coefficients.push_back(numerator / denominator);
+            }
+
+            return coefficients;
+        }
+    };
+
+    /**
+     * @brief Common Sturm-Liouville problems
+     */
+
+    /**
+     * @brief Fourier sine series (special case)
+     *
+     * u'' + λu = 0 on [0, L], u(0) = u(L) = 0
+     * Eigenvalues: λ_n = (nπ/L)²
+     * Eigenfunctions: φ_n(x) = sin(nπx/L)
+     */
+    static SturmLiouvilleProblem fourierSineProblem(double L) {
+        SturmLiouvilleProblem prob;
+        prob.p = [](double) { return 1.0; };
+        prob.q = [](double) { return 0.0; };
+        prob.w = [](double) { return 1.0; };
+        prob.a = 0.0;
+        prob.b = L;
+        prob.alpha1 = 1.0; prob.alpha2 = 0.0;  // u(0) = 0
+        prob.beta1 = 1.0; prob.beta2 = 0.0;    // u(L) = 0
+        return prob;
+    }
+
+    /**
+     * @brief Bessel problem (cylindrical symmetry)
+     *
+     * (xu')' + λxu = 0 on [0, R], u(R) = 0, u(0) bounded
+     * Eigenfunctions: φ_n(r) = J_0(√λ_n r)
+     */
+    static SturmLiouvilleProblem besselProblem(double R) {
+        SturmLiouvilleProblem prob;
+        prob.p = [](double x) { return x; };
+        prob.q = [](double) { return 0.0; };
+        prob.w = [](double x) { return x; };
+        prob.a = 0.0;
+        prob.b = R;
+        prob.alpha1 = 0.0; prob.alpha2 = 1.0;  // Bounded at 0
+        prob.beta1 = 1.0; prob.beta2 = 0.0;    // u(R) = 0
+        return prob;
+    }
+
+    /**
+     * @brief Legendre problem (spherical symmetry)
+     *
+     * ((1-x²)u')' + λu = 0 on [-1, 1]
+     * Eigenvalues: λ_n = n(n+1)
+     * Eigenfunctions: φ_n(x) = P_n(x) (Legendre polynomials)
+     */
+    static SturmLiouvilleProblem legendreProblem() {
+        SturmLiouvilleProblem prob;
+        prob.p = [](double x) { return 1.0 - x*x; };
+        prob.q = [](double) { return 0.0; };
+        prob.w = [](double) { return 1.0; };
+        prob.a = -1.0;
+        prob.b = 1.0;
+        prob.alpha1 = 0.0; prob.alpha2 = 1.0;  // Bounded at -1
+        prob.beta1 = 0.0; prob.beta2 = 1.0;    // Bounded at +1
+        return prob;
+    }
+};
+
+/**
  * @class BesselFunctions
  * @brief Bessel functions and applications
  */
