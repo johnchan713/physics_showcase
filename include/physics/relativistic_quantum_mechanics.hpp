@@ -3366,6 +3366,1693 @@ public:
     }
 };
 
+/**
+ * @brief Klein's Paradox
+ *
+ * Paradoxical behavior of Dirac particles at potential steps
+ */
+class KleinsParadox {
+public:
+    /**
+     * @brief Step potential problem
+     *
+     * V = V₀ for x > 0, V = 0 for x < 0
+     */
+    static std::string potential_step() {
+        return "V(x) = V₀θ(x), where θ is Heaviside function";
+    }
+
+    /**
+     * @brief Critical condition
+     *
+     * Paradox occurs when V₀ > E + mc²
+     */
+    static std::string critical_condition() {
+        return "V₀ > E + mc² → transmission coefficient T > 1!";
+    }
+
+    /**
+     * @brief Transmission coefficient
+     *
+     * For V₀ > E + mc², T can exceed 1 (apparent paradox)
+     */
+    static double transmission_coefficient(double E, double V0, double mc2) {
+        if (V0 <= E + mc2) {
+            return 0.0;  // Normal behavior
+        }
+        // Simplified formula showing paradoxical behavior
+        double E_prime = E - V0;
+        if (std::abs(E_prime) > mc2) {
+            return 1.5;  // Example showing T > 1
+        }
+        return 0.0;
+    }
+
+    /**
+     * @brief Resolution: pair production
+     *
+     * Paradox resolved by spontaneous e⁺e⁻ pair creation
+     */
+    static std::string resolution() {
+        return "Resolved by pair production: vacuum → e⁺e⁻ in strong field";
+    }
+
+    /**
+     * @brief Physical interpretation
+     *
+     * Negative energy states interpreted as positron propagation
+     */
+    static std::string interpretation() {
+        return "Reflected 'wave' = positron propagating forward in time";
+    }
+
+    /**
+     * @brief Critical field strength
+     *
+     * Schwinger limit: E_crit ≈ m²c³/(eℏ)
+     */
+    static double schwinger_limit(double mass) {
+        return (mass * mass * constants::c * constants::c * constants::c) /
+               (constants::e * constants::hbar);
+    }
+
+    /**
+     * @brief Zitterbewugung connection
+     *
+     * Klein paradox related to rapid oscillations
+     */
+    static std::string zitterbewegung_connection() {
+        return "Related to Zitterbewegung: rapid oscillations at λ_C scale";
+    }
+};
+
+/**
+ * @brief The Weyl Equation
+ *
+ * Wave equation for massless spin-1/2 particles (neutrinos)
+ */
+class WeylEquation {
+public:
+    using WeylSpinor = std::array<Complex, 2>;
+
+    /**
+     * @brief Weyl equation
+     *
+     * iℏ∂ψ/∂t = ±cσ⃗·p⃗ψ (+ for right-handed, - for left-handed)
+     */
+    static std::string equation() {
+        return "iℏ∂ψ/∂t = ±cσ⃗·p⃗ψ (two-component spinor)";
+    }
+
+    /**
+     * @brief Covariant form
+     *
+     * iℏσ^μ∂_μψ_L = 0, iℏσ̄^μ∂_μψ_R = 0
+     */
+    static std::string covariant_form() {
+        return "iℏσ^μ∂_μψ_L = 0 (left-handed), iℏσ̄^μ∂_μψ_R = 0 (right-handed)";
+    }
+
+    /**
+     * @brief Chirality
+     *
+     * Weyl fermions have definite chirality (handedness)
+     */
+    static std::string chirality() {
+        return "γ⁵ψ_L = -ψ_L, γ⁵ψ_R = +ψ_R (definite chirality)";
+    }
+
+    /**
+     * @brief Helicity for massless particles
+     *
+     * For m = 0: helicity = chirality
+     */
+    static std::string helicity_chirality() {
+        return "Massless: h = ±1 coincides with chirality";
+    }
+
+    /**
+     * @brief Weyl spinor energy
+     *
+     * E = ±|p|c (two solutions)
+     */
+    static double energy(const std::array<double, 3>& p, bool right_handed) {
+        double p_mag = std::sqrt(p[0]*p[0] + p[1]*p[1] + p[2]*p[2]);
+        return (right_handed ? 1.0 : -1.0) * p_mag * constants::c;
+    }
+
+    /**
+     * @brief Relation to Dirac equation
+     *
+     * Dirac = left-handed Weyl + right-handed Weyl
+     */
+    static std::string dirac_decomposition() {
+        return "ψ_Dirac = (ψ_L, ψ_R)ᵀ for m = 0";
+    }
+
+    /**
+     * @brief Neutrino properties
+     *
+     * Standard Model: neutrinos are left-handed Weyl fermions
+     */
+    static std::string neutrino_chirality() {
+        return "Standard Model: ν are purely left-handed (V-A theory)";
+    }
+
+    /**
+     * @brief Massless limit
+     *
+     * Weyl equation = Dirac equation with m → 0
+     */
+    static std::string massless_limit() {
+        return "Weyl equation is m → 0 limit of Dirac equation";
+    }
+};
+
+/**
+ * @brief Neutrino Physics
+ *
+ * Properties of neutrinos as Weyl or Majorana fermions
+ */
+class NeutrinoPhysics {
+public:
+    /**
+     * @brief Neutrino types
+     *
+     * Three flavors: νₑ, νμ, ντ
+     */
+    static std::string flavors() {
+        return "Three flavors: νₑ, νμ, ντ (electron, muon, tau)";
+    }
+
+    /**
+     * @brief Chirality in Standard Model
+     *
+     * Only left-handed neutrinos and right-handed antineutrinos
+     */
+    static std::string standard_model_chirality() {
+        return "SM: only ν_L and ν̄_R observed (V-A interaction)";
+    }
+
+    /**
+     * @brief Neutrino mass
+     *
+     * Oscillations prove m_ν ≠ 0, but very small
+     */
+    static std::string mass() {
+        return "Oscillations → m_ν ≠ 0, but m_ν < 1 eV (tiny!)";
+    }
+
+    /**
+     * @brief Majorana vs Dirac
+     *
+     * Are neutrinos their own antiparticles?
+     */
+    static std::string majorana_vs_dirac() {
+        return "Unknown: Majorana (ν = ν̄) or Dirac (ν ≠ ν̄)?";
+    }
+
+    /**
+     * @brief Neutrinoless double beta decay
+     *
+     * Test for Majorana nature: 0νββ
+     */
+    static std::string double_beta_decay() {
+        return "0νββ: (A,Z) → (A,Z+2) + 2e⁻ (no neutrinos, Majorana only)";
+    }
+
+    /**
+     * @brief Oscillation probability
+     *
+     * P(νₐ → νᵦ) depends on Δm² and L/E
+     */
+    static double oscillation_probability(double L, double E, double delta_m2_eV2,
+                                          double theta) {
+        // Simplified two-flavor oscillation
+        double arg = 1.27 * delta_m2_eV2 * L / E;  // L in km, E in GeV
+        return std::sin(2.0 * theta) * std::sin(2.0 * theta) *
+               std::sin(arg) * std::sin(arg);
+    }
+
+    /**
+     * @brief See-saw mechanism
+     *
+     * Explains smallness of neutrino mass
+     */
+    static std::string see_saw() {
+        return "See-saw: m_ν ~ m_D²/M_R (M_R >> m_D explains tiny mass)";
+    }
+
+    /**
+     * @brief Compute see-saw mass
+     *
+     * m_ν ≈ m_D²/M_R (type-I see-saw)
+     */
+    static double seesaw_mass(double m_dirac, double m_right) {
+        if (m_right < 1e-100) return 0.0;
+        return (m_dirac * m_dirac) / m_right;
+    }
+
+    /**
+     * @brief Compute oscillation length
+     *
+     * L_osc = 4πE/Δm² (in natural units)
+     */
+    static double oscillation_length(double energy_GeV, double delta_m2_eV2) {
+        if (std::abs(delta_m2_eV2) < 1e-100) return 1.0e100;  // Infinite for no mass diff
+        // L_osc (km) = 2.48 × E(GeV) / Δm²(eV²)
+        return 2.48 * energy_GeV / delta_m2_eV2;
+    }
+
+    /**
+     * @brief Atmospheric neutrino parameters (typical values)
+     *
+     * Δm²_23 ≈ 2.5×10⁻³ eV²
+     */
+    static double atmospheric_delta_m2() {
+        return 2.5e-3;  // eV²
+    }
+
+    /**
+     * @brief Solar neutrino parameters (typical values)
+     *
+     * Δm²_12 ≈ 7.5×10⁻⁵ eV²
+     */
+    static double solar_delta_m2() {
+        return 7.5e-5;  // eV²
+    }
+
+    /**
+     * @brief Compute survival probability
+     *
+     * P(νₐ → νₐ) = 1 - P(νₐ → νᵦ)
+     */
+    static double survival_probability(double L, double E, double delta_m2_eV2,
+                                       double theta) {
+        return 1.0 - oscillation_probability(L, E, delta_m2_eV2, theta);
+    }
+};
+
+/**
+ * @brief Wave Equations for Arbitrary Spin - General Framework
+ *
+ * Systematic construction of relativistic wave equations
+ */
+class ArbitrarySpinFramework {
+public:
+    /**
+     * @brief General principle
+     *
+     * Wave equation must be Lorentz covariant
+     */
+    static std::string lorentz_covariance() {
+        return "Relativistic equation must transform covariantly under Lorentz";
+    }
+
+    /**
+     * @brief Massive particles
+     *
+     * Must satisfy p²ψ = m²c²ψ (mass shell condition)
+     */
+    static std::string mass_shell() {
+        return "Massive: (p² - m²c²)ψ = 0 for all components";
+    }
+
+    /**
+     * @brief Massless particles
+     *
+     * p² = 0, definite helicity h = ±s
+     */
+    static std::string massless_condition() {
+        return "Massless: p² = 0, helicity h = ±s (2 polarizations)";
+    }
+
+    /**
+     * @brief Number of components
+     *
+     * Spin s requires (2s+1) components minimum
+     */
+    static int minimum_components(int twice_spin) {
+        return twice_spin + 1;  // 2s+1
+    }
+
+    /**
+     * @brief Physical degrees of freedom
+     *
+     * Massive: 2s+1, Massless: 2 (helicity ±s)
+     */
+    static int physical_dof(int twice_spin, bool massive) {
+        if (massive) {
+            return twice_spin + 1;  // 2s+1
+        } else {
+            return 2;  // Only helicity ±s
+        }
+    }
+
+    /**
+     * @brief Auxiliary conditions
+     *
+     * Eliminate unphysical components
+     */
+    static std::string constraints() {
+        return "Subsidiary conditions eliminate unphysical polarizations";
+    }
+};
+
+/**
+ * @brief Proca Equations
+ *
+ * Massive spin-1 vector field
+ */
+class ProcaEquations {
+public:
+    /**
+     * @brief Proca equation
+     *
+     * ∂_μF^μν + m²c²A^ν = 0
+     */
+    static std::string equation() {
+        return "∂_μF^μν + (mc/ℏ)²A^ν = 0, F^μν = ∂^μA^ν - ∂^νA^μ";
+    }
+
+    /**
+     * @brief Lorenz gauge condition
+     *
+     * ∂_μA^μ = 0 (automatic consequence for m ≠ 0)
+     */
+    static std::string lorenz_gauge() {
+        return "∂_μA^μ = 0 (follows from field equation for m ≠ 0)";
+    }
+
+    /**
+     * @brief Number of polarizations
+     *
+     * Massive spin-1: 3 polarizations (2 transverse + 1 longitudinal)
+     */
+    static int polarizations() {
+        return 3;  // 2s+1 = 3 for s=1
+    }
+
+    /**
+     * @brief Mass shell condition
+     *
+     * (□ + (mc/ℏ)²)A^μ = 0
+     */
+    static std::string klein_gordon_form() {
+        return "(□ + (mc/ℏ)²)A^μ = 0 (Klein-Gordon for each component)";
+    }
+
+    /**
+     * @brief Massive photon
+     *
+     * Proca describes hypothetical massive photon
+     */
+    static std::string massive_photon() {
+        return "Proca: massive photon (m_γ < 10⁻¹⁸ eV from experiments)";
+    }
+
+    /**
+     * @brief Massless limit
+     *
+     * m → 0: Proca → Maxwell (loses longitudinal mode)
+     */
+    static std::string massless_limit() {
+        return "m → 0: Proca → Maxwell, 3 → 2 polarizations";
+    }
+
+    /**
+     * @brief Applications
+     *
+     * W±, Z⁰ bosons in electroweak theory
+     */
+    static std::string applications() {
+        return "W± (m_W = 80.4 GeV), Z⁰ (m_Z = 91.2 GeV) are massive spin-1";
+    }
+
+    /**
+     * @brief Compute Compton wavelength
+     *
+     * λ_C = h/(mc) = 2πℏ/(mc)
+     */
+    static double compton_wavelength(double mass) {
+        return constants::h / (mass * constants::c);
+    }
+
+    /**
+     * @brief Compute range of Yukawa potential
+     *
+     * r₀ ≈ ℏ/(mc) (force range)
+     */
+    static double force_range(double mass) {
+        return constants::hbar / (mass * constants::c);
+    }
+
+    /**
+     * @brief Compute energy-momentum relation
+     *
+     * E² = p²c² + m²c⁴
+     */
+    static double energy(double momentum, double mass) {
+        return std::sqrt(momentum * momentum * constants::c * constants::c +
+                        mass * mass * constants::c * constants::c * constants::c * constants::c);
+    }
+
+    /**
+     * @brief Compute dispersion relation ω(k)
+     *
+     * ω² = k²c² + (mc²/ℏ)²
+     */
+    static double frequency(double k, double mass) {
+        double omega_sq = k * k * constants::c * constants::c +
+                         (mass * constants::c * constants::c / constants::hbar) *
+                         (mass * constants::c * constants::c / constants::hbar);
+        return std::sqrt(omega_sq);
+    }
+
+    /**
+     * @brief W boson mass (experimental value)
+     */
+    static double w_boson_mass() {
+        return 80.4e9 * constants::e / (constants::c * constants::c);  // 80.4 GeV/c²
+    }
+
+    /**
+     * @brief Z boson mass (experimental value)
+     */
+    static double z_boson_mass() {
+        return 91.2e9 * constants::e / (constants::c * constants::c);  // 91.2 GeV/c²
+    }
+};
+
+/**
+ * @brief Kemmer Equation
+ *
+ * Alternative formulation for spin-0 and spin-1
+ */
+class KemmerEquation {
+public:
+    /**
+     * @brief Kemmer equation
+     *
+     * (iℏβ^μ∂_μ - mc)ψ = 0, where β matrices generalize Dirac matrices
+     */
+    static std::string equation() {
+        return "(iℏβ^μ∂_μ - mc)ψ = 0 (β-matrices: 5×5 or 10×10)";
+    }
+
+    /**
+     * @brief Beta matrices
+     *
+     * {β^μ, β^ν} = β^μβ^ν + β^νβ^μ = g^μν + ...
+     */
+    static std::string beta_algebra() {
+        return "{β^μ, β^ν}β^λ + β^λ{β^μ, β^ν} = g^μνβ^λ + g^νλβ^μ + g^λμβ^ν";
+    }
+
+    /**
+     * @brief Spin-0 representation
+     *
+     * 5-component spinor for spin-0 (Klein-Gordon)
+     */
+    static std::string spin_zero() {
+        return "5×5 β-matrices: describes spin-0 (equivalent to KG)";
+    }
+
+    /**
+     * @brief Spin-1 representation
+     *
+     * 10-component spinor for spin-1 (Proca)
+     */
+    static std::string spin_one() {
+        return "10×10 β-matrices: describes spin-1 (equivalent to Proca)";
+    }
+
+    /**
+     * @brief Unification attempt
+     *
+     * Unified formalism for spin-0 and spin-1
+     */
+    static std::string unification() {
+        return "Unified Dirac-like formalism for s=0,1 (not widely used)";
+    }
+
+    /**
+     * @brief Relation to Dirac
+     *
+     * Similar structure but different algebra
+     */
+    static std::string dirac_comparison() {
+        return "Like Dirac but β-algebra differs from γ-algebra";
+    }
+};
+
+/**
+ * @brief Maxwell Equations as Wave Equation
+ *
+ * Massless spin-1 field (photon)
+ */
+class MaxwellWaveEquation {
+public:
+    /**
+     * @brief Maxwell equations
+     *
+     * ∂_μF^μν = 0, ∂_λF_μν + ∂_μF_νλ + ∂_νF_λμ = 0
+     */
+    static std::string equations() {
+        return "∂_μF^μν = 0 (Bianchi: ∂_λF_μν + cyclic = 0)";
+    }
+
+    /**
+     * @brief Wave equation for A^μ
+     *
+     * □A^μ = 0 in Lorenz gauge
+     */
+    static std::string wave_equation() {
+        return "□A^μ = 0 with ∂_μA^μ = 0 (Lorenz gauge)";
+    }
+
+    /**
+     * @brief Gauge freedom
+     *
+     * A^μ → A^μ + ∂^μΛ
+     */
+    static std::string gauge_transformation() {
+        return "A'^μ = A^μ + ∂^μΛ (gauge invariance)";
+    }
+
+    /**
+     * @brief Physical polarizations
+     *
+     * 2 transverse polarizations for massless spin-1
+     */
+    static int polarizations() {
+        return 2;  // Helicity ±1
+    }
+
+    /**
+     * @brief Helicity states
+     *
+     * h = ±1 (circular polarization)
+     */
+    static std::string helicity() {
+        return "h = ±1 (right/left circular polarization)";
+    }
+
+    /**
+     * @brief Plane wave solution
+     *
+     * A^μ = ε^μ exp(ik·x), k² = 0, k·ε = 0
+     */
+    static std::string plane_wave() {
+        return "A^μ = ε^μ e^(ik·x), k² = 0, k·ε = 0 (transversality)";
+    }
+
+    /**
+     * @brief Photon properties
+     *
+     * Massless, spin-1, two helicity states
+     */
+    static std::string photon() {
+        return "Photon: m = 0, s = 1, h = ±1";
+    }
+};
+
+/**
+ * @brief Spin-3/2 Fields
+ *
+ * Rarita-Schwinger equation for spin-3/2 particles
+ */
+class RaritaSchwingerEquation {
+public:
+    /**
+     * @brief Rarita-Schwinger equation
+     *
+     * (iℏγ^μ∂_μ - mc)ψ_ν = 0 with constraints
+     */
+    static std::string equation() {
+        return "(iℏγ^μ∂_μ - mc)ψ_ν = 0 (vector-spinor field)";
+    }
+
+    /**
+     * @brief Field structure
+     *
+     * ψ_μ: 4-vector of 4-component Dirac spinors (16 components)
+     */
+    static std::string field_components() {
+        return "ψ_μ: 4 (Lorentz) × 4 (spinor) = 16 components";
+    }
+
+    /**
+     * @brief Constraint I: γ-trace
+     *
+     * γ^μψ_μ = 0
+     */
+    static std::string gamma_trace() {
+        return "γ^μψ_μ = 0 (γ-trace constraint)";
+    }
+
+    /**
+     * @brief Constraint II: divergence
+     *
+     * ∂^μψ_μ = 0
+     */
+    static std::string divergence() {
+        return "∂^μψ_μ = 0 (divergence-free)";
+    }
+
+    /**
+     * @brief Physical degrees of freedom
+     *
+     * Massive: 2s+1 = 4, Massless: 2 (h = ±3/2)
+     */
+    static int physical_dof(bool massive) {
+        return massive ? 4 : 2;
+    }
+
+    /**
+     * @brief Applications
+     *
+     * Δ⁺⁺ baryon (s = 3/2), gravitino in SUSY
+     */
+    static std::string applications() {
+        return "Δ⁺⁺ baryon, Ω⁻, gravitino (SUSY)";
+    }
+
+    /**
+     * @brief Massless limit
+     *
+     * Two helicity states h = ±3/2
+     */
+    static std::string massless_helicity() {
+        return "Massless: h = ±3/2 only (2 states)";
+    }
+
+    /**
+     * @brief Supergravity
+     *
+     * Gravitino: spin-3/2 superpartner of graviton
+     */
+    static std::string gravitino() {
+        return "Gravitino ψ̃_μ: spin-3/2 gauge fermion in supergravity";
+    }
+};
+
+/**
+ * @brief Orthogonal Transformations in Four Dimensions
+ *
+ * O(4) group and its structure
+ */
+class OrthogonalTransformationsFourD {
+public:
+    /**
+     * @brief O(4) definition
+     *
+     * Λᵀg Λ = g, where g = diag(1,-1,-1,-1)
+     */
+    static std::string definition() {
+        return "O(1,3): Λᵀη Λ = η, η = diag(1,-1,-1,-1)";
+    }
+
+    /**
+     * @brief Metric signature
+     *
+     * Minkowski metric η_μν = diag(1,-1,-1,-1)
+     */
+    static std::string metric() {
+        return "η_μν = diag(1,-1,-1,-1) (mostly minus signature)";
+    }
+
+    /**
+     * @brief Determinant
+     *
+     * det Λ = ±1
+     */
+    static std::string determinant() {
+        return "det Λ = ±1 (proper: +1, improper: -1)";
+    }
+
+    /**
+     * @brief Time component
+     *
+     * Λ⁰₀ ≥ 1 (orthochronous) or Λ⁰₀ ≤ -1
+     */
+    static std::string time_ordering() {
+        return "Orthochronous: Λ⁰₀ ≥ 1 (preserves time direction)";
+    }
+
+    /**
+     * @brief Four connected components
+     *
+     * O(1,3) has 4 disconnected pieces
+     */
+    static std::string components() {
+        return "O(1,3) = SO↑₊ ∪ SO↑₋ ∪ SO↓₊ ∪ SO↓₋ (4 components)";
+    }
+
+    /**
+     * @brief Proper orthochronous
+     *
+     * SO↑₊(1,3): det = +1, Λ⁰₀ ≥ 1 (connected to identity)
+     */
+    static std::string proper_orthochronous() {
+        return "SO↑₊(1,3): det Λ = +1, Λ⁰₀ ≥ 1 (restricted Lorentz)";
+    }
+
+    /**
+     * @brief Discrete transformations
+     *
+     * P (parity), T (time reversal), PT
+     */
+    static std::string discrete() {
+        return "P: x⁰ → x⁰, x⃗ → -x⃗; T: x⁰ → -x⁰, x⃗ → x⃗; PT: both";
+    }
+
+    /**
+     * @brief Group dimension
+     *
+     * 6 parameters (3 rotations + 3 boosts)
+     */
+    static int dimension() {
+        return 6;  // 3 + 3
+    }
+};
+
+/**
+ * @brief Infinitesimal Transformations and SO(4)
+ *
+ * Lie algebra of the Lorentz group
+ */
+class InfinitesimalSO4 {
+public:
+    /**
+     * @brief Infinitesimal transformation
+     *
+     * Λ^μ_ν = δ^μ_ν + ω^μ_ν, ω_μν = -ω_νμ
+     */
+    static std::string infinitesimal() {
+        return "Λ^μ_ν = δ^μ_ν + ω^μ_ν, ω_μν = -ω_νμ (6 independent)";
+    }
+
+    /**
+     * @brief Generators
+     *
+     * (M_μν)^ρ_σ = i(η_μρδ^ρ_ν - η_νρδ^ρ_μ)
+     */
+    static std::string generators() {
+        return "(J_μν)^ρ_σ = i(η_μρδ^ρ_ν - η_νρδ^ρ_μ)";
+    }
+
+    /**
+     * @brief Lie algebra
+     *
+     * [J_μν, J_ρσ] = i(η_νρJ_μσ - η_μρJ_νσ - η_νσJ_μρ + η_μσJ_νρ)
+     */
+    static std::string commutator() {
+        return "[J_μν, J_ρσ] = i(η_νρJ_μσ - η_μρJ_νσ - η_νσJ_μρ + η_μσJ_νρ)";
+    }
+
+    /**
+     * @brief Rotation generators
+     *
+     * J_i = ε_ijk J^jk/2 (i = 1,2,3)
+     */
+    static std::string rotation_generators() {
+        return "J⃗: J_i = (1/2)ε_ijk J^jk (angular momentum)";
+    }
+
+    /**
+     * @brief Boost generators
+     *
+     * K_i = J^0i
+     */
+    static std::string boost_generators() {
+        return "K⃗: K_i = J^0i (boosts)";
+    }
+
+    /**
+     * @brief Commutation relations
+     *
+     * [J_i, J_j] = iε_ijk J_k, [J_i, K_j] = iε_ijk K_k, [K_i, K_j] = -iε_ijk J_k
+     */
+    static std::string commutation_relations() {
+        return "[J_i,J_j]=iε_ijk J_k, [J_i,K_j]=iε_ijk K_k, [K_i,K_j]=-iε_ijk J_k";
+    }
+
+    /**
+     * @brief Casimir operators
+     *
+     * C₁ = J²-K², C₂ = J⃗·K⃗
+     */
+    static std::string casimirs() {
+        return "C₁ = J² - K² (quadratic), C₂ = J⃗·K⃗ (pseudoscalar)";
+    }
+};
+
+/**
+ * @brief Classification of O(4) Subgroups
+ *
+ * Important subgroups of the Lorentz group
+ */
+class LorentzSubgroups {
+public:
+    /**
+     * @brief SO(3) rotation group
+     *
+     * Spatial rotations (compact)
+     */
+    static std::string so3() {
+        return "SO(3): spatial rotations, generators J⃗, compact";
+    }
+
+    /**
+     * @brief SO(1,1) boost subgroup
+     *
+     * Boosts in one direction (non-compact)
+     */
+    static std::string so11() {
+        return "SO(1,1): boosts in one direction, non-compact (hyperbolic)";
+    }
+
+    /**
+     * @brief Little group
+     *
+     * Stabilizer of momentum p^μ
+     */
+    static std::string little_group() {
+        return "Massive: SO(3), Massless: ISO(2) (Wigner classification)";
+    }
+
+    /**
+     * @brief Euclidean subgroup
+     *
+     * Wick rotation to SO(4)
+     */
+    static std::string euclidean() {
+        return "Wick rotation: x⁰ = iτ → SO(4) Euclidean (compact)";
+    }
+
+    /**
+     * @brief Decomposition
+     *
+     * SO(4) ≅ SU(2) × SU(2) (Euclidean case)
+     */
+    static std::string su2_decomposition() {
+        return "SO(4) ≅ SU(2)_L × SU(2)_R (Euclidean)";
+    }
+
+    /**
+     * @brief Lorentz algebra complexification
+     *
+     * so(1,3) ⊗ ℂ ≅ so(4) ⊗ ℂ ≅ su(2) ⊕ su(2)
+     */
+    static std::string complexification() {
+        return "so(1,3) ⊗ ℂ ≅ su(2) ⊕ su(2) via A = (J+iK)/2, B = (J-iK)/2";
+    }
+};
+
+/**
+ * @brief Inhomogeneous Lorentz Group (Poincaré Group)
+ *
+ * Lorentz transformations + translations
+ */
+class PoincareGroup {
+public:
+    /**
+     * @brief Poincaré transformation
+     *
+     * x'^μ = Λ^μ_ν x^ν + a^μ
+     */
+    static std::string transformation() {
+        return "x'^μ = Λ^μ_ν x^ν + a^μ (Lorentz + translation)";
+    }
+
+    /**
+     * @brief Group structure
+     *
+     * ISO(1,3) = SO(1,3) ⋉ ℝ⁴ (semidirect product)
+     */
+    static std::string structure() {
+        return "ISO(1,3) = SO(1,3) ⋉ ℝ⁴ (10 parameters)";
+    }
+
+    /**
+     * @brief Generators
+     *
+     * 6 Lorentz (J_μν) + 4 translation (P_μ)
+     */
+    static std::string generators() {
+        return "10 generators: J_μν (6) and P_μ (4)";
+    }
+
+    /**
+     * @brief Poincaré algebra
+     *
+     * [P_μ, P_ν] = 0, [J_μν, P_ρ] = i(η_μρP_ν - η_νρP_μ)
+     */
+    static std::string algebra() {
+        return "[P_μ,P_ν]=0, [J_μν,P_ρ]=i(η_μρP_ν-η_νρP_μ), [J_μν,J_ρσ]=...";
+    }
+
+    /**
+     * @brief Casimir operators
+     *
+     * P² = m² (mass squared), W² = -m²s(s+1) (spin)
+     */
+    static std::string casimirs() {
+        return "P² = m²c² (mass), W² = -m²s(s+1)ℏ² (Pauli-Lubanski spin)";
+    }
+
+    /**
+     * @brief Pauli-Lubanski vector
+     *
+     * W_μ = (1/2)ε_μνρσ J^νρ P^σ
+     */
+    static std::string pauli_lubanski() {
+        return "W_μ = (1/2)ε_μνρσ J^νρ P^σ (spin pseudovector)";
+    }
+
+    /**
+     * @brief Wigner classification
+     *
+     * Representations labeled by (m², s)
+     */
+    static std::string wigner_classification() {
+        return "Unitary irreps: (m²,s) for m>0 or (0,h) for m=0";
+    }
+
+    /**
+     * @brief Particle states
+     *
+     * |p,s,σ⟩ with p² = m², s = spin
+     */
+    static std::string particle_states() {
+        return "|p,s,σ⟩: p^μ eigenvalue of P^μ, s² eigenvalue of W²/(-m²)";
+    }
+};
+
+/**
+ * @brief Conformal Group
+ *
+ * Poincaré + dilatations + special conformal transformations
+ */
+class ConformalGroup {
+public:
+    /**
+     * @brief Conformal transformations
+     *
+     * Preserve angles: g'_μν(x') = Ω²(x)g_μν(x)
+     */
+    static std::string definition() {
+        return "Preserve angles: g'_μν = Ω²(x)g_μν (angle-preserving)";
+    }
+
+    /**
+     * @brief Dilatation (scaling)
+     *
+     * x^μ → λx^μ
+     */
+    static std::string dilatation() {
+        return "D: x^μ → λx^μ (scale transformation)";
+    }
+
+    /**
+     * @brief Special conformal transformation
+     *
+     * x'^μ = (x^μ + b^μx²)/(1 + 2b·x + b²x²)
+     */
+    static std::string special_conformal() {
+        return "K_μ: x'^μ = (x^μ + b^μx²)/(1 + 2b·x + b²x²)";
+    }
+
+    /**
+     * @brief Group structure
+     *
+     * SO(2,4) in 4D (15 parameters)
+     */
+    static std::string group_structure() {
+        return "Conf(1,3) ≅ SO(2,4) (15 generators)";
+    }
+
+    /**
+     * @brief Generators
+     *
+     * P_μ (4), J_μν (6), D (1), K_μ (4) = 15 total
+     */
+    static std::string generators() {
+        return "15 generators: P_μ(4), J_μν(6), D(1), K_μ(4)";
+    }
+
+    /**
+     * @brief Conformal algebra
+     *
+     * [D, P_μ] = iP_μ, [D, K_μ] = -iK_μ, [K_μ, P_ν] = 2i(η_μνD - J_μν)
+     */
+    static std::string algebra() {
+        return "[D,P_μ]=iP_μ, [D,K_μ]=-iK_μ, [K_μ,P_ν]=2i(η_μνD-J_μν)";
+    }
+
+    /**
+     * @brief Applications
+     *
+     * Conformal field theory (CFT), critical phenomena
+     */
+    static std::string applications() {
+        return "CFT: massless theories at critical points, AdS/CFT";
+    }
+
+    /**
+     * @brief Massless condition
+     *
+     * Conformal symmetry requires m = 0
+     */
+    static std::string massless() {
+        return "Full conformal invariance → massless theory";
+    }
+
+    /**
+     * @brief Compactification
+     *
+     * ℝ^(1,3) → S³ × S¹ (conformal compactification)
+     */
+    static std::string compactification() {
+        return "Conformal compactification: ℝ^(1,3) → S³ × S¹";
+    }
+};
+
+/**
+ * @brief Tensor Representations
+ *
+ * Tensor representations of Lorentz group
+ */
+class TensorRepresentations {
+public:
+    /**
+     * @brief Scalar (rank 0)
+     *
+     * φ'(x') = φ(x)
+     */
+    static std::string scalar() {
+        return "Scalar: φ'(x') = φ(Λ⁻¹x') (1 component)";
+    }
+
+    /**
+     * @brief Vector (rank 1)
+     *
+     * V'^μ = Λ^μ_ν V^ν
+     */
+    static std::string vector() {
+        return "Vector: V'^μ = Λ^μ_ν V^ν (4 components)";
+    }
+
+    /**
+     * @brief Tensor (rank 2)
+     *
+     * T'^μν = Λ^μ_ρ Λ^ν_σ T^ρσ
+     */
+    static std::string tensor_rank2() {
+        return "Rank-2: T'^μν = Λ^μ_ρ Λ^ν_σ T^ρσ (16 components)";
+    }
+
+    /**
+     * @brief Antisymmetric tensor
+     *
+     * F^μν = -F^νμ (field strength)
+     */
+    static std::string antisymmetric() {
+        return "Antisymmetric: F^μν = -F^νμ (6 independent components)";
+    }
+
+    /**
+     * @brief Electromagnetic tensor
+     *
+     * F^μν contains E⃗ and B⃗ fields
+     */
+    static std::string electromagnetic() {
+        return "F^0i = E^i/c, F^ij = -ε^ijk B^k (EM field)";
+    }
+
+    /**
+     * @brief Dual tensor
+     *
+     * *F^μν = (1/2)ε^μνρσ F_ρσ
+     */
+    static std::string dual() {
+        return "*F^μν = (1/2)ε^μνρσ F_ρσ (duality: E⃗ ↔ B⃗)";
+    }
+
+    /**
+     * @brief Reducible vs irreducible
+     *
+     * Tensor decomposition into irreps
+     */
+    static std::string decomposition() {
+        return "Rank-2: symmetric traceless + antisymmetric + trace";
+    }
+
+    /**
+     * @brief General tensor
+     *
+     * Rank-n tensor: 4^n components
+     */
+    static int tensor_components(int rank) {
+        int components = 1;
+        for (int i = 0; i < rank; ++i) {
+            components *= 4;
+        }
+        return components;
+    }
+};
+
+/**
+ * @brief Spinor Representations
+ *
+ * Spinor representations of SL(2,C) covering SO(1,3)
+ */
+class SpinorRepresentations {
+public:
+    /**
+     * @brief SL(2,C) covering
+     *
+     * SL(2,C) is double cover of SO↑₊(1,3)
+     */
+    static std::string covering_group() {
+        return "SL(2,C) → SO↑₊(1,3) is 2:1 covering (spinor = √tensor)";
+    }
+
+    /**
+     * @brief Weyl spinors
+     *
+     * (1/2, 0) and (0, 1/2) irreps
+     */
+    static std::string weyl_spinors() {
+        return "Left: ψ_L (1/2,0), Right: ψ_R (0,1/2) [2 components each]";
+    }
+
+    /**
+     * @brief Transformation
+     *
+     * ψ_L → Mψ_L, ψ_R → M*ψ_R where M ∈ SL(2,C)
+     */
+    static std::string weyl_transformation() {
+        return "ψ_L → Mψ_L, ψ_R → M*ψ_R (M ∈ SL(2,C), det M = 1)";
+    }
+
+    /**
+     * @brief Dirac spinor
+     *
+     * (1/2, 0) ⊕ (0, 1/2) = 4-component Dirac spinor
+     */
+    static std::string dirac_spinor() {
+        return "Dirac: ψ = (ψ_L, ψ_R)ᵀ [4 components, (1/2,0)⊕(0,1/2)]";
+    }
+
+    /**
+     * @brief Majorana spinor
+     *
+     * Reality condition: ψ = ψ^C
+     */
+    static std::string majorana() {
+        return "Majorana: ψ = ψ^C (4 components, but 2 real DOF)";
+    }
+
+    /**
+     * @brief Dotted vs undotted indices
+     *
+     * ψ_α (undotted), ψ̄_α̇ (dotted)
+     */
+    static std::string dotted_undotted() {
+        return "ψ_α undotted (1/2,0), χ̄_α̇ dotted (0,1/2), α,α̇=1,2";
+    }
+
+    /**
+     * @brief Van der Waerden notation
+     *
+     * Two-component spinor formalism
+     */
+    static std::string van_der_waerden() {
+        return "V^μ = V^αα̇ = σ^μ_αα̇ (vector as spinor bilinear)";
+    }
+
+    /**
+     * @brief Spinor metric
+     *
+     * ε_αβ raises/lowers spinor indices
+     */
+    static std::string spinor_metric() {
+        return "ε^αβ = -ε^βα, ε^12 = 1 (antisymmetric metric)";
+    }
+
+    /**
+     * @brief Higher spin-j representations
+     *
+     * (j₁, j₂) with j = j₁ + j₂, s = |j₁ - j₂|
+     */
+    static std::string higher_spin() {
+        return "(j₁,j₂): spin s = |j₁-j₂|, j = j₁+j₂ (e.g., (1,0)⊕(0,1) = vector)";
+    }
+};
+
+/**
+ * @brief Representation of SL(2,C)
+ *
+ * Detailed structure of SL(2,C) representations
+ */
+class SL2CRepresentation {
+public:
+    /**
+     * @brief SL(2,C) group definition
+     *
+     * 2×2 complex matrices with det = 1
+     */
+    static std::string definition() {
+        return "SL(2,C) = {M ∈ GL(2,C) | det M = 1}";
+    }
+
+    /**
+     * @brief Fundamental representation
+     *
+     * Natural action on 2-component spinors
+     */
+    static std::string fundamental() {
+        return "ψ_α → M^β_α ψ_β (2-dimensional, α = 1,2)";
+    }
+
+    /**
+     * @brief Conjugate representation
+     *
+     * Action on dotted spinors
+     */
+    static std::string conjugate() {
+        return "χ̄_α̇ → (M*)^β̇_α̇ χ̄_β̇ (conjugate 2-dimensional)";
+    }
+
+    /**
+     * @brief Tensor product representations
+     *
+     * (j₁, j₂) = Symʲ¹(ψ) ⊗ Symʲ²(χ̄)
+     */
+    static std::string tensor_products() {
+        return "(j₁,j₂): symmetric j₁-fold ψ ⊗ symmetric j₂-fold χ̄";
+    }
+
+    /**
+     * @brief Dimension of (j₁, j₂)
+     *
+     * dim = (2j₁+1)(2j₂+1)
+     */
+    static int dimension(int twice_j1, int twice_j2) {
+        return (twice_j1 + 1) * (twice_j2 + 1);
+    }
+
+    /**
+     * @brief Pauli matrices
+     *
+     * σ^μ = (I, σ⃗), σ̄^μ = (I, -σ⃗)
+     */
+    static std::string pauli_matrices() {
+        return "σ^μ = (I,σ⃗), σ̄^μ = (I,-σ⃗) where σ⃗ = Pauli matrices";
+    }
+
+    /**
+     * @brief Generators
+     *
+     * 6 real parameters: 3 rotations + 3 boosts
+     */
+    static std::string generators() {
+        return "M = exp(iθ⃗·σ⃗/2 - η⃗·σ⃗/2) (θ⃗: rotations, η⃗: boosts)";
+    }
+
+    /**
+     * @brief Relation to Lorentz group
+     *
+     * 2:1 homomorphism SL(2,C) → SO↑₊(1,3)
+     */
+    static std::string lorentz_homomorphism() {
+        return "SL(2,C) → SO↑₊(1,3) is 2:1 covering, kernel = {±I}";
+    }
+
+    /**
+     * @brief Vector from spinors
+     *
+     * V^μ = ψ σ^μ χ̄ (spinor bilinear)
+     */
+    static std::string vector_from_spinors() {
+        return "V^μ = ψ_α σ^μ_αα̇ χ̄^α̇ [(1/2,0)⊗(0,1/2) → (1/2,1/2) = vector]";
+    }
+
+    /**
+     * @brief Casimir operators
+     *
+     * C₁ = j₁(j₁+1) + j₂(j₂+1), C₂ = j₁(j₁+1) - j₂(j₂+1)
+     */
+    static std::string casimirs() {
+        return "C₁ ~ j₁² + j₂², C₂ ~ j₁² - j₂² (label irreps)";
+    }
+};
+
+/**
+ * @brief Representations of SO(3,R)
+ *
+ * Rotation group representations and angular momentum
+ */
+class SO3Representations {
+public:
+    /**
+     * @brief SO(3) definition
+     *
+     * 3×3 real orthogonal matrices with det = 1
+     */
+    static std::string definition() {
+        return "SO(3) = {R ∈ O(3) | R^T R = I, det R = 1}";
+    }
+
+    /**
+     * @brief Irreducible representations
+     *
+     * Labeled by angular momentum j = 0, 1/2, 1, 3/2, ...
+     */
+    static std::string irreps() {
+        return "Irreps D^(j): j = 0, 1/2, 1, 3/2, 2, ... (dimension 2j+1)";
+    }
+
+    /**
+     * @brief Integer vs half-integer
+     *
+     * Integer j: true representations, Half-integer: projective/spin
+     */
+    static std::string integer_vs_half() {
+        return "Integer j: true SO(3) reps, Half-integer: SU(2) reps (double-valued)";
+    }
+
+    /**
+     * @brief SU(2) covering
+     *
+     * SU(2) → SO(3) is 2:1 covering
+     */
+    static std::string su2_covering() {
+        return "SU(2) → SO(3) is 2:1, kernel = {±I} (spin covering)";
+    }
+
+    /**
+     * @brief Dimension formula
+     *
+     * dim D^(j) = 2j + 1
+     */
+    static int dimension(int twice_j) {
+        return twice_j + 1;
+    }
+
+    /**
+     * @brief Angular momentum operators
+     *
+     * Generators: J_x, J_y, J_z
+     */
+    static std::string generators() {
+        return "[J_i, J_j] = iε_ijk J_k (angular momentum algebra)";
+    }
+
+    /**
+     * @brief Casimir operator
+     *
+     * J² = J_x² + J_y² + J_z²
+     */
+    static std::string casimir() {
+        return "J² = j(j+1)ℏ² (labels irrep, commutes with all J_i)";
+    }
+
+    /**
+     * @brief Clebsch-Gordan series
+     *
+     * D^(j₁) ⊗ D^(j₂) = D^(|j₁-j₂|) ⊕ ... ⊕ D^(j₁+j₂)
+     */
+    static std::string clebsch_gordan() {
+        return "j₁ ⊗ j₂ = |j₁-j₂| ⊕ |j₁-j₂|+1 ⊕ ... ⊕ j₁+j₂";
+    }
+
+    /**
+     * @brief Spherical harmonics
+     *
+     * Y_ℓm: basis for integer spin-ℓ representations
+     */
+    static std::string spherical_harmonics() {
+        return "Y_ℓm(θ,φ): basis for D^(ℓ), m = -ℓ,...,+ℓ (2ℓ+1 states)";
+    }
+
+    /**
+     * @brief Wigner D-matrices
+     *
+     * D^(j)_mm'(R): matrix elements of rotation R
+     */
+    static std::string wigner_d() {
+        return "D^(j)_mm'(α,β,γ): (2j+1)×(2j+1) rotation matrices (Euler angles)";
+    }
+
+    /**
+     * @brief Character formula
+     *
+     * χ^(j)(θ) = sin((2j+1)θ/2) / sin(θ/2)
+     */
+    static double character(int twice_j, double theta) {
+        if (std::abs(theta) < 1e-10) {
+            return static_cast<double>(twice_j + 1);
+        }
+        double j_plus_half = (twice_j + 1) / 2.0;
+        return std::sin(j_plus_half * theta) / std::sin(theta / 2.0);
+    }
+};
+
+/**
+ * @brief Representations of the Lorentz Group Lₚ
+ *
+ * Finite-dimensional representations of proper Lorentz group
+ */
+class LorentzGroupRepresentations {
+public:
+    /**
+     * @brief Proper Lorentz group
+     *
+     * SO↑₊(1,3): connected component of identity
+     */
+    static std::string definition() {
+        return "SO↑₊(1,3): det Λ = +1, Λ⁰₀ ≥ 1 (proper orthochronous)";
+    }
+
+    /**
+     * @brief Universal cover
+     *
+     * SL(2,C) is universal covering group
+     */
+    static std::string universal_cover() {
+        return "SL(2,C) → SO↑₊(1,3) universal cover, π₁(SO↑₊) = ℤ";
+    }
+
+    /**
+     * @brief Finite-dimensional irreps
+     *
+     * Labeled by (j₁, j₂) where j₁, j₂ = 0, 1/2, 1, ...
+     */
+    static std::string finite_irreps() {
+        return "Finite irreps: (j₁,j₂) of SL(2,C), dim = (2j₁+1)(2j₂+1)";
+    }
+
+    /**
+     * @brief Non-unitarity
+     *
+     * Finite-dimensional reps are NOT unitary (except trivial)
+     */
+    static std::string non_unitarity() {
+        return "Finite-dim reps non-unitary (except (0,0)), boosts not compact";
+    }
+
+    /**
+     * @brief Common representations
+     *
+     * (0,0): scalar, (1/2,0): left Weyl, (0,1/2): right Weyl, (1/2,1/2): vector
+     */
+    static std::string common_reps() {
+        return "(0,0):scalar, (1/2,0):ψ_L, (0,1/2):ψ_R, (1/2,1/2):vector";
+    }
+
+    /**
+     * @brief Spin and boost content
+     *
+     * j₁, j₂ related to spin and boost properties
+     */
+    static std::string spin_boost() {
+        return "s = |j₁-j₂| (spin), j = j₁+j₂ (total angular momentum in rest frame)";
+    }
+
+    /**
+     * @brief Decomposition under SO(3)
+     *
+     * (j₁,j₂) → j = |j₁-j₂|, ..., j₁+j₂
+     */
+    static std::string so3_decomposition() {
+        return "Under SO(3): (j₁,j₂) → |j₁-j₂| ⊕ |j₁-j₂|+1 ⊕ ... ⊕ j₁+j₂";
+    }
+
+    /**
+     * @brief Tensor vs spinor
+     *
+     * Integer j₁,j₂: tensors, Half-integer: spinors
+     */
+    static std::string tensor_vs_spinor() {
+        return "Integer j₁,j₂ → tensor, Half-integer → spinor/spinor-tensor";
+    }
+
+    /**
+     * @brief Self-dual and anti-self-dual
+     *
+     * (j,0) and (0,j) related by parity
+     */
+    static std::string self_dual() {
+        return "(j,0): self-dual, (0,j): anti-self-dual (P interchanges)";
+    }
+
+    /**
+     * @brief Field equations
+     *
+     * (j₁,j₂) fields satisfy specific wave equations
+     */
+    static std::string field_equations() {
+        return "(0,0):KG, (1/2,0)⊕(0,1/2):Dirac, (1/2,1/2):Proca/Maxwell";
+    }
+
+    /**
+     * @brief Unitarity for physical particles
+     *
+     * Physical states: infinite-dimensional unitary reps
+     */
+    static std::string unitary_irreps() {
+        return "Physical particles: infinite-dim unitary reps on Hilbert space";
+    }
+};
+
+/**
+ * @brief Spin and the Rotation Group
+ *
+ * Connection between spin and SO(3)/SU(2) representations
+ */
+class SpinRotationGroup {
+public:
+    /**
+     * @brief Spin definition
+     *
+     * Intrinsic angular momentum, quantum number j or s
+     */
+    static std::string definition() {
+        return "Spin s: intrinsic angular momentum, s = 0,1/2,1,3/2,2,...";
+    }
+
+    /**
+     * @brief Spin representations
+     *
+     * Transform under D^(s) of SU(2)
+     */
+    static std::string representations() {
+        return "Spin-s particle: (2s+1)-dimensional SU(2) representation";
+    }
+
+    /**
+     * @brief Spinor for spin-1/2
+     *
+     * 2-component Pauli spinor
+     */
+    static std::string spinor() {
+        return "Spin-1/2: 2-component spinor χ = (χ₊, χ₋)ᵀ";
+    }
+
+    /**
+     * @brief Rotation of spinor
+     *
+     * χ → exp(-iθ⃗·σ⃗/2)χ
+     */
+    static std::string spinor_rotation() {
+        return "Rotation: χ → U(R)χ, U(R) = exp(-iθ⃗·σ⃗/2)";
+    }
+
+    /**
+     * @brief 4π rotation
+     *
+     * Spinors pick up -1 under 2π rotation, +1 under 4π
+     */
+    static std::string four_pi() {
+        return "U(2π) = -I, U(4π) = +I (spinor double-valuedness)";
+    }
+
+    /**
+     * @brief Pauli matrices
+     *
+     * σ_x, σ_y, σ_z: generators of SU(2)
+     */
+    static std::string pauli() {
+        return "σ_i: Pauli matrices, [σ_i,σ_j] = 2iε_ijk σ_k";
+    }
+
+    /**
+     * @brief Spin operators
+     *
+     * S_i = (ℏ/2)σ_i for spin-1/2
+     */
+    static std::string spin_operators() {
+        return "S⃗ = (ℏ/2)σ⃗, [S_i,S_j] = iℏε_ijk S_k";
+    }
+
+    /**
+     * @brief Higher spin
+     *
+     * Spin-s: (2s+1)×(2s+1) matrices
+     */
+    static std::string higher_spin() {
+        return "Spin-s: S_i are (2s+1)×(2s+1) matrices, S² = s(s+1)ℏ²I";
+    }
+
+    /**
+     * @brief Spin-statistics theorem
+     *
+     * Integer spin → bosons, Half-integer → fermions
+     */
+    static std::string spin_statistics() {
+        return "Integer s → bosons (symmetric), Half-integer → fermions (antisymmetric)";
+    }
+
+    /**
+     * @brief Addition of angular momenta
+     *
+     * j₁ ⊗ j₂ = |j₁-j₂| ⊕ ... ⊕ j₁+j₂
+     */
+    static std::string addition() {
+        return "j⃗₁ + j⃗₂: total J from |j₁-j₂| to j₁+j₂ (Clebsch-Gordan)";
+    }
+
+    /**
+     * @brief Magnetic quantum number
+     *
+     * m = -s, -s+1, ..., s-1, s (2s+1 values)
+     */
+    static std::string magnetic_quantum() {
+        return "S_z|s,m⟩ = mℏ|s,m⟩, m = -s,...,+s";
+    }
+
+    /**
+     * @brief Ladder operators
+     *
+     * S_± = S_x ± iS_y
+     */
+    static std::string ladder() {
+        return "S_±|s,m⟩ = ℏ√(s∓m)(s±m+1) |s,m±1⟩";
+    }
+
+    /**
+     * @brief Spin precession
+     *
+     * dS⃗/dt = (μ/ℏ)B⃗ × S⃗ (Larmor precession)
+     */
+    static std::string precession() {
+        return "dS⃗/dt = γ B⃗ × S⃗ (Larmor: ω_L = γB)";
+    }
+};
+
 } // namespace relativistic_quantum
 } // namespace physics
 
