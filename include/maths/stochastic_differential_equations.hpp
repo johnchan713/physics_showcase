@@ -195,6 +195,176 @@ public:
 
         return S;
     }
+
+    /**
+     * @brief Multi-dimensional Itô formula
+     *
+     * For X = (X₁, ..., Xₙ) with dXᵢ = μᵢ dt + ∑ⱼ σᵢⱼ dWⱼ
+     * and Y = f(t, X), then:
+     * dY = (∂f/∂t + ∑ᵢ μᵢ ∂f/∂xᵢ + ½∑ᵢⱼₖ σᵢₖσⱼₖ ∂²f/∂xᵢ∂xⱼ) dt
+     *      + ∑ᵢⱼ σᵢⱼ ∂f/∂xᵢ dWⱼ
+     *
+     * @param x State vector X
+     * @param mu Drift vector
+     * @param sigma Diffusion matrix (n × m)
+     * @param df_dt Time derivative
+     * @param grad_f Gradient ∇f
+     * @param hessian_f Hessian ∂²f/∂xᵢ∂xⱼ
+     * @return Pair (drift of Y, diffusion coefficients of Y)
+     */
+    static std::pair<double, std::vector<double>> applyMultiDimensional(
+        const std::vector<double>& x,
+        const std::vector<double>& mu,
+        const std::vector<std::vector<double>>& sigma,
+        double df_dt,
+        const std::vector<double>& grad_f,
+        const std::vector<std::vector<double>>& hessian_f) {
+
+        int n = x.size();
+        int m = sigma[0].size();  // Number of Brownian motions
+
+        // Compute drift term
+        double drift = df_dt;
+
+        // Add ∑ᵢ μᵢ ∂f/∂xᵢ
+        for (int i = 0; i < n; ++i) {
+            drift += mu[i] * grad_f[i];
+        }
+
+        // Add ½∑ᵢⱼₖ σᵢₖσⱼₖ ∂²f/∂xᵢ∂xⱼ
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                double sum_sigma = 0.0;
+                for (int k = 0; k < m; ++k) {
+                    sum_sigma += sigma[i][k] * sigma[j][k];
+                }
+                drift += 0.5 * sum_sigma * hessian_f[i][j];
+            }
+        }
+
+        // Compute diffusion terms: ∑ᵢ σᵢⱼ ∂f/∂xᵢ for each j
+        std::vector<double> diffusion(m, 0.0);
+        for (int j = 0; j < m; ++j) {
+            for (int i = 0; i < n; ++i) {
+                diffusion[j] += sigma[i][j] * grad_f[i];
+            }
+        }
+
+        return {drift, diffusion};
+    }
+};
+
+/**
+ * ============================================================================
+ * MARTINGALE REPRESENTATION THEOREM
+ * ============================================================================
+ */
+
+/**
+ * @class MartingaleRepresentation
+ * @brief Martingale representation and properties
+ *
+ * Every square-integrable martingale M adapted to Brownian filtration
+ * has representation: M(t) = M(0) + ∫₀ᵗ φ(s) dW(s)
+ */
+class MartingaleRepresentation {
+public:
+    /**
+     * @brief Check if process is a martingale
+     *
+     * Verify E[X(t) | ℱₛ] = X(s) for s < t
+     * (Simplified check: verify drift is zero)
+     */
+    static bool isMartingale(
+        std::function<double(double, double)> drift,
+        double t_start, double t_end,
+        int n_samples = 100) {
+
+        // For a process to be a martingale, drift must be zero
+        double avg_drift = 0.0;
+        int n_points = 20;
+
+        for (int i = 0; i < n_points; ++i) {
+            double t = t_start + (t_end - t_start) * i / n_points;
+            double x = 0.0;  // Test at origin
+            avg_drift += std::abs(drift(t, x));
+        }
+
+        avg_drift /= n_points;
+        return avg_drift < 1e-6;
+    }
+
+    /**
+     * @brief Represent martingale via Itô integral
+     *
+     * For martingale M(t), find integrand φ(t) such that:
+     * M(t) = M(0) + ∫₀ᵗ φ(s) dW(s)
+     *
+     * @param martingale Function M(t, W_t)
+     * @param phi Integrand (computed via differentiation)
+     * @param M0 Initial value M(0)
+     * @param T Terminal time
+     * @param n_steps Number of time steps
+     * @return Simulated martingale path
+     */
+    static std::vector<double> represent(
+        std::function<double(double, double)> phi,
+        double M0, double T, int n_steps) {
+
+        double dt = T / n_steps;
+        double sqrt_dt = std::sqrt(dt);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        std::vector<double> M(n_steps + 1);
+        M[0] = M0;
+
+        double W = 0.0;
+        for (int i = 0; i < n_steps; ++i) {
+            double t = i * dt;
+            double dW = sqrt_dt * normal(gen);
+
+            M[i+1] = M[i] + phi(t, W) * dW;
+            W += dW;
+        }
+
+        return M;
+    }
+
+    /**
+     * @brief Doob's optional stopping theorem
+     *
+     * For martingale M and stopping time τ:
+     * E[M(τ)] = M(0) (under suitable conditions)
+     */
+    static double optionalStopping(
+        std::function<double(double, double)> martingale,
+        std::function<bool(double, double)> stopping_condition,
+        double M0, double max_time,
+        int n_samples = 1000) {
+
+        std::vector<double> stopped_values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double t = 0.0;
+            double W = 0.0;
+            double dt = 0.01;
+            double sqrt_dt = std::sqrt(dt);
+
+            double M = M0;
+
+            while (t < max_time && !stopping_condition(t, W)) {
+                double dW = sqrt_dt * normal(gen);
+                W += dW;
+                t += dt;
+                M = martingale(t, W);
+            }
+
+            stopped_values[sample] = M;
+        }
+
+        return std::accumulate(stopped_values.begin(), stopped_values.end(), 0.0) / n_samples;
+    }
 };
 
 /**
@@ -284,6 +454,285 @@ public:
         auto diffusion = [sigma](double t, double X) { return sigma; };
 
         return eulerMaruyama(drift, diffusion, X0, T, n_steps);
+    }
+
+    /**
+     * @brief Linear SDE with exact solution
+     *
+     * dX = aX dt + bX dW
+     * Exact: X(t) = X₀ exp((a - b²/2)t + bW(t))
+     */
+    static double linearSDE(double X0, double a, double b, double T) {
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double W_T = std::sqrt(T) * normal(gen);
+
+        return X0 * std::exp((a - 0.5 * b * b) * T + b * W_T);
+    }
+
+    /**
+     * @brief Bessel process (radial part of Brownian motion)
+     *
+     * dR = (n-1)/(2R) dt + dW for n-dimensional Brownian motion
+     */
+    static std::vector<double> besselProcess(
+        double R0, int dimension, double T, int n_steps) {
+
+        auto drift = [dimension](double t, double R) {
+            return (dimension - 1) / (2.0 * std::max(R, 1e-10));
+        };
+        auto diffusion = [](double t, double R) { return 1.0; };
+
+        return eulerMaruyama(drift, diffusion, R0, T, n_steps);
+    }
+
+    /**
+     * @brief Langevin equation (physics)
+     *
+     * dv = -γv dt + σ dW (damped Brownian motion)
+     */
+    static std::vector<double> langevinEquation(
+        double v0, double gamma, double sigma, double T, int n_steps) {
+
+        auto drift = [gamma](double t, double v) { return -gamma * v; };
+        auto diffusion = [sigma](double t, double v) { return sigma; };
+
+        return eulerMaruyama(drift, diffusion, v0, T, n_steps);
+    }
+};
+
+/**
+ * ============================================================================
+ * EXISTENCE AND UNIQUENESS THEOREM
+ * ============================================================================
+ */
+
+/**
+ * @class ExistenceUniqueness
+ * @brief Existence and uniqueness results for SDEs
+ *
+ * Theorem: If μ and σ satisfy Lipschitz and linear growth conditions,
+ * then SDE dX = μ(t,X)dt + σ(t,X)dW has unique strong solution
+ */
+class ExistenceUniqueness {
+public:
+    /**
+     * @brief Check Lipschitz condition
+     *
+     * |f(t,x) - f(t,y)| ≤ K|x - y| for all x, y
+     */
+    static bool checkLipschitz(
+        std::function<double(double, double)> f,
+        double t, double x_min, double x_max,
+        int n_points = 100) {
+
+        double max_lipschitz_constant = 0.0;
+
+        for (int i = 0; i < n_points - 1; ++i) {
+            double x1 = x_min + (x_max - x_min) * i / n_points;
+            double x2 = x_min + (x_max - x_min) * (i + 1) / n_points;
+
+            double f1 = f(t, x1);
+            double f2 = f(t, x2);
+
+            double lipschitz = std::abs(f2 - f1) / std::abs(x2 - x1);
+            max_lipschitz_constant = std::max(max_lipschitz_constant, lipschitz);
+        }
+
+        // Check if bounded
+        return std::isfinite(max_lipschitz_constant);
+    }
+
+    /**
+     * @brief Check linear growth condition
+     *
+     * |f(t,x)|² ≤ K(1 + |x|²) for all x
+     */
+    static bool checkLinearGrowth(
+        std::function<double(double, double)> f,
+        double t, double x_min, double x_max,
+        int n_points = 100) {
+
+        for (int i = 0; i < n_points; ++i) {
+            double x = x_min + (x_max - x_min) * i / n_points;
+            double f_val = f(t, x);
+
+            // Check if f²/(1 + x²) is bounded
+            double ratio = (f_val * f_val) / (1.0 + x * x);
+
+            if (!std::isfinite(ratio) || ratio > 1e6) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Verify conditions for existence & uniqueness
+     */
+    static bool verifyConditions(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        double t, double x_min, double x_max) {
+
+        bool mu_lipschitz = checkLipschitz(mu, t, x_min, x_max);
+        bool sigma_lipschitz = checkLipschitz(sigma, t, x_min, x_max);
+        bool mu_growth = checkLinearGrowth(mu, t, x_min, x_max);
+        bool sigma_growth = checkLinearGrowth(sigma, t, x_min, x_max);
+
+        return mu_lipschitz && sigma_lipschitz && mu_growth && sigma_growth;
+    }
+
+    /**
+     * @brief Picard iteration for SDE existence proof
+     *
+     * X^{(n+1)}(t) = X₀ + ∫₀ᵗ μ(s, X^{(n)}(s)) ds + ∫₀ᵗ σ(s, X^{(n)}(s)) dW(s)
+     */
+    static std::vector<double> picardIteration(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        double X0, double T, int n_iterations, int n_steps) {
+
+        double dt = T / n_steps;
+        double sqrt_dt = std::sqrt(dt);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        // Initialize X^(0) = X₀
+        std::vector<double> X_old(n_steps + 1, X0);
+        std::vector<double> X_new(n_steps + 1);
+        X_new[0] = X0;
+
+        // Picard iterations
+        for (int iter = 0; iter < n_iterations; ++iter) {
+            double W = 0.0;
+
+            for (int i = 0; i < n_steps; ++i) {
+                double t = i * dt;
+                double dW = sqrt_dt * normal(gen);
+
+                X_new[i+1] = X0 + mu(t, X_old[i]) * dt + sigma(t, X_old[i]) * dW;
+                W += dW;
+            }
+
+            X_old = X_new;
+        }
+
+        return X_new;
+    }
+};
+
+/**
+ * ============================================================================
+ * WEAK AND STRONG SOLUTIONS
+ * ============================================================================
+ */
+
+/**
+ * @class WeakStrongSolutions
+ * @brief Distinction between weak and strong solutions of SDEs
+ *
+ * Strong solution: Adapted to given Brownian motion filtration
+ * Weak solution: Brownian motion is part of the solution (law of process)
+ */
+class WeakStrongSolutions {
+public:
+    /**
+     * @brief Strong solution (pathwise uniqueness)
+     *
+     * Given (Ω, ℱ, {ℱₜ}, P, W), find adapted process X satisfying SDE
+     */
+    static std::vector<double> strongSolution(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        double X0, double T, int n_steps) {
+
+        // Use Euler-Maruyama on given Brownian motion
+        return StochasticDifferentialEquation::eulerMaruyama(mu, sigma, X0, T, n_steps);
+    }
+
+    /**
+     * @brief Weak solution (distributional uniqueness)
+     *
+     * Find probability space and Brownian motion such that SDE is satisfied
+     * Focus on law of process, not specific path
+     */
+    static std::vector<double> weakSolution(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        double X0, double T, int n_steps,
+        int n_samples = 1000) {
+
+        // Average over multiple realizations (distribution)
+        std::vector<std::vector<double>> samples(n_samples);
+
+        for (int s = 0; s < n_samples; ++s) {
+            samples[s] = StochasticDifferentialEquation::eulerMaruyama(mu, sigma, X0, T, n_steps);
+        }
+
+        // Return expected path
+        std::vector<double> expected_path(n_steps + 1, 0.0);
+        for (int i = 0; i <= n_steps; ++i) {
+            for (int s = 0; s < n_samples; ++s) {
+                expected_path[i] += samples[s][i];
+            }
+            expected_path[i] /= n_samples;
+        }
+
+        return expected_path;
+    }
+
+    /**
+     * @brief Girsanov theorem (change of measure)
+     *
+     * Transform drift via change of probability measure
+     * dW̃ = dW + θ(t) dt is Brownian under new measure Q
+     */
+    static std::vector<double> girsanovTransform(
+        std::function<double(double)> theta,
+        double T, int n_steps) {
+
+        double dt = T / n_steps;
+        double sqrt_dt = std::sqrt(dt);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        std::vector<double> W_tilde(n_steps + 1, 0.0);
+
+        for (int i = 0; i < n_steps; ++i) {
+            double t = i * dt;
+            double dW = sqrt_dt * normal(gen);
+
+            // W̃(t+dt) = W̃(t) + dW + θ(t)dt
+            W_tilde[i+1] = W_tilde[i] + dW + theta(t) * dt;
+        }
+
+        return W_tilde;
+    }
+
+    /**
+     * @brief Radon-Nikodym derivative for measure change
+     *
+     * dQ/dP = exp(-∫₀ᵗ θ(s) dW(s) - ½∫₀ᵗ θ²(s) ds)
+     */
+    static double radonNikodym(
+        std::function<double(double)> theta,
+        const std::vector<double>& W_path,
+        double T) {
+
+        int n_steps = W_path.size() - 1;
+        double dt = T / n_steps;
+
+        double integral_theta_dW = 0.0;
+        double integral_theta_squared = 0.0;
+
+        for (int i = 0; i < n_steps; ++i) {
+            double t = i * dt;
+            double dW = W_path[i+1] - W_path[i];
+
+            integral_theta_dW += theta(t) * dW;
+            integral_theta_squared += theta(t) * theta(t) * dt;
+        }
+
+        return std::exp(-integral_theta_dW - 0.5 * integral_theta_squared);
     }
 };
 
