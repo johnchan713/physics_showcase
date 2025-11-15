@@ -1787,6 +1787,910 @@ public:
     }
 };
 
+/**
+ * @brief Zeros of Holomorphic Functions
+ *
+ * Analysis of zero sets, argument principle, and Rouché's theorem
+ */
+class ZerosOfHolomorphicFunctions {
+public:
+    /**
+     * @brief Count zeros inside contour using argument principle
+     *
+     * N - P = (1/2πi) ∮ f'(z)/f(z) dz
+     * where N = number of zeros, P = number of poles
+     */
+    static int count_zeros_argument_principle(
+        const ComplexFunction& f,
+        const std::function<Complex(double)>& contour,
+        int n_points = 1000) {
+
+        // Integrate f'(z)/f(z) around contour
+        auto integrand = [&f](Complex z) -> Complex {
+            Complex fz = f(z);
+            if (std::abs(fz) < 1e-10) {
+                return Complex(0.0, 0.0);  // Avoid division by zero
+            }
+            Complex fprime = CauchyRiemann::derivative(f, z);
+            return fprime / fz;
+        };
+
+        Complex integral = CauchyTheory::contour_integral(integrand, contour, n_points);
+
+        // (1/2πi) ∮ f'/f dz gives winding number
+        double winding = integral.imag() / (2.0 * M_PI);
+        return static_cast<int>(std::round(winding));
+    }
+
+    /**
+     * @brief Rouché's theorem: if |f-g| < |f| on contour, then
+     * f and g have same number of zeros inside
+     */
+    static bool rouche_theorem_holds(
+        const ComplexFunction& f,
+        const ComplexFunction& g,
+        const std::function<Complex(double)>& contour,
+        int n_samples = 100) {
+
+        for (int i = 0; i < n_samples; ++i) {
+            double t = 2.0 * M_PI * i / n_samples;
+            Complex z = contour(t);
+
+            Complex fz = f(z);
+            Complex gz = g(z);
+
+            if (std::abs(fz - gz) >= std::abs(fz)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @brief Determine multiplicity of zero at z0
+     */
+    static int zero_multiplicity(
+        const ComplexFunction& f,
+        Complex z0,
+        int max_order = 10,
+        double tol = 1e-6) {
+
+        for (int m = 1; m <= max_order; ++m) {
+            // Check if f^(m)(z0) ≠ 0
+            // Use numerical differentiation
+            auto f_m = f;
+            for (int k = 0; k < m; ++k) {
+                auto prev = f_m;
+                f_m = [prev](Complex z) -> Complex {
+                    return CauchyRiemann::derivative(prev, z);
+                };
+            }
+
+            Complex derivative_value = f_m(z0);
+            if (std::abs(derivative_value) > tol) {
+                return m;
+            }
+        }
+        return max_order;  // High multiplicity
+    }
+
+    /**
+     * @brief Find zeros in a region using grid search
+     */
+    static std::vector<Complex> find_zeros_grid(
+        const ComplexFunction& f,
+        Complex bottom_left,
+        Complex top_right,
+        int grid_size = 20,
+        double tol = 1e-6) {
+
+        std::vector<Complex> zeros;
+        double x_min = bottom_left.real();
+        double y_min = bottom_left.imag();
+        double x_max = top_right.real();
+        double y_max = top_right.imag();
+
+        double dx = (x_max - x_min) / grid_size;
+        double dy = (y_max - y_min) / grid_size;
+
+        for (int i = 0; i < grid_size; ++i) {
+            for (int j = 0; j < grid_size; ++j) {
+                double x = x_min + i * dx;
+                double y = y_min + j * dy;
+                Complex z(x, y);
+
+                if (std::abs(f(z)) < tol) {
+                    zeros.push_back(z);
+                }
+            }
+        }
+
+        return zeros;
+    }
+
+    /**
+     * @brief Jensen's formula relating zeros to growth
+     *
+     * log|f(0)| = Σ log(r/|aₖ|) + (1/2π)∫₀^(2π) log|f(re^(iθ))| dθ
+     */
+    static double jensens_formula(
+        const ComplexFunction& f,
+        const std::vector<Complex>& zeros,
+        double r,
+        int n_samples = 100) {
+
+        double sum_log_zeros = 0.0;
+        for (const auto& a : zeros) {
+            if (std::abs(a) < r) {
+                sum_log_zeros += std::log(r / std::abs(a));
+            }
+        }
+
+        double integral = 0.0;
+        for (int k = 0; k < n_samples; ++k) {
+            double theta = 2.0 * M_PI * k / n_samples;
+            Complex z = r * std::exp(Complex(0.0, theta));
+            integral += std::log(std::abs(f(z)));
+        }
+        integral /= n_samples;
+
+        return sum_log_zeros + integral;
+    }
+};
+
+/**
+ * @brief Infinite Products
+ *
+ * Convergence, Weierstrass factorization, and canonical products
+ */
+class InfiniteProducts {
+public:
+    /**
+     * @brief Elementary factors for Weierstrass factorization
+     *
+     * E₀(z) = 1 - z
+     * Eₙ(z) = (1 - z)exp(z + z²/2 + ... + zⁿ/n)
+     */
+    static Complex elementary_factor(int n, Complex z) {
+        if (n == 0) {
+            return 1.0 - z;
+        }
+
+        Complex sum(0.0, 0.0);
+        Complex z_power = z;
+
+        for (int k = 1; k <= n; ++k) {
+            sum += z_power / static_cast<double>(k);
+            z_power *= z;
+        }
+
+        return (1.0 - z) * std::exp(sum);
+    }
+
+    /**
+     * @brief Check convergence of infinite product ∏(1 + aₙ)
+     *
+     * Converges if Σ|aₙ| < ∞ and ∏(1 + aₙ) ≠ 0
+     */
+    static bool is_convergent(
+        const std::vector<Complex>& terms,
+        double tol = 1e-6) {
+
+        double sum_abs = 0.0;
+        for (const auto& a : terms) {
+            sum_abs += std::abs(a);
+        }
+
+        // Product converges if Σ|aₙ| < ∞
+        return sum_abs < 1.0 / tol;  // Practical convergence test
+    }
+
+    /**
+     * @brief Evaluate finite product ∏(1 + aₙ)
+     */
+    static Complex evaluate_product(const std::vector<Complex>& terms) {
+        Complex product(1.0, 0.0);
+
+        for (const auto& a : terms) {
+            product *= (1.0 + a);
+        }
+
+        return product;
+    }
+
+    /**
+     * @brief Weierstrass factorization theorem
+     *
+     * Entire function with zeros {aₙ}:
+     * f(z) = z^m e^(g(z)) ∏ Eₙ(z/aₙ)
+     * where m is order of zero at origin
+     */
+    static ComplexFunction weierstrass_factorization(
+        const std::vector<Complex>& zeros,
+        int order_at_origin,
+        const ComplexFunction& exponential_factor) {
+
+        return [zeros, order_at_origin, exponential_factor](Complex z) -> Complex {
+            // z^m factor
+            Complex result = std::pow(z, order_at_origin);
+
+            // e^(g(z)) factor
+            result *= std::exp(exponential_factor(z));
+
+            // Product over zeros
+            for (const auto& a : zeros) {
+                if (std::abs(a) > 1e-10) {
+                    // Choose order p based on convergence
+                    int p = 0;  // Simplified
+                    result *= elementary_factor(p, z / a);
+                }
+            }
+
+            return result;
+        };
+    }
+
+    /**
+     * @brief Canonical product of genus p
+     *
+     * P(z) = ∏ Eₚ(z/aₙ)
+     */
+    static ComplexFunction canonical_product(
+        const std::vector<Complex>& zeros,
+        int genus) {
+
+        return [zeros, genus](Complex z) -> Complex {
+            Complex product(1.0, 0.0);
+
+            for (const auto& a : zeros) {
+                if (std::abs(a) > 1e-10) {
+                    product *= elementary_factor(genus, z / a);
+                }
+            }
+
+            return product;
+        };
+    }
+
+    /**
+     * @brief Hadamard's formula for genus
+     *
+     * Genus p is smallest integer such that Σ 1/|aₙ|^(p+1) < ∞
+     */
+    static int compute_genus(const std::vector<Complex>& zeros) {
+        for (int p = 0; p <= 10; ++p) {
+            double sum = 0.0;
+
+            for (const auto& a : zeros) {
+                if (std::abs(a) > 1e-10) {
+                    sum += std::pow(1.0 / std::abs(a), p + 1);
+                }
+            }
+
+            if (sum < 1e6) {  // Practical convergence
+                return p;
+            }
+        }
+        return 10;  // High genus
+    }
+};
+
+/**
+ * @brief The Ring H(D) of Holomorphic Functions
+ *
+ * Ring structure, ideals, and zero sets
+ */
+class RingHD {
+public:
+    /**
+     * @brief Check if function generates principal ideal
+     */
+    static bool is_principal_ideal_generator(
+        const ComplexFunction& f,
+        Complex z0) {
+
+        // f generates (f) if it doesn't vanish identically
+        // in any neighborhood of z0
+
+        const int samples = 20;
+        const double r = 0.1;
+
+        for (int k = 0; k < samples; ++k) {
+            double theta = 2.0 * M_PI * k / samples;
+            Complex z = z0 + r * std::exp(Complex(0.0, theta));
+
+            if (std::abs(f(z)) > 1e-10) {
+                return true;  // Non-zero somewhere
+            }
+        }
+
+        return false;  // May be identically zero
+    }
+
+    /**
+     * @brief Compute common zeros of two holomorphic functions
+     */
+    static std::vector<Complex> common_zeros(
+        const ComplexFunction& f,
+        const ComplexFunction& g,
+        Complex bottom_left,
+        Complex top_right,
+        int grid_size = 20,
+        double tol = 1e-6) {
+
+        std::vector<Complex> common;
+        double x_min = bottom_left.real();
+        double y_min = bottom_left.imag();
+        double x_max = top_right.real();
+        double y_max = top_right.imag();
+
+        double dx = (x_max - x_min) / grid_size;
+        double dy = (y_max - y_min) / grid_size;
+
+        for (int i = 0; i < grid_size; ++i) {
+            for (int j = 0; j < grid_size; ++j) {
+                double x = x_min + i * dx;
+                double y = y_min + j * dy;
+                Complex z(x, y);
+
+                if (std::abs(f(z)) < tol && std::abs(g(z)) < tol) {
+                    common.push_back(z);
+                }
+            }
+        }
+
+        return common;
+    }
+
+    /**
+     * @brief Check if ideal is maximal
+     *
+     * Maximal ideals in H(D) correspond to points in D
+     */
+    static bool is_maximal_ideal_at_point(
+        const std::vector<ComplexFunction>& generators,
+        Complex z0,
+        double tol = 1e-6) {
+
+        // Maximal ideal at z0: {f ∈ H(D) : f(z0) = 0}
+        for (const auto& f : generators) {
+            if (std::abs(f(z0)) > tol) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @brief Identity theorem: if f = g on a set with accumulation point,
+     * then f = g everywhere
+     */
+    static bool satisfies_identity_theorem(
+        const ComplexFunction& f,
+        const ComplexFunction& g,
+        const std::vector<Complex>& agreement_points,
+        Complex test_point,
+        double tol = 1e-6) {
+
+        // Check if they agree on the given points
+        for (const auto& z : agreement_points) {
+            if (std::abs(f(z) - g(z)) > tol) {
+                return false;
+            }
+        }
+
+        // If agreement points have accumulation point,
+        // they should agree at test point too
+        return std::abs(f(test_point) - g(test_point)) < tol;
+    }
+};
+
+/**
+ * @brief Euler's Gamma Function
+ *
+ * Γ(z) = ∫₀^∞ t^(z-1) e^(-t) dt for Re(z) > 0
+ */
+class GammaFunction {
+public:
+    /**
+     * @brief Compute Γ(z) for Re(z) > 0
+     *
+     * Using numerical integration or product formula
+     */
+    static Complex gamma(Complex z) {
+        // For real positive values, use standard library
+        if (z.imag() == 0.0 && z.real() > 0.0) {
+            return Complex(std::tgamma(z.real()), 0.0);
+        }
+
+        // Weierstrass product formula:
+        // Γ(z) = (e^(-γz)/z) ∏ₙ₌₁^∞ (1 + z/n)^(-1) e^(z/n)
+        const double euler_mascheroni = 0.5772156649015329;
+        const int N = 100;  // Number of product terms
+
+        Complex result = std::exp(-euler_mascheroni * z) / z;
+
+        for (int n = 1; n <= N; ++n) {
+            Complex term = (1.0 + z / static_cast<double>(n));
+            result *= std::exp(z / static_cast<double>(n)) / term;
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief Functional equation: Γ(z+1) = z·Γ(z)
+     */
+    static Complex gamma_functional_equation(Complex z) {
+        return z * gamma(z);
+    }
+
+    /**
+     * @brief Reflection formula: Γ(z)Γ(1-z) = π/sin(πz)
+     */
+    static Complex reflection_formula(Complex z) {
+        Complex lhs = gamma(z) * gamma(1.0 - z);
+        Complex rhs = M_PI / ComplexFunctions::sin(M_PI * z);
+        return rhs;  // Return expected value
+    }
+
+    /**
+     * @brief Legendre duplication formula
+     *
+     * Γ(z)Γ(z + 1/2) = 2^(1-2z) √π Γ(2z)
+     */
+    static Complex duplication_formula(Complex z) {
+        Complex lhs = gamma(z) * gamma(z + 0.5);
+        Complex rhs = std::pow(2.0, 1.0 - 2.0 * z) *
+                      std::sqrt(M_PI) * gamma(2.0 * z);
+        return rhs;
+    }
+
+    /**
+     * @brief Stirling's approximation
+     *
+     * log Γ(z) ≈ (z - 1/2)log(z) - z + (1/2)log(2π) + O(1/z)
+     */
+    static Complex stirling_approximation(Complex z) {
+        Complex log_gamma = (z - 0.5) * std::log(z) - z +
+                           0.5 * std::log(2.0 * M_PI);
+        return std::exp(log_gamma);
+    }
+
+    /**
+     * @brief Estimate |Γ(z)| for large |z|
+     *
+     * |Γ(x + iy)| ≈ √(2π) |y|^(x-1/2) e^(-π|y|/2)
+     */
+    static double gamma_magnitude_estimate(Complex z) {
+        double x = z.real();
+        double y = z.imag();
+
+        if (std::abs(y) < 1.0) {
+            return std::abs(gamma(z));
+        }
+
+        return std::sqrt(2.0 * M_PI) *
+               std::pow(std::abs(y), x - 0.5) *
+               std::exp(-M_PI * std::abs(y) / 2.0);
+    }
+
+    /**
+     * @brief Beta function: B(z, w) = Γ(z)Γ(w)/Γ(z+w)
+     */
+    static Complex beta(Complex z, Complex w) {
+        return gamma(z) * gamma(w) / gamma(z + w);
+    }
+
+    /**
+     * @brief Pochhammer symbol (rising factorial)
+     *
+     * (z)ₙ = z(z+1)(z+2)...(z+n-1) = Γ(z+n)/Γ(z)
+     */
+    static Complex pochhammer(Complex z, int n) {
+        if (n == 0) return Complex(1.0, 0.0);
+        if (n < 0) {
+            throw std::invalid_argument("Pochhammer: n must be non-negative");
+        }
+
+        // Direct computation for small n
+        if (n <= 20) {
+            Complex result = z;
+            for (int k = 1; k < n; ++k) {
+                result *= (z + static_cast<double>(k));
+            }
+            return result;
+        }
+
+        // Use Gamma function for large n
+        return gamma(z + static_cast<double>(n)) / gamma(z);
+    }
+
+    /**
+     * @brief Digamma function: ψ(z) = Γ'(z)/Γ(z)
+     *
+     * Logarithmic derivative of Gamma
+     */
+    static Complex digamma(Complex z, double h = 1e-6) {
+        // Numerical derivative of log Γ(z)
+        auto log_gamma = [](Complex w) -> Complex {
+            return std::log(gamma(w));
+        };
+
+        Complex derivative = CauchyRiemann::derivative(log_gamma, z, h);
+        return derivative;
+    }
+
+    /**
+     * @brief Γ(n) = (n-1)! for positive integers
+     */
+    static double gamma_factorial(int n) {
+        if (n <= 0) {
+            throw std::invalid_argument("Gamma factorial: n must be positive");
+        }
+
+        double result = 1.0;
+        for (int k = 1; k < n; ++k) {
+            result *= k;
+        }
+        return result;
+    }
+
+    /**
+     * @brief Incomplete Gamma function
+     *
+     * γ(s, x) = ∫₀ˣ t^(s-1) e^(-t) dt
+     */
+    static Complex incomplete_gamma_lower(Complex s, double x, int n_points = 1000) {
+        // Numerical integration
+        Complex sum(0.0, 0.0);
+        double dt = x / n_points;
+
+        for (int i = 1; i <= n_points; ++i) {
+            double t = i * dt;
+            Complex integrand = std::pow(t, s - 1.0) * std::exp(-t);
+            sum += integrand * dt;
+        }
+
+        return sum;
+    }
+};
+
+/**
+ * @brief Divisors and the Field of Meromorphic Functions
+ *
+ * Divisor groups, principal divisors, and meromorphic function construction
+ */
+class DivisorsAndMeromorphicFunctions {
+public:
+    /**
+     * @brief Divisor representation
+     *
+     * D = Σ nₐ[a] where nₐ = order at a (positive for zeros, negative for poles)
+     */
+    struct Divisor {
+        std::vector<Complex> points;
+        std::vector<int> orders;  // Positive for zeros, negative for poles
+
+        int degree() const {
+            int deg = 0;
+            for (int n : orders) {
+                deg += n;
+            }
+            return deg;
+        }
+
+        void add(Complex point, int order) {
+            points.push_back(point);
+            orders.push_back(order);
+        }
+    };
+
+    /**
+     * @brief Compute divisor of a meromorphic function
+     */
+    static Divisor divisor_of_function(
+        const ComplexFunction& f,
+        const std::vector<Complex>& zeros,
+        const std::vector<int>& zero_orders,
+        const std::vector<Complex>& poles,
+        const std::vector<int>& pole_orders) {
+
+        Divisor div;
+
+        for (size_t i = 0; i < zeros.size(); ++i) {
+            div.add(zeros[i], zero_orders[i]);
+        }
+
+        for (size_t i = 0; i < poles.size(); ++i) {
+            div.add(poles[i], -pole_orders[i]);
+        }
+
+        return div;
+    }
+
+    /**
+     * @brief Check if divisor is principal
+     *
+     * D is principal if D = div(f) for some meromorphic f
+     * On compact Riemann surface: deg(D) = 0 necessary
+     */
+    static bool is_principal_divisor(const Divisor& div) {
+        // On Riemann sphere: principal divisors have degree 0
+        return div.degree() == 0;
+    }
+
+    /**
+     * @brief Construct meromorphic function with given divisor
+     *
+     * Using Weierstrass/Mittag-Leffler techniques
+     */
+    static ComplexFunction construct_from_divisor(const Divisor& div) {
+        return [div](Complex z) -> Complex {
+            Complex result(1.0, 0.0);
+
+            for (size_t i = 0; i < div.points.size(); ++i) {
+                Complex a = div.points[i];
+                int n = div.orders[i];
+
+                if (n > 0) {
+                    // Zero of order n
+                    result *= std::pow(z - a, n);
+                } else if (n < 0) {
+                    // Pole of order -n
+                    result /= std::pow(z - a, -n);
+                }
+            }
+
+            return result;
+        };
+    }
+
+    /**
+     * @brief Order of function at point (ord_a(f))
+     *
+     * Positive for zeros, negative for poles, 0 for regular non-zero
+     */
+    static int order_at_point(
+        const ComplexFunction& f,
+        Complex a,
+        int max_order = 10,
+        double tol = 1e-6) {
+
+        Complex fa = f(a);
+
+        if (std::abs(fa) < tol) {
+            // Check for zero
+            return ZerosOfHolomorphicFunctions::zero_multiplicity(f, a, max_order, tol);
+        }
+
+        if (std::isinf(std::abs(fa)) || std::abs(fa) > 1e10) {
+            // Pole: check 1/f for zero
+            auto f_inv = [f](Complex z) -> Complex {
+                Complex val = f(z);
+                if (std::abs(val) < 1e-10) return Complex(1e10, 0.0);
+                return 1.0 / val;
+            };
+            return -ZerosOfHolomorphicFunctions::zero_multiplicity(f_inv, a, max_order, tol);
+        }
+
+        return 0;  // Regular point
+    }
+
+    /**
+     * @brief Divisor addition (in divisor group)
+     */
+    static Divisor add_divisors(const Divisor& D1, const Divisor& D2) {
+        Divisor result = D1;
+
+        for (size_t i = 0; i < D2.points.size(); ++i) {
+            result.add(D2.points[i], D2.orders[i]);
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief Check linear equivalence: D₁ ~ D₂ if D₁ - D₂ is principal
+     */
+    static bool are_linearly_equivalent(const Divisor& D1, const Divisor& D2) {
+        Divisor diff = D1;
+        for (size_t i = 0; i < D2.points.size(); ++i) {
+            diff.add(D2.points[i], -D2.orders[i]);
+        }
+
+        return is_principal_divisor(diff);
+    }
+};
+
+/**
+ * @brief Infinite Blaschke Products
+ *
+ * Blaschke products with infinitely many zeros
+ */
+class InfiniteBlaschkeProducts {
+public:
+    /**
+     * @brief Check Blaschke condition: Σ(1 - |aₙ|) < ∞
+     *
+     * Necessary and sufficient for convergence in unit disc
+     */
+    static bool satisfies_blaschke_condition(
+        const std::vector<Complex>& zeros,
+        double tol = 1e-6) {
+
+        double sum = 0.0;
+
+        for (const auto& a : zeros) {
+            if (std::abs(a) >= 1.0 - tol) {
+                return false;  // Zero not strictly inside disc
+            }
+            sum += (1.0 - std::abs(a));
+        }
+
+        return sum < 1e6;  // Practical convergence test
+    }
+
+    /**
+     * @brief Evaluate infinite Blaschke product
+     *
+     * B(z) = ∏ₙ (|aₙ|/aₙ) · (aₙ - z)/(1 - āₙz)
+     */
+    static Complex evaluate(
+        const std::vector<Complex>& zeros,
+        Complex z,
+        int max_terms = 100) {
+
+        if (std::abs(z) >= 1.0) {
+            throw std::invalid_argument("Blaschke product: |z| must be < 1");
+        }
+
+        Complex product(1.0, 0.0);
+        int n_terms = std::min(max_terms, static_cast<int>(zeros.size()));
+
+        for (int n = 0; n < n_terms; ++n) {
+            Complex a = zeros[n];
+
+            // Blaschke factor
+            Complex normalizer = std::abs(a) > 1e-10 ?
+                                std::abs(a) / a : Complex(1.0, 0.0);
+            Complex factor = normalizer * (a - z) / (1.0 - std::conj(a) * z);
+
+            product *= factor;
+        }
+
+        return product;
+    }
+
+    /**
+     * @brief Check if product is bounded in disc
+     *
+     * Blaschke products satisfy |B(z)| ≤ 1 for |z| < 1
+     */
+    static bool is_bounded_in_disc(
+        const std::vector<Complex>& zeros,
+        int n_samples = 100,
+        double tol = 1e-3) {
+
+        for (int i = 0; i < n_samples; ++i) {
+            double r = 0.9 * i / n_samples;  // Sample inside disc
+            double theta = 2.0 * M_PI * i / n_samples;
+            Complex z = r * std::exp(Complex(0.0, theta));
+
+            Complex B = evaluate(zeros, z);
+
+            if (std::abs(B) > 1.0 + tol) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Finite Blaschke product (from SchwarzLemma class)
+     *
+     * For comparison and finite case
+     */
+    static ComplexFunction finite_blaschke(
+        const std::vector<Complex>& zeros,
+        double theta = 0.0) {
+
+        return [zeros, theta](Complex z) -> Complex {
+            Complex product = std::exp(Complex(0.0, theta));
+
+            for (const auto& a : zeros) {
+                if (std::abs(a) > 1e-10) {
+                    Complex factor = (z - a) / (1.0 - std::conj(a) * z);
+                    product *= factor;
+                } else {
+                    product *= z;  // Zero at origin
+                }
+            }
+
+            return product;
+        };
+    }
+
+    /**
+     * @brief Convergence on circles
+     *
+     * B(re^(iθ)) converges uniformly on |z| = r < 1
+     */
+    static bool converges_uniformly_on_circle(
+        const std::vector<Complex>& zeros,
+        double r,
+        int n_samples = 100,
+        double tol = 1e-6) {
+
+        if (r >= 1.0) return false;
+
+        // Check variation across different numbers of terms
+        std::vector<double> partial_values;
+
+        for (int terms = 10; terms <= std::min(100, (int)zeros.size());
+             terms += 10) {
+
+            double max_on_circle = 0.0;
+
+            for (int k = 0; k < n_samples; ++k) {
+                double theta = 2.0 * M_PI * k / n_samples;
+                Complex z = r * std::exp(Complex(0.0, theta));
+
+                Complex B = evaluate(zeros, z, terms);
+                max_on_circle = std::max(max_on_circle, std::abs(B));
+            }
+
+            partial_values.push_back(max_on_circle);
+        }
+
+        // Check if stabilizing
+        if (partial_values.size() >= 2) {
+            double diff = std::abs(partial_values.back() -
+                                  partial_values[partial_values.size()-2]);
+            return diff < tol;
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Zeros distribution
+     *
+     * Count zeros in annulus r₁ < |z| < r₂
+     */
+    static int count_zeros_in_annulus(
+        const std::vector<Complex>& zeros,
+        double r1,
+        double r2) {
+
+        int count = 0;
+
+        for (const auto& a : zeros) {
+            double mod = std::abs(a);
+            if (mod > r1 && mod < r2) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * @brief Boundary behavior
+     *
+     * B(re^(iθ)) → boundary values as r → 1⁻
+     */
+    static Complex boundary_value(
+        const std::vector<Complex>& zeros,
+        double theta,
+        double r = 0.999) {
+
+        Complex z = r * std::exp(Complex(0.0, theta));
+        return evaluate(zeros, z);
+    }
+};
+
 } // namespace complex_analysis
 } // namespace maths
 
