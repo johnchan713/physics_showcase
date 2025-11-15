@@ -21,6 +21,7 @@ physics_showcase/
 │   │   ├── advanced_subdifferentials.hpp
 │   │   ├── black_scholes.hpp
 │   │   ├── calculus_theorems.hpp
+│   │   ├── complex_analysis.hpp   # NEW: Zeros, products, Gamma, Blaschke
 │   │   ├── differential_algebra.hpp
 │   │   ├── distributions.hpp
 │   │   ├── econometrics_regression.hpp
@@ -42,11 +43,15 @@ physics_showcase/
 │   │   └── vectors.hpp
 │   └── physics/
 │       ├── (basic modules)        # Classical mechanics, waves, etc.
+│       ├── advanced_quantum_mechanics.hpp  # NEW: Advanced QM topics
+│       ├── quantum_chemistry.hpp           # NEW: Atomic/molecular structure
+│       ├── quantum_foundations.hpp         # NEW: Historical QM development
 │       └── advanced/              # Advanced physics topics
 │           ├── classical/         # Hamiltonian, Liouville, phase space
 │           ├── cosmology/         # Friedmann equations, early universe
 │           ├── fluid_dynamics/    # Turbulence, compressible flow
 │           ├── gauge_theory/      # Gauge invariance, Higgs mechanism
+│           ├── operator_algebras.hpp  # NEW: Von Neumann, C*-algebras
 │           └── qft/              # Quantum field theory
 ├── examples/                      # Physics demonstration programs
 └── README.md
@@ -667,6 +672,56 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - Chi-squared goodness-of-fit
 - Maximum likelihood estimation
 
+### Complex Analysis (`maths/complex_analysis.hpp`)
+**Advanced complex function theory**
+
+- **Zeros of Holomorphic Functions**
+  - Argument principle: (1/2πi) ∮ f'/f dz counts zeros minus poles
+  - Rouché's theorem for zero counting
+  - Zero multiplicity and order computation
+  - Jensen's formula relating zeros to growth
+
+- **Infinite Products**
+  - Weierstrass factorization theorem
+  - Elementary factors E_n(z)
+  - Canonical products and genus
+  - Hadamard's theorem for entire functions
+
+- **Ring H(D)**
+  - Principal ideals in holomorphic functions
+  - Common zeros and greatest common divisors
+  - Maximal ideals and point evaluation
+  - Identity theorem applications
+
+- **Euler's Gamma Function**
+  - Γ(z) via Weierstrass product formula
+  - Reflection formula: Γ(z)Γ(1-z) = π/sin(πz)
+  - Duplication and multiplication formulas
+  - Stirling's approximation for large |z|
+  - Beta function: B(z,w) = Γ(z)Γ(w)/Γ(z+w)
+  - Pochhammer symbols (rising factorials)
+  - Digamma function ψ(z) = Γ'(z)/Γ(z)
+
+- **Divisors and Meromorphic Functions**
+  - Divisor representation for meromorphic functions
+  - Principal divisors and equivalence
+  - Construction of meromorphic functions from divisors
+  - Mittag-Leffler theorem for prescribed poles
+
+- **Infinite Blaschke Products**
+  - Blaschke condition: Σ(1 - |aₙ|) < ∞
+  - Blaschke factor: b_a(z) = (a-z)/(1-āz)
+  - Convergence and boundary behavior
+  - Applications to Hardy spaces
+
+- **Confluent Hypergeometric Functions**
+  - Kummer's function M(a,b,z) = ₁F₁(a;b;z)
+  - Kummer's U function (second solution)
+  - Associated Laguerre polynomials L_n^k(x)
+  - Applications to hydrogen atom radial functions
+
+**Applications:** Analytic number theory, complex dynamics, quantum mechanics, special functions
+
 ### Basic Mathematics
 
 - **Calculus** (`maths/calculus_theorems.hpp`): Numerical derivatives, integration (Simpson's rule)
@@ -766,6 +821,362 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - **Supersymmetry** (`supersymmetry.hpp`): SUSY transformations, superpartners
 - **Quark-Gluon Plasma** (`quark_gluon_plasma.hpp`): QCD matter at extreme temperatures
 
+**Operator Algebras and Quantum Mechanics** (`physics/advanced/operator_algebras.hpp`):
+Comprehensive functional analysis framework for quantum mechanics (~2,800 lines)
+
+- **Hilbert Spaces**
+  - Inner products ⟨ψ|φ⟩ and norms
+  - Gram-Schmidt orthogonalization
+  - Orthonormal bases and completeness
+  - Tensor products |ψ⟩ ⊗ |φ⟩ for composite systems
+
+- **Bounded Operators**
+  - Operator norm ||A|| = sup ||Aψ||
+  - Adjoints A†, self-adjoint operators
+  - Unitary operators: U†U = I
+  - Commutators [A,B] = AB - BA
+  - Trace and partial trace operations
+  - Projection operators
+
+- **Von Neumann Algebras (Rings of Operators)**
+  - Commutants A' = {B : AB = BA for all A}
+  - Double commutant theorem: A'' = A (weak closure)
+  - Factors (von Neumann algebras with trivial center)
+  - Quantum observables as self-adjoint operators
+
+- **Unitary Representations**
+  - Group representations on Hilbert spaces
+  - Irreducibility and Schur's lemma
+  - Characters and orthogonality
+  - Direct sums and tensor products
+  - Reduction of representations
+
+- **Murray-von Neumann Factor Classification**
+  - Type I: B(H), finite/infinite dimensional
+  - Type II₁: Finite factors (tracial states)
+  - Type II∞: Infinite factors
+  - Type III: Properly infinite factors
+  - Dimension theory and comparison of projections
+
+- **Elementary C*-Algebra Theory**
+  - **Banach Algebras**: Submultiplicativity, spectral radius, Neumann series, resolvent
+  - **Commutative Banach Algebras**: Characters, Gelfand transform, maximal ideals, Shilov boundary
+  - **Commutative C*-Algebras**: Gelfand-Naimark theorem (isomorphism with C(X))
+  - **Spectrum and Functional Calculus**: σ(A), continuous functional calculus, spectral mapping theorem
+  - **Positivity**: Positive cone, order structure, square roots, polar decomposition
+  - **Ideals**: Left/right/two-sided ideals, quotients, maximal ideals, simplicity
+  - **States**: State functionals, vector states, pure states, faithful states, tracial states
+  - **Representations and GNS Construction**: GNS theorem (states → representations), cyclic vectors, universal representation
+  - **Gelfand-Naimark Theorem**: Every C*-algebra embeds in B(H), abstract vs concrete C*-algebras
+  - **Complete Positivity**: CP maps, Stinespring dilation, Kraus representation, quantum channels
+  - **Pure States and Irreducible Representations**: Correspondence via GNS, extremal points
+  - **Compact Operators**: K(H), finite-rank operators, Calkin algebra B(H)/K(H), Fredholm operators
+  - **Double Commutant Theorem**: von Neumann bicommutant A'' = Ā^SOT, Kaplansky density
+
+**Applications:** Quantum mechanics foundations, quantum information theory, quantum field theory, statistical mechanics, mathematical physics
+
+**Quantum Mechanics Foundations** (`physics/quantum_foundations.hpp`):
+Historical development of quantum mechanics (~1,000 lines)
+
+- **Introduction to Quantum Mechanics**
+  - Failures of classical physics
+  - Ultraviolet catastrophe in blackbody radiation
+  - Photoelectric effect paradox
+  - Atomic stability problem
+  - Need for quantization
+
+- **Planck and Quantization**
+  - Planck's blackbody radiation law: u(ν,T) = (8πhν³/c³)/(e^(hν/kT) - 1)
+  - Energy quantization: E = nhν
+  - Planck constant h = 6.626 × 10⁻³⁴ J·s
+  - Photoelectric effect: E_kinetic = hν - W
+  - Einstein's photon hypothesis
+  - Specific heat models (Einstein, Debye)
+
+- **Bohr and the Hydrogen Atom**
+  - Bohr model of hydrogen
+  - Orbital radii: r_n = n²a₀ (Bohr radius a₀ = 0.529 Å)
+  - Energy levels: E_n = -13.6 eV/n²
+  - Rydberg formula: 1/λ = R_∞(1/n₁² - 1/n₂²)
+  - Spectral series: Lyman, Balmer, Paschen, Brackett, Pfund
+  - Angular momentum quantization: L = nℏ
+
+- **Matrix Mechanics (Heisenberg)**
+  - Heisenberg's formulation with matrices
+  - Position and momentum matrices
+  - Canonical commutation relation: [x,p] = iℏ
+  - Ladder operators a, a† for harmonic oscillator
+  - Energy eigenvalues: E_n = ℏω(n + 1/2)
+  - Matrix elements and transition amplitudes
+
+- **Uncertainty Relations**
+  - Heisenberg uncertainty principle: ΔxΔp ≥ ℏ/2
+  - General uncertainty: ΔAΔB ≥ ½|⟨[A,B]⟩|
+  - Wave packet spreading: σ_x(t) = σ₀√(1 + (ℏt/2mσ₀²)²)
+  - Energy-time uncertainty: ΔEΔt ≥ ℏ/2
+  - Coherent states (minimum uncertainty)
+
+- **Wave Mechanics (Schrödinger)**
+  - Schrödinger's wave formulation
+  - De Broglie relations: λ = h/p, ω = E/ℏ
+  - Wave function ψ(x,t) and probability interpretation
+  - Time-dependent Schrödinger equation: iℏ∂ψ/∂t = Hψ
+  - Time-independent equation: Hψ = Eψ
+  - Gaussian wave packets
+  - Harmonic oscillator eigenstates with Hermite polynomials
+  - Born rule: P(x) = |ψ(x)|²
+
+**Applications:** Quantum mechanics education, atomic physics, quantum chemistry, historical physics
+
+**Advanced Quantum Mechanics** (`physics/advanced_quantum_mechanics.hpp`):
+Advanced topics in quantum mechanics (~1,650 lines)
+
+- **Kummer's Confluent Hypergeometric Functions**
+  - Kummer's M function: M(a,b,z) = ₁F₁(a;b;z)
+  - Kummer's U function (second solution)
+  - Pochhammer symbols and series expansions
+  - Associated Laguerre polynomials: L_n^k(x)
+  - Hydrogen radial wave functions via Laguerre polynomials
+
+- **Hamiltonian Mechanics**
+  - Hamiltonian H(q,p) = p²/2m + V(q)
+  - Hamilton's equations: dq/dt = ∂H/∂p, dp/dt = -∂H/∂q
+  - Poisson brackets: {f,g} = ∂f/∂q·∂g/∂p - ∂f/∂p·∂g/∂q
+  - Canonical transformations and generating functions
+  - Phase space trajectories
+  - Liouville's theorem connection
+
+- **Classical Harmonic Oscillator**
+  - Classical solutions: x(t) = A cos(ωt + φ)
+  - Phase space ellipses
+  - Energy E = ½mω²A²
+  - Action-angle variables
+  - Correspondence with quantum oscillator
+
+- **Mathematics of Plane Waves**
+  - Plane wave solutions: ψ(x,t) = Ae^(i(kx-ωt))
+  - Dispersion relations: ω(k) = ℏk²/2m
+  - Fourier transforms and wave packets
+  - Parseval's theorem and normalization
+  - Group and phase velocities
+
+- **Schrödinger Equation for Free Particle**
+  - Free particle solutions: ψ_k(x,t) = e^(i(kx-ωt))
+  - Energy-momentum relation: E = ℏ²k²/2m
+  - Continuity equation: ∂ρ/∂t + ∇·j = 0
+  - Probability current density
+  - Time evolution operators
+
+- **Wave Functions and Wave Packets**
+  - Gaussian wave packets: ψ(x,0) = (2πσ²)^(-1/4) e^(-x²/4σ²) e^(ik₀x)
+  - Wave packet spreading with time
+  - Normalization and expectation values
+  - Position and momentum uncertainties
+  - Fourier transforms between representations
+
+- **Quantum Tunneling**
+  - Transmission coefficients for barriers
+  - Rectangular barrier: T = 1/(1 + V₀²sinh²(κa)/4E(V₀-E))
+  - WKB approximation: T ≈ exp(-2∫κ(x)dx)
+  - Alpha decay and nuclear physics
+  - Scanning tunneling microscopy (STM)
+  - Tunneling time and probability
+
+- **Perturbation Theory (Nondegenerate States)**
+  - First-order energy correction: E_n^(1) = ⟨ψ_n^(0)|H'|ψ_n^(0)⟩
+  - Second-order energy: E_n^(2) = Σ|⟨ψ_k|H'|ψ_n⟩|²/(E_n-E_k)
+  - First-order wave function correction
+  - Anharmonic oscillator perturbations
+  - Convergence and validity conditions
+
+- **Stark Effect of the Hydrogen Atom**
+  - Linear Stark effect (degenerate states): ΔE ∝ E
+  - Quadratic Stark effect (ground state): ΔE ∝ E²
+  - Hydrogen polarizability α = (9/2)a₀³
+  - Stark splitting for n=2: ΔE = 3eEa₀
+  - Matrix elements and selection rules
+  - Avoided crossings in Stark maps
+
+- **Pauli's Exclusion Principle**
+  - No two fermions in same quantum state
+  - Quantum number uniqueness (n,l,m_l,m_s)
+  - Shell filling: maximum 2n² electrons per shell
+  - Subshell capacity: 2(2l+1) electrons
+  - Antisymmetric wave functions for fermions
+  - Slater determinants
+  - Fermi energy: E_F = (ℏ²/2m)(3π²n)^(2/3)
+  - Degeneracy pressure in white dwarfs
+
+- **Electron Spin**
+  - Spin quantum number s = 1/2
+  - Spin angular momentum: |S| = (√3/2)ℏ
+  - Spin z-component: S_z = ±ℏ/2
+  - Spinors: |↑⟩ = (1,0)ᵀ, |↓⟩ = (0,1)ᵀ
+  - Pauli matrices σ_x, σ_y, σ_z
+  - Magnetic moment: μ = -g_e(e/2m)S
+  - Zeeman effect: ΔE = g_e μ_B m_s B
+  - Stern-Gerlach experiment
+  - Spin-orbit coupling: H_SO ∝ L·S
+  - Fine structure in hydrogen
+
+- **Two-Electron Systems**
+  - Total wave function antisymmetry
+  - Singlet state (S=0): |S=0,M=0⟩ = (1/√2)(|↑↓⟩ - |↓↑⟩)
+  - Triplet states (S=1): |S=1,M⟩ with M = -1,0,+1
+  - Spatial symmetry requirements
+  - Exchange energy: ΔE = 2K
+  - Direct Coulomb integral J
+  - Exchange integral K
+  - Ortho and para states
+
+- **Helium Atom**
+  - Ground state energy: E₀ = -79.0 eV (experimental)
+  - Independent particle approximation: -108.8 eV
+  - Variational method with Z_eff
+  - Optimal screening: Z_eff = Z - 5/16 ≈ 1.69
+  - First ionization energy: 24.6 eV
+  - Second ionization energy: 54.4 eV
+  - Electron-electron repulsion corrections
+  - Excited states: 1s2s configuration
+  - Singlet ¹S and triplet ³S energies
+  - Exchange splitting
+
+- **Helium Atom Orbitals**
+  - Hydrogenic orbital approximations
+  - Radial wave functions: R_1s(r), R_2s(r), R_2p(r)
+  - Effective nuclear charge Z_eff
+  - Product wave functions: ψ(r₁,r₂) = ψ_a(r₁)ψ_b(r₂)
+  - Symmetric spatial: ψ_+ = (1/√2)[ψ_a(1)ψ_b(2) + ψ_a(2)ψ_b(1)]
+  - Antisymmetric spatial: ψ_- = (1/√2)[ψ_a(1)ψ_b(2) - ψ_a(2)ψ_b(1)]
+  - Probability densities |ψ|²
+  - Radial expectation values ⟨r⟩
+  - Most probable radii
+
+**Applications:** Atomic physics, quantum chemistry, spectroscopy, multi-electron systems, perturbation theory, solid-state physics
+
+**Quantum Chemistry: Atomic and Molecular Structure** (`physics/quantum_chemistry.hpp`):
+Comprehensive quantum chemistry module for atoms and molecules (~1,300 lines)
+
+**Atomic Structure:**
+
+- **Atomic and Molecular Wave Functions**
+  - Multi-electron wave functions: ψ(1,2,...,N)
+  - Product wave functions vs antisymmetrized
+  - Slater determinants for fermions: ψ(1,2) = -ψ(2,1)
+  - Normalization integrals ∫|ψ|² dτ = 1
+  - Spin-spatial factorization: ψ(r,s) = ψ_spatial(r) × χ_spin(s)
+  - Exchange symmetry verification
+
+- **The Hartree-Fock Method**
+  - Self-consistent field (SCF) theory
+  - Fock operator: F = h + Σⱼ(2Jⱼ - Kⱼ)
+  - Coulomb integral Jᵢⱼ: electron-electron repulsion
+  - Exchange integral Kᵢⱼ: quantum exchange effects
+  - Hartree-Fock energy: E_HF = Σᵢhᵢᵢ + ½ΣᵢΣⱼ(2Jᵢⱼ - Kᵢⱼ)
+  - SCF iteration and convergence criteria
+  - Koopmans' theorem: ionization energy ≈ -εᵢ
+
+- **Slater Orbitals**
+  - Slater-type orbitals (STOs): φₙₗₘ = N rⁿ⁻¹ e^(-ζr) Yₗₘ
+  - Slater's rules for screening constants
+  - Effective nuclear charge: Z_eff = Z - S
+  - Slater exponents ζ = Z_eff/n*
+  - Overlap integrals between STOs
+  - Orbital normalization
+
+- **Multiplet Theory**
+  - Term symbols: ²ˢ⁺¹Lⱼ notation
+  - L-S coupling (Russell-Saunders): L = Σlᵢ, S = Σsᵢ
+  - Total angular momentum: J = L + S
+  - Hund's rules for ground states:
+    1. Maximize total spin S
+    2. Maximize total orbital angular momentum L
+    3. J = |L-S| if less than half-filled, J = L+S if more
+  - Spectroscopic notation (S, P, D, F, G, ...)
+  - Fine structure splitting
+  - Multiplicity 2S+1
+
+**Molecular Structure:**
+
+- **The Born-Oppenheimer Approximation**
+  - Electronic-nuclear motion separation
+  - Mass ratio justification: m_e/M_n << 1
+  - Wave function factorization: Ψ(r,R) ≈ ψ_el(r;R) × χ_nuc(R)
+  - Electronic Hamiltonian at fixed nuclear positions
+  - Adiabatic vs diabatic representations
+  - Validity criterion: ω_vib << ω_el
+
+- **Nuclear Motion of Diatomic Molecules**
+  - Reduced mass: μ = m₁m₂/(m₁ + m₂)
+  - Rotational energy levels: E_J = BJ(J+1)
+  - Rotational constant: B = ℏ²/(2I)
+  - Vibrational energy (harmonic): E_v = ℏω(v + 1/2)
+  - Anharmonic corrections: -χₑℏω(v + 1/2)²
+  - Rovibrational coupling: E(v,J) = E_vib + E_rot
+  - Centrifugal distortion: -DJ²(J+1)²
+  - Morse potential: V(R) = Dₑ[1 - e^(-a(R-Rₑ))]²
+  - Selection rules: ΔJ = ±1, Δv = ±1
+
+- **The Hydrogen Molecular Ion H₂⁺**
+  - LCAO (Linear Combination of Atomic Orbitals)
+  - Molecular orbitals: ψ = c₁φ_A ± c₂φ_B
+  - Bonding (σ_g) and antibonding (σ_u*) orbitals
+  - Bonding/antibonding energies: E_± = (H_AA ± H_AB)/(1 ± S_AB)
+  - Overlap integral S_AB for 1s orbitals
+  - Equilibrium bond length: R_e ≈ 2.5a₀
+  - Dissociation energy: D₀ ≈ 2.8 eV
+  - Energy curve E(R)
+
+- **The Hydrogen Molecule H₂**
+  - Molecular orbital configuration: (σ_g 1s)²
+  - Valence bond (VB) wave function: covalent structure
+  - Molecular orbital (MO) wave function
+  - Heitler-London approximation: E = (Q + J)/(1 + S²)
+  - Bond dissociation energy: D₀ = 4.75 eV
+  - Equilibrium bond length: R_e = 0.74 Å
+  - Ionic-covalent resonance: ψ = c₁ψ_covalent + c₂ψ_ionic
+  - Comparison of VB and MO theories
+
+- **The Chemical Bond**
+  - Bond order: BO = (n_bonding - n_antibonding)/2
+  - σ, π, and δ bonds
+  - Hybridization: sp, sp², sp³, sp³d, sp³d²
+  - Electronegativity and ionic character
+  - Percent ionic character: 100[1 - e^(-0.25Δχ²)]
+  - Bond length correlation with bond order
+  - Bond energy correlation with bond order
+  - Resonance structures and hybrid energies
+
+- **Structures of Simple Polyatomic Molecules**
+  - VSEPR (Valence Shell Electron Pair Repulsion) theory
+  - Molecular geometries:
+    - Linear (180°): 2 electron pairs
+    - Trigonal planar (120°): 3 pairs, no lone pairs
+    - Bent (<120°): 3 pairs with lone pairs
+    - Tetrahedral (109.5°): 4 pairs, no lone pairs
+    - Trigonal pyramidal (107°): 4 pairs, 1 lone pair
+    - Bent (104.5°): 4 pairs, 2 lone pairs
+    - Trigonal bipyramidal: 5 pairs
+    - Octahedral (90°): 6 pairs
+  - Walsh diagrams: orbital energy vs geometry
+  - Examples: H₂O (bent), NH₃ (pyramidal), CH₄ (tetrahedral), CO₂ (linear)
+  - Dipole moments: μ = Σqᵢrᵢ
+
+- **The Hückel Molecular Orbital Method**
+  - π-electron theory for conjugated systems
+  - Hückel Hamiltonian matrix: H_ii = α, H_ij = β (adjacent)
+  - Hückel 4n+2 aromaticity rule
+  - Aromatic: benzene (6π), naphthalene (10π), cyclopentadienyl⁻ (6π)
+  - Antiaromatic: cyclobutadiene (4π)
+  - Total π-electron energy: E_π = Σᵢnᵢεᵢ
+  - Delocalization (resonance) energy
+  - Bond order: p_ij = Σₖnₖc_ikc_jk
+  - Charge density: q_i = Σₖnₖ|c_ik|²
+  - Aromatic stabilization energy
+  - Examples: benzene resonance energy = 2β
+
+**Applications:** Quantum chemistry, computational chemistry, molecular spectroscopy, chemical bonding theory, organic chemistry, materials science, drug design
+
 ## 🚀 Usage
 
 ### Integration
@@ -808,11 +1219,15 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
   - Clarke's "Optimization and Nonsmooth Analysis"
   - Mallat's "A Wavelet Tour of Signal Processing"
   - Arnold's "Mathematical Methods of Classical Mechanics"
+  - Standard texts on complex analysis (Ahlfors, Rudin)
+  - Operator algebra texts (Kadison & Ringrose, Takesaki)
+  - Quantum mechanics (Griffiths, Sakurai, Cohen-Tannoudji)
   - Standard texts on stochastic processes and Monte Carlo methods
 
 ## 📊 Statistics
 
-- **Mathematics Modules**: 23 header-only modules in flat structure
+- **Mathematics Modules**: 24 header-only modules in flat structure
+  - **Complex Analysis** (~1,650 lines): Zeros of holomorphic functions, infinite products, Gamma function, divisors, Blaschke products, Kummer's functions
   - Differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms
   - Monte Carlo & MCMC methods, stochastic differential equations (SDEs) & Itô calculus
   - Variational calculus, dynamical systems & chaos
@@ -821,7 +1236,12 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
   - Financial mathematics, actuarial science, econometrics
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
-  - Advanced: 20+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
+  - **Quantum Mechanics & Chemistry** (4 comprehensive modules, ~6,750 lines total):
+    - **Operator Algebras** (~2,800 lines): von Neumann algebras, unitary representations, factor classification, elementary C*-algebra theory (13 classes), GNS construction
+    - **Quantum Foundations** (~1,000 lines): Historical development from Planck to Schrödinger, Bohr model, matrix mechanics, uncertainty relations
+    - **Advanced Quantum Mechanics** (~1,650 lines): Kummer's functions, Hamiltonian mechanics, perturbation theory, Stark effect, Pauli exclusion, electron spin, helium atom
+    - **Quantum Chemistry** (~1,300 lines): Atomic structure (Hartree-Fock, Slater orbitals, multiplet theory), molecular structure (Born-Oppenheimer, diatomic molecules, H₂⁺, H₂, chemical bonding, VSEPR, Hückel MO theory)
+  - Advanced: 23+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
 - **Probability Distributions**: 14 distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, Student's t, F-distribution)
 - **Key Algorithms**:
   - DFT, FFT (O(N log N))
@@ -867,6 +1287,10 @@ Each module serves as both:
 1. **Production-ready code** for numerical computations
 2. **Educational reference** showing how abstract mathematics translates to algorithms
 3. **Research tool** for:
+   - **Complex Analysis**: Zeros of holomorphic functions, infinite products, special functions (Gamma, Beta), Blaschke products, Hardy spaces
+   - **Operator Algebras**: Von Neumann algebras, C*-algebras, GNS construction, spectral theory, quantum observables
+   - **Quantum Mechanics**: Historical development, Schrödinger equation, perturbation theory, multi-electron systems, atomic structure
+   - **Quantum Chemistry**: Hartree-Fock method, molecular orbital theory, chemical bonding, VSEPR theory, Hückel aromaticity, spectroscopy
    - Ordinary and partial differential equations
    - Stochastic differential equations and Itô calculus
    - Dynamical systems, chaos theory, and bifurcation analysis
