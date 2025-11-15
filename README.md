@@ -1663,6 +1663,227 @@ Comprehensive spin-1/2 theory and relativistic quantum mechanics (~1,174 lines)
 
 **Applications:** Relativistic quantum mechanics, atomic spectroscopy, spin resonance (ESR/NMR), quantum electrodynamics (QED), high-energy physics, particle physics, astrophysics (pulsars, magnetars), precision measurements (g-2 experiments), relativistic quantum chemistry
 
+---
+
+**Loop Quantum Gravity** (`physics/loop_quantum_gravity.hpp`):
+
+**Overview:**
+- Background-independent quantum theory of spacetime geometry
+- Discrete quantum structure at Planck scale: l_P ≈ 1.6×10⁻³⁵ m
+- Resolves classical singularities (Big Bounce replaces Big Bang)
+- Based on Ashtekar-Barbero connection formulation
+
+**Quantum Space Structure:**
+- **Planck Scale:**
+  - Planck length: l_P = √(ℏG/c³) ≈ 1.616×10⁻³⁵ m
+  - Planck area: A_P = l_P² (fundamental area quantum)
+  - Planck volume: V_P = l_P³ (fundamental volume quantum)
+  - Planck time: t_P = l_P/c ≈ 5.391×10⁻⁴⁴ s
+  - Planck energy: E_P ≈ 1.956 GJ (Planck mass × c²)
+- **Main Features:**
+  - Background independence (no a priori spacetime)
+  - Diffeomorphism invariance
+  - Discrete quantum geometry (no continuum at l_P)
+  - Spin network states (quantum excitations of geometry)
+- **Ashtekar Variables:**
+  - Connection: A^i_a (SU(2) Ashtekar-Barbero connection)
+  - Conjugate momentum: E^a_i (densitized triad)
+  - Poisson bracket: {A^i_a(x), E^b_j(y)} = δ^i_j δ^b_a δ³(x-y)
+- **Singularity Resolution:**
+  - No V = 0 classical singularities
+  - Quantum bounce replaces Big Bang
+  - Black hole interior: quantum geometry
+
+**Kinematical State Space 𝓚:**
+- **Configuration Space:**
+  - 𝒜 = space of SU(2) connections on spatial manifold Σ
+  - 𝒢 = group of SU(2) gauge transformations
+  - 𝓚 = space of cylindrical functions Ψ[A] on 𝒜/𝒢
+- **Cylindrical Functions:**
+  - Depend on connection A via holonomies h_e[A] = 𝒫 exp(∫_e A)
+  - Defined on finite graphs γ embedded in Σ
+  - Ψ_γ[A] = f(h_e₁[A], ..., h_eₙ[A])
+- **Ashtekar-Lewandowski Measure:**
+  - Unique diffeomorphism-invariant measure dμ_AL
+  - Scalar product: ⟨Ψ₁|Ψ₂⟩ = ∫ Ψ₁*[A] Ψ₂[A] dμ_AL[A]
+  - Based on Haar measure on SU(2)
+- **Mathematical Structure:**
+  - Decomposition: 𝓚 = ⊕_γ 𝓚_γ (direct sum over graphs)
+  - Each 𝓚_γ = L²(SU(2)^|E|, dμ_Haar) (separable)
+  - 𝓚 itself non-separable (uncountable sum)
+  - Peter-Weyl: L²(SU(2)) = ⊕_j V_j ⊗ V_j* (spin j representations)
+- **Invariances:**
+  - Gauge invariance: ⟨U_g Ψ₁|U_g Ψ₂⟩ = ⟨Ψ₁|Ψ₂⟩
+  - Diffeomorphism invariance: ⟨U_φ Ψ₁|U_φ Ψ₂⟩ = ⟨Ψ₁|Ψ₂⟩
+  - Non-perturbative measure (no background metric)
+
+**Gauge Invariance and 𝓚₀:**
+- **Gauss Constraint:**
+  - Ĝ_i[Λ]Ψ = 0 (SU(2) gauge invariance)
+  - Generates local gauge transformations
+- **Gauge-Invariant Space:**
+  - 𝓚₀ = {Ψ ∈ 𝓚 | Ĝ_i Ψ = 0}
+  - Gauge-invariant states = spin networks
+- **Intertwiners:**
+  - i_v ∈ Inv(⊗_{e∈v} V_{j_e}) at each vertex v
+  - Gauge-invariant tensor coupling edge spins
+  - 3-valent: dim Inv = 1 (if triangle inequality satisfied)
+  - n-valent: computed via recoupling theory (6j, 9j symbols)
+
+**Spin Network States:**
+- **Definition:**
+  - |s⟩ = |γ, {j_e}, {i_v}⟩ (graph + spins + intertwiners)
+  - γ = (V, E): graph embedded in Σ
+  - j_e ∈ {0, 1/2, 1, 3/2, ...}: SU(2) spin on edge e
+  - i_v: intertwiner at vertex v
+- **Orthonormality:**
+  - ⟨s|s'⟩ = δ_{γγ'} δ_{jj'} δ_{ii'}
+  - Discrete, countable basis for 𝓚₀
+- **Physical Interpretation:**
+  - Spin network = quantum state of 3-geometry
+  - Edges: carry quantized area
+  - Vertices: carry quantized volume
+  - Graph structure: skeleton of quantum spacetime
+- **Mathematical Details:**
+  - Wave function: Ψ_s[A] = Tr[D^j(h_e) ⊗ ... ⊗ i_v]
+  - Wigner D-matrices: D^j_mn(g) for SU(2) representation
+  - 3j symbols (Clebsch-Gordan): 3-valent vertices
+  - 6j symbols: recoupling for 4-valent vertices
+  - Penrose binor calculus: graphical computation
+
+**Diffeomorphism Invariance and 𝓚_Diff:**
+- **Diffeomorphism Constraint:**
+  - D̂_a[N^a]Ψ = 0 (spatial diff invariance)
+  - Generates diffeomorphisms of Σ
+- **Diff-Invariant Space:**
+  - 𝓚_Diff = {Ψ ∈ 𝓚₀ | D̂_a Ψ = 0}
+  - Quotient: 𝓚_Diff = 𝓚₀ / Diff(Σ)
+- **Diffeomorphism Action:**
+  - φ ∈ Diff(Σ) acts by φ*: γ → φ(γ)
+  - Pushforward of graph embedding
+  - Abstract graphs: only combinatorial structure matters
+- **Separability:**
+  - 𝓚_Diff is separable (countable basis)
+  - Countably many diff equivalence classes [γ]_Diff
+  - Allows standard quantum mechanics formulation
+
+**Knots and s-Knot States:**
+- **s-Knot Definition:**
+  - s-knot = [γ, j, i]_Diff (diff equivalence class)
+  - Spin network up to ambient isotopy
+- **Knot Invariants:**
+  - Colored Jones polynomials
+  - Kauffman brackets
+  - Topological quantum field theory (TQFT) connection
+- **Embedding Matters:**
+  - Linking and knotting: physically distinct states
+  - Before diff constraint: embedding crucial
+  - After diff constraint: abstract combinatorics
+- **Turaev-Viro Model:**
+  - Connection to 3D TQFT with q = root of unity
+  - Quantum groups and knot theory
+
+**Operators:**
+- **Connection Operator  Â:**
+  - Configuration variable: A^i_a (Ashtekar-Barbero connection)
+  - Point operator Â(x) ill-defined (distributional)
+  - Well-defined: smeared Â(S) = ∫_S A^i_a ε^a dΣ
+  - Holonomy h_e[A] = 𝒫 exp(∫_e A) ∈ SU(2) fundamental
+  - Polymer representation (not Fock)
+- **Momentum Operator Ê:**
+  - E^a_i: densitized triad (conjugate to A)
+  - Quantum: Ê = -iℏ δ/δA (functional derivative)
+  - Flux: Ê(S,f) = ∫_S E^a_i f^i n_a well-defined
+  - Commutator: [Â, Ê] = iℏ (canonical quantization)
+  - Geometric meaning: E determines 3-metric q_ab
+- **Â(S) Action on Spin Networks:**
+  - Inserts Pauli matrices at punctures p ∈ S ∩ γ
+  - Can create new edges piercing S
+  - Generates SU(2) rotations of spins
+
+**Quanta of Area:**
+- **Area Operator:**
+  - Â(S) = Σ_{p∈S∩γ} √(E^i_a E^j_b n_a n_b)|_p
+  - Sum over punctures where γ pierces surface S
+- **Eigenvalue Formula:**
+  - A = 8πγl_P² Σ_p √(j_p(j_p+1))
+  - Discrete spectrum (quantum geometry!)
+  - γ ≈ 0.2375 (Barbero-Immirzi parameter)
+- **Minimal Area:**
+  - A_min = 8πγl_P²√(3/4) for j = 1/2
+  - Area gap ΔA ∼ l_P² (Planck area)
+- **Black Hole Entropy:**
+  - S_BH = A_horizon/(4γl_P²) ∼ N_punctures
+  - Bekenstein-Hawking from counting microstates
+  - Fixes γ by matching classical formula
+
+**Recoupling Theory:**
+- **n-Valent Vertices:**
+  - n edges meeting at vertex v
+  - Intertwiner space: Inv(V_{j₁} ⊗ ... ⊗ V_{jₙ})
+- **6j Symbols:**
+  - {j₁ j₂ j₃; j₄ j₅ j₆}: recoupling for 4-valent
+  - Wigner 6j, Racah coefficients
+  - Tetrahedral symmetry (24 permutations)
+- **9j Symbols:**
+  - Higher-valent vertices (≥5)
+  - Computed via recoupling trees
+- **Degenerate Sector:**
+  - Many spin configurations → same area
+  - Huge volume degeneracy
+  - Intertwiner quantum numbers resolve degeneracy
+
+**Quanta of Volume:**
+- **Volume Operator:**
+  - V̂(R) = Σ_{v∈R} V̂_v (sum over vertices)
+  - V_v depends on spins {j_e} and intertwiner i_v
+  - Complex formula (Rovelli-Smolin)
+- **Discrete Spectrum:**
+  - Volume eigenvalues V_n ∼ n l_P³
+  - Volume gap ΔV ∼ l_P³ (Planck volume)
+  - No arbitrarily small volumes
+- **Minimal Volume:**
+  - V_min ∼ l_P³ ≈ (1.6×10⁻³⁵ m)³
+- **Singularity Resolution:**
+  - V > 0 always (bounded below)
+  - No classical V = 0 singularities
+  - Big Bounce replaces Big Bang
+
+**Quantum Geometry:**
+- **Discrete Geometry:**
+  - 3-geometry built from area/volume quanta
+  - Graph γ = skeleton of quantum geometry
+- **Edges and Vertices:**
+  - Edges: quantized area A_j = 8πγl_P²√(j(j+1))
+  - Vertices: quantized volume V_v ∼ l_P³
+- **Continuum Limit:**
+  - Smooth geometry from fine-grained networks
+  - Coarse graining: ⟨q_ab⟩ ≈ classical metric
+- **Polymer Structure:**
+  - Space has polymer-like structure at l_P
+  - Network of Planck-scale chunks
+- **Background Independence:**
+  - No pre-existing space
+  - Geometry IS the quantum state
+
+**Weaves (Texture of Space):**
+- **Weave Definition:**
+  - Fine-grained spin network with mesh ε ~ l_P
+  - Many edges, dense network
+- **Classical Limit:**
+  - Weave → smooth 3-metric q_ab as l_P/L → 0
+  - Semiclassical coherent states
+- **Coarse Graining:**
+  - Average over ΔV >> l_P³
+  - ⟨q_ab⟩_ΔV ≈ classical metric
+- **Quantum Fluctuations:**
+  - δq_ab ~ (l_P/ε)² (suppressed for ε >> l_P)
+- **Effective Continuum:**
+  - For ε << L: effective GR + quantum corrections ~ (l_P/L)²
+  - Planck lattice: regular weave at scale l_P
+
+**Applications:** Quantum gravity, quantum cosmology (Big Bounce, singularity resolution), black hole thermodynamics (entropy counting, information paradox), Planck-scale physics, quantum spacetime, spin foams (covariant dynamics), canonical quantization of GR, background-independent quantum theory
+
 ## 🚀 Usage
 
 ### Integration
@@ -1722,12 +1943,13 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
   - Financial mathematics, actuarial science, econometrics
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
-  - **Quantum Mechanics & Chemistry** (5 comprehensive modules, ~8,906 lines total):
+  - **Quantum Mechanics & Chemistry** (6 comprehensive modules, ~10,297 lines total):
     - **Operator Algebras** (~2,800 lines): von Neumann algebras, unitary representations, factor classification, elementary C*-algebra theory (13 classes), GNS construction
     - **Quantum Foundations** (~1,000 lines): Historical development from Planck to Schrödinger, Bohr model, matrix mechanics, uncertainty relations
     - **Advanced Quantum Mechanics** (~1,650 lines): Kummer's functions, Hamiltonian mechanics, perturbation theory, Stark effect, Pauli exclusion, electron spin, helium atom
     - **Quantum Chemistry** (~1,300 lines): Atomic structure (Hartree-Fock, Slater orbitals, multiplet theory), molecular structure (Born-Oppenheimer, diatomic molecules, H₂⁺, H₂, chemical bonding, VSEPR, Hückel MO theory)
     - **Relativistic Quantum Mechanics** (~4,957 lines): Comprehensive Klein-Gordon equation (12 topics), comprehensive Dirac equation (16 topics: foundation, Lorentz covariance, free motion, solutions by transformations, single-particle interpretation, nonrelativistic limit, polarized electrons, projection operators, wave packets, external fields, Foldy-Wouthuysen, hole theory, charge conjugation, time reversal, PCT), Klein's paradox, Weyl equation and neutrino physics, wave equations for arbitrary spins (Proca, Kemmer, Maxwell, Rarita-Schwinger), comprehensive Lorentz group theory (O(4), Poincaré, conformal), complete representation theory (tensor, spinor, SL(2,C), SO(3), Lorentz group Lₚ, spin-rotation)
+    - **Loop Quantum Gravity** (~1,391 lines): Quantum space structure (Planck scale), kinematical state space 𝓚 (cylindrical functions, Ashtekar-Lewandowski measure), gauge invariance 𝓚₀ (spin networks, intertwiners), diffeomorphism invariance 𝓚_Diff (s-knots, separability), connection and momentum operators (Â, Ê), quanta of area (A = 8πγl_P²√(j(j+1)), black hole entropy), quanta of volume (discrete spectrum, singularity resolution), recoupling theory (6j, 9j symbols), quantum geometry (discrete chunks, polymer structure), weaves (texture of space, semiclassical limit)
   - Advanced: 23+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
 - **Probability Distributions**: 14 distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, Student's t, F-distribution)
 - **Key Algorithms**:
