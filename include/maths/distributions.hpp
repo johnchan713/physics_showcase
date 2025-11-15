@@ -4072,6 +4072,905 @@ public:
 };
 
 /**
+ * @class NonparametricStatistics
+ * @brief Distribution-free (nonparametric) statistical methods
+ *
+ * Implements computational methods for:
+ * - Rank-based tests (Wilcoxon, Mann-Whitney, Kruskal-Wallis)
+ * - Correlation coefficients (Spearman's rho, Kendall's tau)
+ * - Randomness tests (runs test)
+ * - Sign tests and matched-pairs tests
+ * - Goodness-of-fit (Kolmogorov-Smirnov)
+ */
+class NonparametricStatistics {
+public:
+    /**
+     * @brief Friedman test for randomized block design
+     *
+     * Nonparametric alternative to two-way ANOVA
+     * Tests H₀: treatments have identical effects
+     * χ² = (12/bk(k+1)) Σ R²ⱼ - 3b(k+1)
+     *
+     * @param data Data[i][j] = observation for treatment j in block i
+     * @param b Number of blocks
+     * @param k Number of treatments
+     * @return Friedman's χ² statistic (df = k-1)
+     */
+    static double friedman_test(
+        const std::vector<std::vector<double>>& data,
+        int b, int k) {
+
+        // Rank within each block
+        std::vector<std::vector<double>> ranks(b, std::vector<double>(k));
+
+        for (int i = 0; i < b; ++i) {
+            // Create pairs (value, index)
+            std::vector<std::pair<double, int>> block_data(k);
+            for (int j = 0; j < k; ++j) {
+                block_data[j] = {data[i][j], j};
+            }
+
+            // Sort by value
+            std::sort(block_data.begin(), block_data.end());
+
+            // Assign ranks
+            for (int j = 0; j < k; ++j) {
+                int idx = block_data[j].second;
+                ranks[i][idx] = j + 1.0;  // Ranks 1 to k
+            }
+        }
+
+        // Compute rank sums for each treatment
+        std::vector<double> R_j(k, 0.0);
+        for (int j = 0; j < k; ++j) {
+            for (int i = 0; i < b; ++i) {
+                R_j[j] += ranks[i][j];
+            }
+        }
+
+        // Friedman statistic
+        double sum_R_sq = 0.0;
+        for (int j = 0; j < k; ++j) {
+            sum_R_sq += R_j[j] * R_j[j];
+        }
+
+        double chi_sq = (12.0 / (b * k * (k + 1))) * sum_R_sq - 3.0 * b * (k + 1);
+
+        return chi_sq;
+    }
+
+    /**
+     * @brief Kendall's rank correlation coefficient τ (tau)
+     *
+     * Measures ordinal association between two variables
+     * τ = (C - D) / (n(n-1)/2)
+     * where C = concordant pairs, D = discordant pairs
+     *
+     * @param x First variable
+     * @param y Second variable
+     * @return Kendall's tau (-1 to +1)
+     */
+    static double kendalls_tau(
+        const std::vector<double>& x,
+        const std::vector<double>& y) {
+
+        int n = x.size();
+        if (n != static_cast<int>(y.size())) {
+            throw std::invalid_argument("x and y must have same size");
+        }
+
+        int concordant = 0, discordant = 0;
+
+        // Count concordant and discordant pairs
+        for (int i = 0; i < n - 1; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                double x_diff = x[j] - x[i];
+                double y_diff = y[j] - y[i];
+
+                if ((x_diff > 0 && y_diff > 0) || (x_diff < 0 && y_diff < 0)) {
+                    concordant++;
+                } else if ((x_diff > 0 && y_diff < 0) || (x_diff < 0 && y_diff > 0)) {
+                    discordant++;
+                }
+                // Ties: neither concordant nor discordant
+            }
+        }
+
+        double tau = static_cast<double>(concordant - discordant) / (n * (n - 1) / 2.0);
+        return tau;
+    }
+
+    /**
+     * @brief Kruskal-Wallis test (nonparametric one-way ANOVA)
+     *
+     * Tests H₀: k samples come from identical distributions
+     * H = (12/(N(N+1))) Σ(R²ᵢ/nᵢ) - 3(N+1)
+     *
+     * @param groups Vector of samples (one vector per group)
+     * @return Kruskal-Wallis H statistic (approximately χ²(k-1))
+     */
+    static double kruskal_wallis_test(const std::vector<std::vector<double>>& groups) {
+        int k = groups.size();
+        if (k < 2) throw std::invalid_argument("Need at least 2 groups");
+
+        // Combine all data with group labels
+        std::vector<std::pair<double, int>> combined;
+        int N = 0;
+
+        for (int i = 0; i < k; ++i) {
+            for (double x : groups[i]) {
+                combined.push_back({x, i});
+                N++;
+            }
+        }
+
+        // Sort by value
+        std::sort(combined.begin(), combined.end());
+
+        // Assign ranks (handle ties by averaging)
+        std::vector<double> ranks(N);
+        int i = 0;
+        while (i < N) {
+            int j = i;
+            // Find ties
+            while (j < N && combined[j].first == combined[i].first) {
+                j++;
+            }
+
+            // Average rank for tied values
+            double avg_rank = (i + 1 + j) / 2.0;
+            for (int m = i; m < j; ++m) {
+                ranks[m] = avg_rank;
+            }
+
+            i = j;
+        }
+
+        // Compute rank sums for each group
+        std::vector<double> R_i(k, 0.0);
+        std::vector<int> n_i(k, 0);
+
+        for (int idx = 0; idx < N; ++idx) {
+            int group = combined[idx].second;
+            R_i[group] += ranks[idx];
+            n_i[group]++;
+        }
+
+        // Kruskal-Wallis statistic
+        double H = 0.0;
+        for (int i = 0; i < k; ++i) {
+            H += (R_i[i] * R_i[i]) / n_i[i];
+        }
+        H = (12.0 / (N * (N + 1))) * H - 3.0 * (N + 1);
+
+        return H;
+    }
+
+    /**
+     * @brief Runs test for randomness
+     *
+     * Tests H₀: sequence is random
+     * Counts runs (consecutive sequences of same value/sign)
+     *
+     * @param data Binary sequence (0s and 1s) or signs
+     * @return Standardized runs statistic Z ~ N(0,1) for large n
+     */
+    static double runs_test(const std::vector<int>& data) {
+        int n = data.size();
+        if (n < 2) throw std::invalid_argument("Need at least 2 observations");
+
+        // Count runs
+        int runs = 1;
+        for (int i = 1; i < n; ++i) {
+            if (data[i] != data[i-1]) {
+                runs++;
+            }
+        }
+
+        // Count n1 (number of 0s/negatives) and n2 (number of 1s/positives)
+        int n1 = 0, n2 = 0;
+        for (int x : data) {
+            if (x == 0) n1++;
+            else n2++;
+        }
+
+        // Expected number of runs
+        double E_R = (2.0 * n1 * n2) / (n1 + n2) + 1.0;
+
+        // Variance of runs
+        double Var_R = (2.0 * n1 * n2 * (2.0 * n1 * n2 - n1 - n2)) /
+                       ((n1 + n2) * (n1 + n2) * (n1 + n2 - 1));
+
+        // Standardized test statistic
+        double Z = (runs - E_R) / std::sqrt(Var_R);
+
+        return Z;
+    }
+
+    /**
+     * @brief Sign test
+     *
+     * Tests H₀: median = m₀
+     * Counts number of observations above vs below m₀
+     *
+     * @param data Sample data
+     * @param median0 Hypothesized median
+     * @return Number of positive signs (compare with binomial(n, 0.5))
+     */
+    static int sign_test(const std::vector<double>& data, double median0) {
+        int n_plus = 0;
+
+        for (double x : data) {
+            if (x > median0) n_plus++;
+            // Ignore x == median0
+        }
+
+        return n_plus;
+    }
+
+    /**
+     * @brief Spearman's rank correlation coefficient ρ (rho)
+     *
+     * Measures monotonic relationship between variables
+     * ρ = 1 - (6Σd²ᵢ)/(n(n²-1))
+     * where dᵢ = rank(xᵢ) - rank(yᵢ)
+     *
+     * @param x First variable
+     * @param y Second variable
+     * @return Spearman's rho (-1 to +1)
+     */
+    static double spearmans_rho(
+        const std::vector<double>& x,
+        const std::vector<double>& y) {
+
+        int n = x.size();
+        if (n != static_cast<int>(y.size())) {
+            throw std::invalid_argument("x and y must have same size");
+        }
+
+        // Rank x
+        std::vector<std::pair<double, int>> x_pairs(n);
+        for (int i = 0; i < n; ++i) {
+            x_pairs[i] = {x[i], i};
+        }
+        std::sort(x_pairs.begin(), x_pairs.end());
+
+        std::vector<double> rank_x(n);
+        for (int i = 0; i < n; ++i) {
+            rank_x[x_pairs[i].second] = i + 1.0;
+        }
+
+        // Rank y
+        std::vector<std::pair<double, int>> y_pairs(n);
+        for (int i = 0; i < n; ++i) {
+            y_pairs[i] = {y[i], i};
+        }
+        std::sort(y_pairs.begin(), y_pairs.end());
+
+        std::vector<double> rank_y(n);
+        for (int i = 0; i < n; ++i) {
+            rank_y[y_pairs[i].second] = i + 1.0;
+        }
+
+        // Compute sum of squared differences
+        double sum_d_sq = 0.0;
+        for (int i = 0; i < n; ++i) {
+            double d = rank_x[i] - rank_y[i];
+            sum_d_sq += d * d;
+        }
+
+        // Spearman's rho
+        double rho = 1.0 - (6.0 * sum_d_sq) / (n * (n * n - 1));
+
+        return rho;
+    }
+
+    /**
+     * @brief Wilcoxon matched-pairs signed-ranks test
+     *
+     * Tests H₀: median difference = 0 for paired data
+     * Ranks absolute differences, sums ranks with positive/negative signs
+     *
+     * @param x First sample (paired)
+     * @param y Second sample (paired)
+     * @return Wilcoxon T statistic (sum of positive ranks)
+     */
+    static double wilcoxon_matched_pairs(
+        const std::vector<double>& x,
+        const std::vector<double>& y) {
+
+        int n = x.size();
+        if (n != static_cast<int>(y.size())) {
+            throw std::invalid_argument("x and y must have same size");
+        }
+
+        // Compute differences
+        std::vector<std::pair<double, int>> diffs;  // (|diff|, sign)
+        for (int i = 0; i < n; ++i) {
+            double diff = x[i] - y[i];
+            if (std::abs(diff) > 1e-10) {  // Ignore zeros
+                diffs.push_back({std::abs(diff), (diff > 0) ? 1 : -1});
+            }
+        }
+
+        int m = diffs.size();
+        if (m == 0) return 0.0;
+
+        // Sort by absolute difference
+        std::sort(diffs.begin(), diffs.end());
+
+        // Assign ranks
+        std::vector<double> ranks(m);
+        for (int i = 0; i < m; ++i) {
+            ranks[i] = i + 1.0;
+        }
+
+        // Sum positive ranks
+        double T_plus = 0.0;
+        for (int i = 0; i < m; ++i) {
+            if (diffs[i].second > 0) {
+                T_plus += ranks[i];
+            }
+        }
+
+        return T_plus;
+    }
+
+    /**
+     * @brief Wilcoxon rank-sum test (Mann-Whitney U test)
+     *
+     * Tests H₀: two independent samples come from same distribution
+     * U = R₁ - n₁(n₁+1)/2
+     * where R₁ is sum of ranks in first sample
+     *
+     * @param sample1 First sample
+     * @param sample2 Second sample
+     * @return Mann-Whitney U statistic
+     */
+    static double mann_whitney_u_test(
+        const std::vector<double>& sample1,
+        const std::vector<double>& sample2) {
+
+        int n1 = sample1.size();
+        int n2 = sample2.size();
+
+        // Combine samples with labels
+        std::vector<std::pair<double, int>> combined;
+        for (double x : sample1) {
+            combined.push_back({x, 1});
+        }
+        for (double x : sample2) {
+            combined.push_back({x, 2});
+        }
+
+        // Sort
+        std::sort(combined.begin(), combined.end());
+
+        // Assign ranks
+        int N = n1 + n2;
+        std::vector<double> ranks(N);
+        int i = 0;
+        while (i < N) {
+            int j = i;
+            while (j < N && combined[j].first == combined[i].first) {
+                j++;
+            }
+            double avg_rank = (i + 1 + j) / 2.0;
+            for (int m = i; m < j; ++m) {
+                ranks[m] = avg_rank;
+            }
+            i = j;
+        }
+
+        // Sum ranks for sample 1
+        double R1 = 0.0;
+        for (int idx = 0; idx < N; ++idx) {
+            if (combined[idx].second == 1) {
+                R1 += ranks[idx];
+            }
+        }
+
+        // Mann-Whitney U
+        double U = R1 - n1 * (n1 + 1.0) / 2.0;
+
+        return U;
+    }
+
+    /**
+     * @brief Wilcoxon signed-rank test (one-sample)
+     *
+     * Tests H₀: median = 0
+     * Alternative to one-sample t-test for non-normal data
+     *
+     * @param data Sample data
+     * @return Wilcoxon W statistic
+     */
+    static double wilcoxon_signed_rank(const std::vector<double>& data) {
+        // Remove zeros
+        std::vector<std::pair<double, int>> abs_vals;
+        for (double x : data) {
+            if (std::abs(x) > 1e-10) {
+                abs_vals.push_back({std::abs(x), (x > 0) ? 1 : -1});
+            }
+        }
+
+        int n = abs_vals.size();
+        if (n == 0) return 0.0;
+
+        // Sort by absolute value
+        std::sort(abs_vals.begin(), abs_vals.end());
+
+        // Sum positive ranks
+        double W_plus = 0.0;
+        for (int i = 0; i < n; ++i) {
+            if (abs_vals[i].second > 0) {
+                W_plus += (i + 1);
+            }
+        }
+
+        return W_plus;
+    }
+
+    /**
+     * @brief Kolmogorov-Smirnov one-sample test
+     *
+     * Tests H₀: sample comes from specified distribution
+     * D = max|Fₙ(x) - F₀(x)|
+     * Already implemented in HypothesisTesting, wrapper here
+     */
+    static double kolmogorov_smirnov_one_sample(
+        std::vector<double> data,
+        std::function<double(double)> cdf_function) {
+
+        return HypothesisTesting::kolmogorov_smirnov_test(data, cdf_function);
+    }
+
+    /**
+     * @brief Kolmogorov-Smirnov two-sample test
+     *
+     * Tests H₀: two samples come from same distribution
+     * D = max|F₁(x) - F₂(x)|
+     *
+     * @param sample1 First sample
+     * @param sample2 Second sample
+     * @return KS statistic D
+     */
+    static double kolmogorov_smirnov_two_sample(
+        std::vector<double> sample1,
+        std::vector<double> sample2) {
+
+        std::sort(sample1.begin(), sample1.end());
+        std::sort(sample2.begin(), sample2.end());
+
+        int n1 = sample1.size();
+        int n2 = sample2.size();
+
+        double max_diff = 0.0;
+        int i = 0, j = 0;
+
+        while (i < n1 && j < n2) {
+            double F1 = (i + 1.0) / n1;
+            double F2 = (j + 1.0) / n2;
+            max_diff = std::max(max_diff, std::abs(F1 - F2));
+
+            if (sample1[i] < sample2[j]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return max_diff;
+    }
+};
+
+/**
+ * @class QualityControl
+ * @brief Quality assurance and control methods
+ *
+ * Implements:
+ * - Control charts (X-bar, R, S, p, c charts)
+ * - Acceptance sampling plans
+ * - Process capability indices
+ * - Reliability analysis
+ * - Risk analysis
+ */
+class QualityControl {
+public:
+    /**
+     * @brief X-bar control chart parameters
+     *
+     * For monitoring process mean
+     * UCL = x̄̄ + A₂R̄, LCL = x̄̄ - A₂R̄
+     */
+    struct XBarChart {
+        double center_line;    // x̄̄ (grand mean)
+        double UCL;            // Upper control limit
+        double LCL;            // Lower control limit
+        double A2_factor;      // A₂ factor from table
+    };
+
+    /**
+     * @brief Compute X-bar control chart limits
+     *
+     * @param sample_means Vector of sample means
+     * @param R_bar Average range
+     * @param n Sample size
+     * @return Control chart parameters
+     */
+    static XBarChart xbar_chart(
+        const std::vector<double>& sample_means,
+        double R_bar,
+        int n) {
+
+        // A2 factors for different sample sizes (n=2 to 10)
+        std::vector<double> A2_table = {0, 0, 1.880, 1.023, 0.729, 0.577,
+                                        0.483, 0.419, 0.373, 0.337, 0.308};
+
+        if (n < 2 || n > 10) {
+            throw std::invalid_argument("Sample size must be between 2 and 10");
+        }
+
+        double x_bar_bar = std::accumulate(sample_means.begin(),
+                                          sample_means.end(), 0.0) / sample_means.size();
+        double A2 = A2_table[n];
+
+        XBarChart chart;
+        chart.center_line = x_bar_bar;
+        chart.A2_factor = A2;
+        chart.UCL = x_bar_bar + A2 * R_bar;
+        chart.LCL = x_bar_bar - A2 * R_bar;
+
+        return chart;
+    }
+
+    /**
+     * @brief R chart (range chart) parameters
+     *
+     * For monitoring process variability
+     * UCL = D₄R̄, LCL = D₃R̄
+     */
+    struct RChart {
+        double center_line;  // R̄
+        double UCL;
+        double LCL;
+    };
+
+    /**
+     * @brief Compute R control chart limits
+     */
+    static RChart r_chart(const std::vector<double>& ranges, int n) {
+        // D3 and D4 factors
+        std::vector<double> D3_table = {0, 0, 0, 0, 0, 0, 0, 0.076, 0.136, 0.184, 0.223};
+        std::vector<double> D4_table = {0, 0, 3.267, 2.574, 2.282, 2.114,
+                                        2.004, 1.924, 1.864, 1.816, 1.777};
+
+        if (n < 2 || n > 10) {
+            throw std::invalid_argument("Sample size must be between 2 and 10");
+        }
+
+        double R_bar = std::accumulate(ranges.begin(), ranges.end(), 0.0) / ranges.size();
+
+        RChart chart;
+        chart.center_line = R_bar;
+        chart.UCL = D4_table[n] * R_bar;
+        chart.LCL = D3_table[n] * R_bar;
+
+        return chart;
+    }
+
+    /**
+     * @brief p-chart for proportion defective
+     *
+     * UCL = p̄ + 3√(p̄(1-p̄)/n), LCL = p̄ - 3√(p̄(1-p̄)/n)
+     */
+    struct PChart {
+        double center_line;  // p̄
+        double UCL;
+        double LCL;
+    };
+
+    static PChart p_chart(const std::vector<double>& proportions, int n) {
+        double p_bar = std::accumulate(proportions.begin(), proportions.end(), 0.0)
+                      / proportions.size();
+
+        double std_error = std::sqrt(p_bar * (1.0 - p_bar) / n);
+
+        PChart chart;
+        chart.center_line = p_bar;
+        chart.UCL = p_bar + 3.0 * std_error;
+        chart.LCL = std::max(0.0, p_bar - 3.0 * std_error);
+
+        return chart;
+    }
+
+    /**
+     * @brief Process capability index Cp
+     *
+     * Cp = (USL - LSL) / (6σ)
+     * Measures potential capability
+     *
+     * @param USL Upper specification limit
+     * @param LSL Lower specification limit
+     * @param sigma Process standard deviation
+     * @return Cp index (>1 is capable)
+     */
+    static double process_capability_cp(double USL, double LSL, double sigma) {
+        return (USL - LSL) / (6.0 * sigma);
+    }
+
+    /**
+     * @brief Process capability index Cpk
+     *
+     * Cpk = min((USL - μ)/(3σ), (μ - LSL)/(3σ))
+     * Measures actual capability accounting for centering
+     *
+     * @return Cpk index (>1 is capable, >1.33 is good)
+     */
+    static double process_capability_cpk(
+        double USL, double LSL, double mu, double sigma) {
+
+        double cpu = (USL - mu) / (3.0 * sigma);
+        double cpl = (mu - LSL) / (3.0 * sigma);
+
+        return std::min(cpu, cpl);
+    }
+
+    /**
+     * @brief Single sampling plan parameters
+     *
+     * Accept lot if c or fewer defectives in sample of n
+     */
+    struct SamplingPlan {
+        int n;      // Sample size
+        int c;      // Acceptance number
+        double AQL;  // Acceptable Quality Level
+        double LTPD; // Lot Tolerance Percent Defective
+    };
+
+    /**
+     * @brief Design single sampling plan
+     *
+     * @param AQL Acceptable quality level (e.g., 0.01 for 1%)
+     * @param LTPD Lot tolerance percent defective
+     * @param alpha Producer's risk
+     * @param beta Consumer's risk
+     * @return Sampling plan (n, c)
+     */
+    static SamplingPlan single_sampling_plan(
+        double AQL, double LTPD, double alpha = 0.05, double beta = 0.10) {
+
+        // Simplified approach: use nomograph approximation
+        // For exact plans, would use OC curve calculations
+
+        SamplingPlan plan;
+        plan.AQL = AQL;
+        plan.LTPD = LTPD;
+
+        // Simple heuristic (real plans use binomial/Poisson tables)
+        plan.c = static_cast<int>(std::ceil(-std::log(alpha) / AQL));
+        plan.n = static_cast<int>(std::ceil(plan.c / LTPD * 2.0));
+
+        return plan;
+    }
+
+    /**
+     * @brief Operating characteristic (OC) curve value
+     *
+     * Probability of acceptance Pa(p) for given defect rate p
+     * Pa(p) = Σᵢ₌₀ᶜ C(n,i) pⁱ(1-p)ⁿ⁻ⁱ
+     *
+     * @param p Proportion defective
+     * @param n Sample size
+     * @param c Acceptance number
+     * @return Probability of acceptance
+     */
+    static double oc_curve(double p, int n, int c) {
+        BinomialDistribution binom(n, p);
+
+        double Pa = 0.0;
+        for (int i = 0; i <= c; ++i) {
+            Pa += binom.pmf(i);
+        }
+
+        return Pa;
+    }
+
+    /**
+     * @brief Reliability function R(t) = P(T > t)
+     *
+     * For exponential failure time: R(t) = e^(-λt)
+     *
+     * @param t Time
+     * @param lambda Failure rate
+     * @return Reliability at time t
+     */
+    static double reliability_exponential(double t, double lambda) {
+        if (t < 0) return 1.0;
+        return std::exp(-lambda * t);
+    }
+
+    /**
+     * @brief Reliability for Weibull distribution
+     *
+     * R(t) = exp(-(t/η)^β)
+     *
+     * @param t Time
+     * @param eta Scale parameter
+     * @param beta Shape parameter
+     * @return Reliability
+     */
+    static double reliability_weibull(double t, double eta, double beta) {
+        if (t < 0) return 1.0;
+        return std::exp(-std::pow(t / eta, beta));
+    }
+
+    /**
+     * @brief Mean Time Between Failures (MTBF)
+     *
+     * For exponential: MTBF = 1/λ
+     */
+    static double mtbf_exponential(double lambda) {
+        return 1.0 / lambda;
+    }
+
+    /**
+     * @brief Failure rate (hazard function) for Weibull
+     *
+     * h(t) = (β/η)(t/η)^(β-1)
+     */
+    static double hazard_rate_weibull(double t, double eta, double beta) {
+        if (t < 0) return 0.0;
+        return (beta / eta) * std::pow(t / eta, beta - 1.0);
+    }
+
+    /**
+     * @brief System reliability for series configuration
+     *
+     * R_system = ∏ᵢ Rᵢ
+     * System fails if any component fails
+     */
+    static double reliability_series(const std::vector<double>& component_reliabilities) {
+        double R_system = 1.0;
+        for (double R : component_reliabilities) {
+            R_system *= R;
+        }
+        return R_system;
+    }
+
+    /**
+     * @brief System reliability for parallel configuration
+     *
+     * R_system = 1 - ∏ᵢ(1 - Rᵢ)
+     * System works if at least one component works
+     */
+    static double reliability_parallel(const std::vector<double>& component_reliabilities) {
+        double F_system = 1.0;  // System unreliability
+        for (double R : component_reliabilities) {
+            F_system *= (1.0 - R);
+        }
+        return 1.0 - F_system;
+    }
+
+    /**
+     * @brief Expected monetary value (EMV) for decision under risk
+     *
+     * EMV = Σᵢ pᵢ · vᵢ
+     * where pᵢ is probability, vᵢ is value/payoff
+     *
+     * @param probabilities Probabilities of outcomes
+     * @param values Values/payoffs for each outcome
+     * @return Expected value
+     */
+    static double expected_monetary_value(
+        const std::vector<double>& probabilities,
+        const std::vector<double>& values) {
+
+        if (probabilities.size() != values.size()) {
+            throw std::invalid_argument("Probabilities and values must have same size");
+        }
+
+        double EMV = 0.0;
+        for (size_t i = 0; i < probabilities.size(); ++i) {
+            EMV += probabilities[i] * values[i];
+        }
+
+        return EMV;
+    }
+
+    /**
+     * @brief Expected value of perfect information (EVPI)
+     *
+     * EVPI = EV with perfect info - EV without perfect info
+     * Maximum amount worth paying for perfect information
+     *
+     * @param best_outcomes Best outcome for each state
+     * @param state_probabilities Probability of each state
+     * @param current_emv EMV of current best decision
+     * @return EVPI
+     */
+    static double expected_value_perfect_information(
+        const std::vector<double>& best_outcomes,
+        const std::vector<double>& state_probabilities,
+        double current_emv) {
+
+        double ev_perfect = expected_monetary_value(state_probabilities, best_outcomes);
+        return ev_perfect - current_emv;
+    }
+
+    /**
+     * @brief Risk priority number (RPN) for FMEA
+     *
+     * RPN = Severity × Occurrence × Detection
+     * Used in Failure Mode and Effects Analysis
+     *
+     * @param severity Severity rating (1-10)
+     * @param occurrence Occurrence rating (1-10)
+     * @param detection Detection rating (1-10)
+     * @return RPN (1-1000)
+     */
+    static int risk_priority_number(int severity, int occurrence, int detection) {
+        return severity * occurrence * detection;
+    }
+
+    /**
+     * @brief Minimax decision rule
+     *
+     * Choose action that minimizes maximum loss
+     * Conservative approach for risk-averse decision makers
+     *
+     * @param payoff_matrix Payoff[action][state]
+     * @return Index of minimax action
+     */
+    static int minimax_decision(const std::vector<std::vector<double>>& payoff_matrix) {
+        int n_actions = payoff_matrix.size();
+
+        double best_worst = -std::numeric_limits<double>::infinity();
+        int best_action = 0;
+
+        for (int i = 0; i < n_actions; ++i) {
+            double worst_payoff = *std::min_element(
+                payoff_matrix[i].begin(), payoff_matrix[i].end());
+
+            if (worst_payoff > best_worst) {
+                best_worst = worst_payoff;
+                best_action = i;
+            }
+        }
+
+        return best_action;
+    }
+
+    /**
+     * @brief Maximax decision rule
+     *
+     * Choose action that maximizes maximum gain
+     * Optimistic approach for risk-seeking decision makers
+     *
+     * @param payoff_matrix Payoff[action][state]
+     * @return Index of maximax action
+     */
+    static int maximax_decision(const std::vector<std::vector<double>>& payoff_matrix) {
+        int n_actions = payoff_matrix.size();
+
+        double best_best = -std::numeric_limits<double>::infinity();
+        int best_action = 0;
+
+        for (int i = 0; i < n_actions; ++i) {
+            double best_payoff = *std::max_element(
+                payoff_matrix[i].begin(), payoff_matrix[i].end());
+
+            if (best_payoff > best_best) {
+                best_best = best_payoff;
+                best_action = i;
+            }
+        }
+
+        return best_action;
+    }
+};
+
+/**
  * @class StatisticalTests
  * @brief Legacy statistical test methods (kept for backward compatibility)
  */
