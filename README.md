@@ -16,23 +16,29 @@ Comprehensive C++17 header-only library implementing computational algorithms fr
 ```
 physics_showcase/
 ├── include/
-│   ├── maths/
-│   │   ├── basic/                 # Foundational mathematics
-│   │   │   ├── calculus/          # Calculus theorems and methods
-│   │   │   ├── linear_algebra/    # Matrix operations & vectors
-│   │   │   ├── trigonometry/      # Trig functions and identities
-│   │   │   └── transforms/        # Basic transforms (Fourier, polar)
-│   │   ├── advanced/              # Advanced mathematical topics
-│   │   │   ├── algebra/           # Differential Algebra (Ritt-Kolchin)
-│   │   │   ├── analysis/          # Fourier analysis & subdifferentials
-│   │   │   ├── geometry/          # Variational calculus & Lagrangians
-│   │   │   ├── stochastic/        # Monte Carlo & MCMC methods
-│   │   │   ├── probability/       # Probability distributions & statistics
-│   │   │   ├── dynamical_systems/ # ODEs, chaos theory, bifurcations
-│   │   │   └── pde/              # Partial differential equations
-│   │   ├── finance/               # Financial mathematics
-│   │   ├── actuarial/             # Actuarial science
-│   │   └── econometrics/          # Econometric models
+│   ├── maths/                     # All mathematics modules (flattened)
+│   │   ├── actuarial_life_tables.hpp
+│   │   ├── advanced_subdifferentials.hpp
+│   │   ├── black_scholes.hpp
+│   │   ├── calculus_theorems.hpp
+│   │   ├── differential_algebra.hpp
+│   │   ├── distributions.hpp
+│   │   ├── econometrics_regression.hpp
+│   │   ├── fourier_analysis.hpp
+│   │   ├── matrices.hpp
+│   │   ├── monte_carlo.hpp
+│   │   ├── nonsmooth_algorithms.hpp
+│   │   ├── ode_dynamical_systems.hpp
+│   │   ├── partial_differential_equations.hpp
+│   │   ├── pde_classification_solutions.hpp
+│   │   ├── pde_numerical_methods.hpp
+│   │   ├── pde_solution_methods.hpp
+│   │   ├── pde_transform_methods.hpp
+│   │   ├── pde_variational_methods.hpp
+│   │   ├── polar_transforms.hpp
+│   │   ├── trigonometry_identities.hpp
+│   │   ├── variational_calculus.hpp
+│   │   └── vectors.hpp
 │   └── physics/
 │       ├── (basic modules)        # Classical mechanics, waves, etc.
 │       └── advanced/              # Advanced physics topics
@@ -41,15 +47,15 @@ physics_showcase/
 │           ├── fluid_dynamics/    # Turbulence, compressible flow
 │           ├── gauge_theory/      # Gauge invariance, Higgs mechanism
 │           └── qft/              # Quantum field theory
-├── examples/                      # Demonstration programs
+├── examples/                      # Physics demonstration programs
 └── README.md
 ```
 
 ## 🧮 Mathematics Modules
 
-### Advanced Mathematics
+All mathematics modules are located in `include/maths/` with a flat structure for easy access.
 
-### Differential Algebra (`maths/advanced/algebra/differential_algebra.hpp`)
+### Differential Algebra (`maths/differential_algebra.hpp`)
 **Chapters I-IX from Ritt's "Differential Algebra"**
 
 - **Differential Polynomials & Fields (Ch. I)**
@@ -99,7 +105,7 @@ physics_showcase/
 - Laplace equation: ∇²u = 0
 - Wave equation: u_tt - c²u_xx = 0
 
-### Fourier Analysis (`maths/advanced/analysis/fourier_analysis.hpp`)
+### Fourier Analysis (`maths/fourier_analysis.hpp`)
 **Discrete & continuous Fourier theory**
 
 - **Discrete & Fast Fourier Transform**
@@ -134,7 +140,7 @@ physics_showcase/
   - Gabor transform with Gaussian windows
   - Chirp signal detection
 
-### Advanced Subdifferentials (`maths/advanced/analysis/advanced_subdifferentials.hpp`)
+### Advanced Subdifferentials (`maths/advanced_subdifferentials.hpp`)
 **Nonsmooth analysis & variational calculus**
 
 - **Clarke Subdifferential** ∂_C f(x)
@@ -145,7 +151,7 @@ physics_showcase/
 - **Calculus Rules**: sum, chain, max rules
 - **Metric Regularity Criterion**
 
-### Nonsmooth Algorithms (`maths/advanced/analysis/nonsmooth_algorithms.hpp`)
+### Nonsmooth Algorithms (`maths/nonsmooth_algorithms.hpp`)
 **Optimization algorithms**
 
 - **Proximal Operators**
@@ -166,7 +172,7 @@ physics_showcase/
   - Consensus optimization
   - Dual variable updates
 
-### Stochastic Methods (`maths/advanced/stochastic/monte_carlo.hpp`)
+### Stochastic Methods (`maths/monte_carlo.hpp`)
 **Monte Carlo methods and stochastic algorithms**
 
 - **Monte Carlo Integration**
@@ -201,7 +207,7 @@ physics_showcase/
 
 **Applications:** Finance (option pricing), physics (molecular dynamics), Bayesian inference, machine learning
 
-### Variational Calculus (`maths/advanced/geometry/variational_calculus.hpp`)
+### Variational Calculus (`maths/variational_calculus.hpp`)
 **Lagrangians, Poincaré-Cartan Forms, and variational principles**
 
 - **Contact Geometry**
@@ -240,7 +246,7 @@ physics_showcase/
 
 **Applications:** Classical mechanics, field theory, optimal control, integrable systems
 
-### Differential Equations and Dynamical Systems (`maths/advanced/dynamical_systems/ode_dynamical_systems.hpp`)
+### Differential Equations and Dynamical Systems (`maths/ode_dynamical_systems.hpp`)
 **Comprehensive ODE theory and chaos**
 
 **Classical ODE Theory:**
@@ -269,7 +275,7 @@ physics_showcase/
 
 **Applications**: Physics (pendulum, Lorenz), biology (population dynamics), engineering (nonlinear control)
 
-### Partial Differential Equations (`maths/advanced/pde/partial_differential_equations.hpp`)
+### Partial Differential Equations (`maths/partial_differential_equations.hpp`)
 **Classical PDE theory and method of characteristics**
 
 **PDE Classification and Fundamentals:**
@@ -296,7 +302,7 @@ physics_showcase/
 
 **Applications**: Heat diffusion, wave propagation, fluid mechanics, electrostatics, quantum mechanics, optimal control
 
-### PDE Solution Methods (`maths/advanced/pde/pde_solution_methods.hpp`)
+### PDE Solution Methods (`maths/pde_solution_methods.hpp`)
 **Classical solution techniques for PDEs**
 
 **Linear Equations with Constant Coefficients:**
@@ -356,7 +362,7 @@ physics_showcase/
 
 **Applications**: Vibrating strings, heat conduction, electrostatic potential, quantum mechanics (particle in box), acoustics, diffusion processes
 
-### PDE Transform Methods (`maths/advanced/pde/pde_transform_methods.hpp`)
+### PDE Transform Methods (`maths/pde_transform_methods.hpp`)
 **Laplace and Fourier transforms for solving PDEs**
 
 **Laplace Transforms:**
@@ -395,7 +401,7 @@ physics_showcase/
 
 **Applications**: Transform methods for ODEs, heat equation, wave equation, diffusion problems, signal processing
 
-### PDE Classification Solutions (`maths/advanced/pde/pde_classification_solutions.hpp`)
+### PDE Classification Solutions (`maths/pde_classification_solutions.hpp`)
 **Detailed solutions for parabolic, elliptic, and hyperbolic PDEs**
 
 **Parabolic Equations (Heat/Diffusion):**
@@ -453,7 +459,7 @@ physics_showcase/
   - Causality and light cone checking
 - **Method of Images**: Image source locations for Dirichlet/Neumann BC
 
-### PDE Variational Methods (`maths/advanced/pde/pde_variational_methods.hpp`)
+### PDE Variational Methods (`maths/pde_variational_methods.hpp`)
 **Weak formulations and variational methods for PDEs**
 
 **Line Integrals and Variational Notation:**
@@ -515,7 +521,7 @@ physics_showcase/
 
 **Applications**: Finite element analysis, structural mechanics, computational fluid dynamics, elasticity
 
-### PDE Numerical Methods (`maths/advanced/pde/pde_numerical_methods.hpp`)
+### PDE Numerical Methods (`maths/pde_numerical_methods.hpp`)
 **Numerical approximation and finite difference schemes**
 
 **Taylor Series Expansions:**
@@ -579,7 +585,7 @@ physics_showcase/
 
 **Applications**: Computational fluid dynamics, heat transfer, wave propagation, image processing, option pricing, boundary layer problems, quantum mechanics
 
-### Probability & Statistics (`maths/advanced/probability/distributions.hpp`)
+### Probability & Statistics (`maths/distributions.hpp`)
 **Comprehensive probability distributions**
 
 **Discrete Distributions:**
@@ -615,16 +621,16 @@ physics_showcase/
 
 ### Basic Mathematics
 
-- **Calculus** (`maths/basic/calculus/theorems.hpp`): Numerical derivatives, integration (Simpson's rule)
-- **Trigonometry** (`maths/basic/trigonometry/identities.hpp`): Computational trig identities
-- **Linear Algebra** (`maths/basic/linear_algebra/`): Matrix operations, vectors, eigenvalues
-- **Transforms** (`maths/basic/transforms/`): Fourier transforms, polar coordinates
+- **Calculus** (`maths/calculus_theorems.hpp`): Numerical derivatives, integration (Simpson's rule)
+- **Trigonometry** (`maths/trigonometry_identities.hpp`): Computational trig identities
+- **Linear Algebra** (`maths/matrices.hpp`, `maths/vectors.hpp`): Matrix operations, vectors, eigenvalues
+- **Transforms** (`maths/polar_transforms.hpp`): Polar coordinates and transformations
 
 ### Applied Mathematics
 
-- **Financial Mathematics** (`maths/finance/`): Options pricing, Black-Scholes, risk metrics
-- **Actuarial Science** (`maths/actuarial/`): Life tables, annuities, mortality models
-- **Econometrics** (`maths/econometrics/`): Time series analysis, regression models
+- **Financial Mathematics** (`maths/black_scholes.hpp`): Options pricing, Black-Scholes, risk metrics
+- **Actuarial Science** (`maths/actuarial_life_tables.hpp`): Life tables, annuities, mortality models
+- **Econometrics** (`maths/econometrics_regression.hpp`): Time series analysis, regression models
 
 ## 🔬 Physics Modules
 
@@ -712,121 +718,25 @@ physics_showcase/
 - **Supersymmetry** (`supersymmetry.hpp`): SUSY transformations, superpartners
 - **Quark-Gluon Plasma** (`quark_gluon_plasma.hpp`): QCD matter at extreme temperatures
 
-## 🎯 Demo Programs
+## 🚀 Usage
 
-All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -lm`
+### Integration
+Simply include the required header files in your C++ project:
 
-### Differential Algebra Demos
+```cpp
+#include "maths/fourier_analysis.hpp"
+#include "maths/pde_numerical_methods.hpp"
+#include "physics/electrostatics.hpp"
 
-1. **`differential_algebra_demo`**
-   - Basic differential polynomials and fields
-   - Characteristic sets and reduction
-   - Differential ideals
-   - Manifolds and dimension theory
-   - Elimination theory
-   - Low power theorem
-
-2. **`differential_algebra_advanced_demo`**
-   - Manifold intersections (Kronecker's theorem)
-   - Orthonomic systems (Riquier)
-   - Partial differential algebra
-   - Classical PDEs: Laplace, wave, heat
-   - Cauchy-Kovalevskaya existence
-
-### Analysis Demos
-
-3. **`fourier_analysis_demo`**
-   - DFT vs FFT performance (11x speedup on N=256)
-   - Circulant matrices and convolution theorem
-   - Haar and Daubechies-4 wavelets
-   - Fourier series and multipliers
-   - STFT and spectrogram
-   - Chirp signal detection
-
-4. **`nonsmooth_algorithms_demo`**
-   - Proximal operators (soft thresholding)
-   - Subgradient descent
-   - ISTA and FISTA comparison
-   - ADMM consensus optimization
-   - Sparse signal recovery (L1 minimization)
-
-5. **`advanced_subdifferentials_demo`**
-   - Clarke subdifferential computation
-   - Normal and tangent cones
-   - Limiting subdifferentials
-   - Metric regularity testing
-   - Nonsmooth optimization examples
-
-### Stochastic Methods Demos
-
-6. **`stochastic_methods_demo`**
-   - Monte Carlo integration (basic, importance, stratified sampling)
-   - Markov chains and stationary distributions
-   - MCMC sampling (Metropolis-Hastings, Gibbs)
-   - Brownian motion and stochastic processes
-   - Boltzmann equation and DSMC simulation
-   - Hamiltonian Monte Carlo
-   - MCMC convergence diagnostics (ESS, R̂)
-
-### Variational Calculus Demos
-
-7. **`variational_calculus_demo`**
-   - Contact geometry and contact structures
-   - Lagrangians and Euler-Lagrange equations
-   - Poincaré-Cartan forms and integral invariants
-   - Legendre transformations (Lagrangian ↔ Hamiltonian)
-   - Noether's theorem (symmetries → conservation laws)
-   - Second variation and Jacobi fields
-   - Bäcklund transformations (Sine-Gordon)
-   - Field theories (Klein-Gordon, Maxwell, Yang-Mills)
-
-### PDE Solution Methods Demos
-
-8. **`pde_solution_methods_demo`**
-   - Orthogonal polynomials (Legendre, Chebyshev, Hermite, Laguerre)
-   - Bessel functions and zeros
-   - Fourier series and Parseval's identity
-   - Series convergence rate analysis
-   - Sturm-Liouville eigenvalue problems
-   - Eigenfunction expansions
-
-9. **`greens_functions_demo`**
-   - Heat equation Green's functions (parabolic)
-   - Poisson equation Green's functions (elliptic)
-   - Wave equation Green's functions (hyperbolic)
-   - Method of images for boundary conditions
-   - Retarded Green's functions and causality
-   - Solutions via convolution with source terms
-
-10. **`variational_wrm_demo`**
-   - Green's identities (first, second, integration by parts)
-   - Weighted Residual Methods framework
-   - Galerkin method for BVPs
-   - Collocation method with Chebyshev nodes
-   - Subdomain method with domain partitioning
-   - Least squares method for optimal approximation
-   - Test function selection (hat, polynomial, trigonometric, bubble functions)
-   - Linear independence verification
-
-## 🚀 Building and Running
-
-### Prerequisites
-- C++17 compatible compiler (g++, clang++)
-- Standard library with `<random>`, `<vector>`, `<cmath>`
-
-### Compile Individual Demo
-```bash
-g++ -std=c++17 -I./include -o fourier_demo examples/fourier_analysis_demo.cpp -lm
-./fourier_demo
+using namespace maths;
+using namespace physics;
 ```
 
-### Compile All Demos
+### Compilation
+All modules are header-only and require C++17:
+
 ```bash
-for demo in examples/*_demo.cpp; do
-    name=$(basename "$demo" .cpp)
-    g++ -std=c++17 -I./include -o "$name" "$demo" -lm
-    echo "Compiled $name"
-done
+g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
 ```
 
 ## ✨ Features
@@ -854,15 +764,16 @@ done
 
 ## 📊 Statistics
 
-- **Mathematics Modules**:
-  - Basic: 4 modules (calculus, linear algebra, trigonometry, transforms)
-  - Advanced: 13 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability, PDEs - classification, solutions, transforms, variational methods, numerical methods)
-  - Applied: 3 modules (finance, actuarial, econometrics)
+- **Mathematics Modules**: 22 header-only modules in flat structure
+  - Differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms
+  - Monte Carlo & MCMC methods, variational calculus, dynamical systems & chaos
+  - Partial differential equations (6 modules: classification, solutions, transforms, variational, numerical methods, plus main PDE module)
+  - Probability distributions, matrices, vectors, calculus, trigonometry
+  - Financial mathematics, actuarial science, econometrics
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
   - Advanced: 20+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
-- **Demos**: 10 comprehensive demonstration programs
-- **Distributions**: 14 probability distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, Student's t, F-distribution)
+- **Probability Distributions**: 14 distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, Student's t, F-distribution)
 - **Key Algorithms**:
   - DFT, FFT (O(N log N))
   - ISTA, FISTA (O(1/k²) convergence)
