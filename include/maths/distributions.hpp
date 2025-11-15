@@ -896,6 +896,808 @@ public:
 };
 
 /**
+ * @class ErlangDistribution
+ * @brief Erlang distribution (special case of Gamma with integer shape)
+ *
+ * Sum of k independent exponential random variables
+ * Used in queuing theory and telecommunications
+ */
+class ErlangDistribution : public Distribution {
+private:
+    int k;          // shape parameter (must be integer)
+    double lambda;  // rate parameter
+
+public:
+    ErlangDistribution(int shape, double rate) : k(shape), lambda(rate) {
+        if (k <= 0) throw std::invalid_argument("Shape must be positive integer");
+        if (lambda <= 0.0) throw std::invalid_argument("Rate must be positive");
+    }
+
+    /**
+     * @brief PDF: f(x) = λᵏ xᵏ⁻¹ e⁻ᵏˣ / (k-1)!
+     */
+    double pdf(double x) const {
+        if (x < 0.0) return 0.0;
+        return std::pow(lambda, k) * std::pow(x, k - 1) * std::exp(-lambda * x) / factorial(k - 1);
+    }
+
+    double mean() const override { return k / lambda; }
+    double variance() const override { return k / (lambda * lambda); }
+
+    double sample() const {
+        // Sum of k exponential random variables
+        GammaDistribution gamma(k, lambda);
+        return gamma.sample();
+    }
+};
+
+/**
+ * @class LognormalDistribution
+ * @brief Lognormal distribution
+ *
+ * If X ~ Lognormal(μ, σ), then log(X) ~ Normal(μ, σ)
+ * Common in finance, biology, economics
+ */
+class LognormalDistribution : public Distribution {
+private:
+    double mu, sigma;  // parameters of underlying normal
+
+public:
+    LognormalDistribution(double mean_log, double std_log) : mu(mean_log), sigma(std_log) {
+        if (sigma <= 0.0) throw std::invalid_argument("Sigma must be positive");
+    }
+
+    /**
+     * @brief PDF: f(x) = 1/(xσ√(2π)) exp(-(ln(x)-μ)²/(2σ²))
+     */
+    double pdf(double x) const {
+        if (x <= 0.0) return 0.0;
+        double log_x = std::log(x);
+        double z = (log_x - mu) / sigma;
+        return (1.0 / (x * sigma * std::sqrt(2.0 * PI))) * std::exp(-0.5 * z * z);
+    }
+
+    double cdf(double x) const {
+        if (x <= 0.0) return 0.0;
+        double z = (std::log(x) - mu) / (sigma * std::sqrt(2.0));
+        return 0.5 * (1.0 + error_function(z));
+    }
+
+    double mean() const override {
+        return std::exp(mu + sigma * sigma / 2.0);
+    }
+
+    double variance() const override {
+        double exp_2mu_sig2 = std::exp(2 * mu + sigma * sigma);
+        return exp_2mu_sig2 * (std::exp(sigma * sigma) - 1.0);
+    }
+
+    double sample() const {
+        std::lognormal_distribution<double> dist(mu, sigma);
+        return dist(gen);
+    }
+};
+
+/**
+ * @class CauchyDistribution
+ * @brief Cauchy distribution (Lorentz distribution)
+ *
+ * Heavy-tailed distribution with no defined mean or variance
+ * PDF: f(x) = 1/(π γ (1 + ((x-x₀)/γ)²))
+ */
+class CauchyDistribution : public Distribution {
+private:
+    double x0;     // location parameter
+    double gamma;  // scale parameter
+
+public:
+    CauchyDistribution(double location, double scale) : x0(location), gamma(scale) {
+        if (gamma <= 0.0) throw std::invalid_argument("Scale must be positive");
+    }
+
+    double pdf(double x) const {
+        double z = (x - x0) / gamma;
+        return 1.0 / (PI * gamma * (1.0 + z * z));
+    }
+
+    double cdf(double x) const {
+        return 0.5 + std::atan((x - x0) / gamma) / PI;
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return x0 + gamma * std::tan(PI * (p - 0.5));
+    }
+
+    double mean() const override {
+        throw std::runtime_error("Cauchy distribution has no defined mean");
+    }
+
+    double variance() const override {
+        throw std::runtime_error("Cauchy distribution has no defined variance");
+    }
+
+    double sample() const {
+        std::cauchy_distribution<double> dist(x0, gamma);
+        return dist(gen);
+    }
+};
+
+/**
+ * @class LaplaceDistribution
+ * @brief Laplace distribution (double exponential)
+ *
+ * PDF: f(x) = (1/2b) exp(-|x-μ|/b)
+ * Used in robust statistics, signal processing
+ */
+class LaplaceDistribution : public Distribution {
+private:
+    double mu;  // location
+    double b;   // scale
+
+public:
+    LaplaceDistribution(double location, double scale) : mu(location), b(scale) {
+        if (b <= 0.0) throw std::invalid_argument("Scale must be positive");
+    }
+
+    double pdf(double x) const {
+        return (1.0 / (2.0 * b)) * std::exp(-std::abs(x - mu) / b);
+    }
+
+    double cdf(double x) const {
+        if (x < mu) {
+            return 0.5 * std::exp((x - mu) / b);
+        } else {
+            return 1.0 - 0.5 * std::exp(-(x - mu) / b);
+        }
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        if (p < 0.5) {
+            return mu + b * std::log(2.0 * p);
+        } else {
+            return mu - b * std::log(2.0 * (1.0 - p));
+        }
+    }
+
+    double mean() const override { return mu; }
+    double variance() const override { return 2.0 * b * b; }
+
+    double sample() const {
+        // Use inverse transform: F⁻¹(U) where U ~ Uniform(0,1)
+        std::uniform_real_distribution<double> uniform(0.0, 1.0);
+        return quantile(uniform(gen));
+    }
+};
+
+/**
+ * @class LogisticDistribution
+ * @brief Logistic distribution
+ *
+ * PDF: f(x) = e⁻ᶻ / (s(1+e⁻ᶻ)²) where z = (x-μ)/s
+ * Used in logistic regression, neural networks
+ */
+class LogisticDistribution : public Distribution {
+private:
+    double mu;  // location
+    double s;   // scale
+
+public:
+    LogisticDistribution(double location, double scale) : mu(location), s(scale) {
+        if (s <= 0.0) throw std::invalid_argument("Scale must be positive");
+    }
+
+    double pdf(double x) const {
+        double z = (x - mu) / s;
+        double exp_z = std::exp(-z);
+        return exp_z / (s * (1.0 + exp_z) * (1.0 + exp_z));
+    }
+
+    double cdf(double x) const {
+        double z = (x - mu) / s;
+        return 1.0 / (1.0 + std::exp(-z));
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return mu + s * std::log(p / (1.0 - p));
+    }
+
+    double mean() const override { return mu; }
+    double variance() const override { return (s * s * PI * PI) / 3.0; }
+
+    double sample() const {
+        std::uniform_real_distribution<double> uniform(0.0, 1.0);
+        return quantile(uniform(gen));
+    }
+};
+
+/**
+ * @class ParetoDistribution
+ * @brief Pareto distribution (power law)
+ *
+ * PDF: f(x) = α xₘᵅ / xᵅ⁺¹ for x ≥ xₘ
+ * Models wealth distribution, city sizes, word frequencies
+ */
+class ParetoDistribution : public Distribution {
+private:
+    double xm;     // scale (minimum value)
+    double alpha;  // shape
+
+public:
+    ParetoDistribution(double scale, double shape) : xm(scale), alpha(shape) {
+        if (xm <= 0.0 || alpha <= 0.0) {
+            throw std::invalid_argument("Scale and shape must be positive");
+        }
+    }
+
+    double pdf(double x) const {
+        if (x < xm) return 0.0;
+        return alpha * std::pow(xm, alpha) / std::pow(x, alpha + 1.0);
+    }
+
+    double cdf(double x) const {
+        if (x < xm) return 0.0;
+        return 1.0 - std::pow(xm / x, alpha);
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return xm / std::pow(1.0 - p, 1.0 / alpha);
+    }
+
+    double mean() const override {
+        if (alpha <= 1.0) throw std::runtime_error("Mean undefined for alpha <= 1");
+        return alpha * xm / (alpha - 1.0);
+    }
+
+    double variance() const override {
+        if (alpha <= 2.0) throw std::runtime_error("Variance undefined for alpha <= 2");
+        return (xm * xm * alpha) / ((alpha - 1.0) * (alpha - 1.0) * (alpha - 2.0));
+    }
+
+    double sample() const {
+        std::uniform_real_distribution<double> uniform(0.0, 1.0);
+        return quantile(uniform(gen));
+    }
+};
+
+/**
+ * @class RayleighDistribution
+ * @brief Rayleigh distribution
+ *
+ * PDF: f(x) = (x/σ²) exp(-x²/(2σ²)) for x ≥ 0
+ * Models magnitude of 2D vector with independent normal components
+ */
+class RayleighDistribution : public Distribution {
+private:
+    double sigma;
+
+public:
+    RayleighDistribution(double scale) : sigma(scale) {
+        if (sigma <= 0.0) throw std::invalid_argument("Scale must be positive");
+    }
+
+    double pdf(double x) const {
+        if (x < 0.0) return 0.0;
+        return (x / (sigma * sigma)) * std::exp(-x * x / (2.0 * sigma * sigma));
+    }
+
+    double cdf(double x) const {
+        if (x < 0.0) return 0.0;
+        return 1.0 - std::exp(-x * x / (2.0 * sigma * sigma));
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return sigma * std::sqrt(-2.0 * std::log(1.0 - p));
+    }
+
+    double mean() const override {
+        return sigma * std::sqrt(PI / 2.0);
+    }
+
+    double variance() const override {
+        return ((4.0 - PI) / 2.0) * sigma * sigma;
+    }
+
+    double sample() const {
+        // R = sqrt(X² + Y²) where X, Y ~ N(0, σ²)
+        std::normal_distribution<double> normal(0.0, sigma);
+        double x = normal(gen);
+        double y = normal(gen);
+        return std::sqrt(x * x + y * y);
+    }
+};
+
+/**
+ * @class HalfNormalDistribution
+ * @brief Half-normal distribution
+ *
+ * PDF: f(x) = (√(2/π) / σ) exp(-x²/(2σ²)) for x ≥ 0
+ * Folded normal distribution at zero
+ */
+class HalfNormalDistribution : public Distribution {
+private:
+    double sigma;
+
+public:
+    HalfNormalDistribution(double scale) : sigma(scale) {
+        if (sigma <= 0.0) throw std::invalid_argument("Scale must be positive");
+    }
+
+    double pdf(double x) const {
+        if (x < 0.0) return 0.0;
+        return std::sqrt(2.0 / PI) / sigma * std::exp(-x * x / (2.0 * sigma * sigma));
+    }
+
+    double cdf(double x) const {
+        if (x < 0.0) return 0.0;
+        return error_function(x / (sigma * std::sqrt(2.0)));
+    }
+
+    double mean() const override {
+        return sigma * std::sqrt(2.0 / PI);
+    }
+
+    double variance() const override {
+        return sigma * sigma * (1.0 - 2.0 / PI);
+    }
+
+    double sample() const {
+        std::normal_distribution<double> normal(0.0, sigma);
+        return std::abs(normal(gen));
+    }
+};
+
+/**
+ * @class InverseGaussianDistribution
+ * @brief Inverse Gaussian (Wald) distribution
+ *
+ * PDF: f(x) = √(λ/(2πx³)) exp(-λ(x-μ)²/(2μ²x))
+ * First passage time for Brownian motion with drift
+ */
+class InverseGaussianDistribution : public Distribution {
+private:
+    double mu;     // mean
+    double lambda; // shape
+
+public:
+    InverseGaussianDistribution(double mean_param, double shape_param)
+        : mu(mean_param), lambda(shape_param) {
+        if (mu <= 0.0 || lambda <= 0.0) {
+            throw std::invalid_argument("Mean and shape must be positive");
+        }
+    }
+
+    double pdf(double x) const {
+        if (x <= 0.0) return 0.0;
+        double coeff = std::sqrt(lambda / (2.0 * PI * x * x * x));
+        double exponent = -lambda * (x - mu) * (x - mu) / (2.0 * mu * mu * x);
+        return coeff * std::exp(exponent);
+    }
+
+    double mean() const override { return mu; }
+
+    double variance() const override {
+        return mu * mu * mu / lambda;
+    }
+
+    double sample() const {
+        // Michael, Schucany and Haas algorithm
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double nu = normal(gen);
+        double y = nu * nu;
+        double x = mu + (mu * mu * y) / (2.0 * lambda)
+                   - (mu / (2.0 * lambda)) * std::sqrt(4.0 * mu * lambda * y + mu * mu * y * y);
+
+        std::uniform_real_distribution<double> uniform(0.0, 1.0);
+        double u = uniform(gen);
+
+        if (u <= mu / (mu + x)) {
+            return x;
+        } else {
+            return mu * mu / x;
+        }
+    }
+};
+
+/**
+ * @class ExtremeValueDistribution
+ * @brief Extreme value (Gumbel) distribution
+ *
+ * PDF: f(x) = (1/β) exp(-(x-μ)/β) exp(-exp(-(x-μ)/β))
+ * Models maximum/minimum of samples, used in extreme value theory
+ */
+class ExtremeValueDistribution : public Distribution {
+private:
+    double mu;   // location
+    double beta; // scale
+
+public:
+    ExtremeValueDistribution(double location, double scale) : mu(location), beta(scale) {
+        if (beta <= 0.0) throw std::invalid_argument("Scale must be positive");
+    }
+
+    double pdf(double x) const {
+        double z = (x - mu) / beta;
+        return (1.0 / beta) * std::exp(-z - std::exp(-z));
+    }
+
+    double cdf(double x) const {
+        double z = (x - mu) / beta;
+        return std::exp(-std::exp(-z));
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return mu - beta * std::log(-std::log(p));
+    }
+
+    double mean() const override {
+        return mu + beta * 0.5772156649;  // Euler-Mascheroni constant
+    }
+
+    double variance() const override {
+        return (PI * PI / 6.0) * beta * beta;
+    }
+
+    double sample() const {
+        std::extreme_value_distribution<double> dist(mu, beta);
+        return dist(gen);
+    }
+};
+
+/**
+ * @class ArcsinDistribution
+ * @brief Arcsine distribution on [a, b]
+ *
+ * PDF: f(x) = 1/(π√((x-a)(b-x))) for a < x < b
+ * Special case of Beta(1/2, 1/2) on [0,1]
+ */
+class ArcsinDistribution : public Distribution {
+private:
+    double a, b;
+
+public:
+    ArcsinDistribution(double lower, double upper) : a(lower), b(upper) {
+        if (a >= b) throw std::invalid_argument("Lower bound must be less than upper");
+    }
+
+    double pdf(double x) const {
+        if (x <= a || x >= b) return 0.0;
+        return 1.0 / (PI * std::sqrt((x - a) * (b - x)));
+    }
+
+    double cdf(double x) const {
+        if (x <= a) return 0.0;
+        if (x >= b) return 1.0;
+        return (2.0 / PI) * std::asin(std::sqrt((x - a) / (b - a)));
+    }
+
+    double mean() const override {
+        return (a + b) / 2.0;
+    }
+
+    double variance() const override {
+        return (b - a) * (b - a) / 8.0;
+    }
+
+    double sample() const {
+        // Use Beta(1/2, 1/2) and transform
+        BetaDistribution beta(0.5, 0.5);
+        return a + (b - a) * beta.sample();
+    }
+};
+
+/**
+ * @class PowerFunctionDistribution
+ * @brief Power function distribution
+ *
+ * PDF: f(x) = α xᵅ⁻¹ / bᵅ for 0 ≤ x ≤ b
+ * Special case of Beta distribution
+ */
+class PowerFunctionDistribution : public Distribution {
+private:
+    double alpha;  // shape
+    double b;      // upper bound
+
+public:
+    PowerFunctionDistribution(double shape, double upper) : alpha(shape), b(upper) {
+        if (alpha <= 0.0) throw std::invalid_argument("Shape must be positive");
+        if (b <= 0.0) throw std::invalid_argument("Upper bound must be positive");
+    }
+
+    double pdf(double x) const {
+        if (x < 0.0 || x > b) return 0.0;
+        return alpha * std::pow(x, alpha - 1.0) / std::pow(b, alpha);
+    }
+
+    double cdf(double x) const {
+        if (x < 0.0) return 0.0;
+        if (x > b) return 1.0;
+        return std::pow(x / b, alpha);
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return b * std::pow(p, 1.0 / alpha);
+    }
+
+    double mean() const override {
+        return alpha * b / (alpha + 1.0);
+    }
+
+    double variance() const override {
+        return (alpha * b * b) / ((alpha + 1.0) * (alpha + 1.0) * (alpha + 2.0));
+    }
+
+    double sample() const {
+        std::uniform_real_distribution<double> uniform(0.0, 1.0);
+        return quantile(uniform(gen));
+    }
+};
+
+/**
+ * @class NoncentralChiSquaredDistribution
+ * @brief Noncentral chi-squared distribution
+ *
+ * Sum of squares of k independent normal random variables with non-zero means
+ * χ²(k, λ) where λ is noncentrality parameter
+ */
+class NoncentralChiSquaredDistribution : public Distribution {
+private:
+    int k;          // degrees of freedom
+    double lambda;  // noncentrality parameter
+
+public:
+    NoncentralChiSquaredDistribution(int df, double noncentrality)
+        : k(df), lambda(noncentrality) {
+        if (k <= 0) throw std::invalid_argument("Degrees of freedom must be positive");
+        if (lambda < 0.0) throw std::invalid_argument("Noncentrality must be non-negative");
+    }
+
+    /**
+     * @brief PDF approximation using series expansion
+     */
+    double pdf(double x) const {
+        if (x < 0.0) return 0.0;
+
+        // Sum of weighted central chi-squared PDFs
+        double sum = 0.0;
+        double poisson_term = std::exp(-lambda / 2.0);
+
+        for (int j = 0; j < 20; ++j) {  // Truncate series
+            ChiSquaredDistribution chi_sq(k + 2 * j);
+            sum += poisson_term * chi_sq.pdf(x);
+            poisson_term *= (lambda / 2.0) / (j + 1);
+        }
+
+        return sum;
+    }
+
+    double mean() const override {
+        return k + lambda;
+    }
+
+    double variance() const override {
+        return 2.0 * (k + 2.0 * lambda);
+    }
+
+    double sample() const {
+        // Sum of squares of normals with non-zero means
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double sum = 0.0;
+
+        // First term has non-zero mean
+        double z = normal(gen) + std::sqrt(lambda);
+        sum += z * z;
+
+        // Remaining k-1 terms are standard normal
+        for (int i = 1; i < k; ++i) {
+            double zi = normal(gen);
+            sum += zi * zi;
+        }
+
+        return sum;
+    }
+};
+
+/**
+ * @class NoncentralTDistribution
+ * @brief Noncentral t-distribution
+ *
+ * t(ν, δ) where ν is degrees of freedom, δ is noncentrality
+ * Ratio of normal with non-zero mean to chi-squared
+ */
+class NoncentralTDistribution : public Distribution {
+private:
+    int nu;        // degrees of freedom
+    double delta;  // noncentrality parameter
+
+public:
+    NoncentralTDistribution(int df, double noncentrality)
+        : nu(df), delta(noncentrality) {
+        if (nu <= 0) throw std::invalid_argument("Degrees of freedom must be positive");
+    }
+
+    /**
+     * @brief PDF approximation
+     */
+    double pdf(double t) const {
+        // Simplified approximation
+        double z = t - delta;
+        StudentTDistribution central_t(nu);
+        return central_t.pdf(z);
+    }
+
+    double mean() const override {
+        if (nu <= 1) throw std::runtime_error("Mean undefined for nu <= 1");
+        return delta * std::sqrt(nu / 2.0) * gamma_function((nu - 1) / 2.0) / gamma_function(nu / 2.0);
+    }
+
+    double variance() const override {
+        if (nu <= 2) throw std::runtime_error("Variance undefined for nu <= 2");
+        double mu = mean();
+        return nu * (1.0 + delta * delta) / (nu - 2.0) - mu * mu;
+    }
+
+    double sample() const {
+        // t = (Z + δ) / sqrt(χ²/ν) where Z ~ N(0,1), χ² ~ χ²(ν)
+        std::normal_distribution<double> normal(0.0, 1.0);
+        ChiSquaredDistribution chi_sq(nu);
+
+        double z = normal(gen) + delta;
+        double chi = chi_sq.sample();
+
+        return z / std::sqrt(chi / nu);
+    }
+};
+
+/**
+ * @class NoncentralFDistribution
+ * @brief Noncentral F-distribution
+ *
+ * F(d₁, d₂, λ) where λ is noncentrality parameter
+ * Ratio of noncentral chi-squared to central chi-squared
+ */
+class NoncentralFDistribution : public Distribution {
+private:
+    int d1, d2;    // degrees of freedom
+    double lambda; // noncentrality parameter
+
+public:
+    NoncentralFDistribution(int df1, int df2, double noncentrality)
+        : d1(df1), d2(df2), lambda(noncentrality) {
+        if (d1 <= 0 || d2 <= 0) {
+            throw std::invalid_argument("Degrees of freedom must be positive");
+        }
+        if (lambda < 0.0) {
+            throw std::invalid_argument("Noncentrality must be non-negative");
+        }
+    }
+
+    double mean() const override {
+        if (d2 <= 2) throw std::runtime_error("Mean undefined for d2 <= 2");
+        return d2 * (d1 + lambda) / (d1 * (d2 - 2));
+    }
+
+    double variance() const override {
+        if (d2 <= 4) throw std::runtime_error("Variance undefined for d2 <= 4");
+
+        double a = d1 + lambda;
+        double num = 2.0 * d2 * d2 * (d1 * a + (d1 + 2 * lambda) * (d2 - 2));
+        double den = d1 * d1 * (d2 - 2) * (d2 - 2) * (d2 - 4);
+
+        return num / den;
+    }
+
+    double sample() const {
+        // F = (χ²₁(λ)/d₁) / (χ²₂/d₂)
+        NoncentralChiSquaredDistribution nc_chi_sq(d1, lambda);
+        ChiSquaredDistribution chi_sq(d2);
+
+        return (nc_chi_sq.sample() / d1) / (chi_sq.sample() / d2);
+    }
+};
+
+/**
+ * @class MultivariateNormalDistribution
+ * @brief Multivariate normal distribution N(μ, Σ)
+ *
+ * Generalization of normal distribution to n dimensions
+ * PDF: f(x) = (2π)^(-n/2) |Σ|^(-1/2) exp(-1/2 (x-μ)ᵀ Σ⁻¹ (x-μ))
+ */
+class MultivariateNormalDistribution {
+private:
+    std::vector<double> mu;                      // mean vector
+    std::vector<std::vector<double>> sigma;      // covariance matrix
+    std::vector<std::vector<double>> L;          // Cholesky decomposition of Σ
+    int n;                                       // dimension
+
+    // Compute Cholesky decomposition: Σ = LLᵀ
+    void computeCholesky() {
+        L.resize(n, std::vector<double>(n, 0.0));
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j <= i; ++j) {
+                double sum = 0.0;
+                for (int k = 0; k < j; ++k) {
+                    sum += L[i][k] * L[j][k];
+                }
+
+                if (i == j) {
+                    L[i][j] = std::sqrt(sigma[i][i] - sum);
+                } else {
+                    L[i][j] = (sigma[i][j] - sum) / L[j][j];
+                }
+            }
+        }
+    }
+
+public:
+    MultivariateNormalDistribution(
+        const std::vector<double>& mean_vec,
+        const std::vector<std::vector<double>>& cov_matrix)
+        : mu(mean_vec), sigma(cov_matrix), n(mean_vec.size()) {
+
+        if (sigma.size() != n || sigma[0].size() != n) {
+            throw std::invalid_argument("Covariance matrix dimensions must match mean vector");
+        }
+
+        computeCholesky();
+    }
+
+    /**
+     * @brief Sample from multivariate normal using Cholesky decomposition
+     *
+     * X = μ + L·Z where Z ~ N(0, I)
+     */
+    std::vector<double> sample() const {
+        std::normal_distribution<double> normal(0.0, 1.0);
+        std::vector<double> z(n);
+
+        // Generate independent standard normals
+        for (int i = 0; i < n; ++i) {
+            z[i] = normal(gen);
+        }
+
+        // Transform: x = μ + L·z
+        std::vector<double> x(n);
+        for (int i = 0; i < n; ++i) {
+            x[i] = mu[i];
+            for (int j = 0; j <= i; ++j) {
+                x[i] += L[i][j] * z[j];
+            }
+        }
+
+        return x;
+    }
+
+    /**
+     * @brief Mean vector
+     */
+    std::vector<double> mean() const {
+        return mu;
+    }
+
+    /**
+     * @brief Covariance matrix
+     */
+    std::vector<std::vector<double>> covariance() const {
+        return sigma;
+    }
+
+    /**
+     * @brief Dimension
+     */
+    int dimension() const {
+        return n;
+    }
+};
+
+/**
  * @class StatisticalTests
  * @brief Hypothesis testing and statistical inference
  */
