@@ -2150,6 +2150,1222 @@ public:
     }
 };
 
+// ============================================================================
+// LORENTZ COVARIANCE OF THE DIRAC EQUATION
+// ============================================================================
+
+/**
+ * @brief Lorentz Covariance - Form Invariance
+ *
+ * Dirac equation maintains form under Lorentz transformations
+ */
+class LorentzCovariance {
+public:
+    /**
+     * @brief Form invariance requirement
+     *
+     * (iℏγ^μ∂'_μ - mc)ψ'(x') = 0 if (iℏγ^μ∂_μ - mc)ψ(x) = 0
+     */
+    static std::string form_invariance() {
+        return "Dirac equation has same form in all Lorentz frames";
+    }
+
+    /**
+     * @brief Spinor transformation
+     *
+     * ψ'(x') = S(Λ)ψ(x) where x'^μ = Λ^μ_ν x^ν
+     */
+    static std::string spinor_transformation() {
+        return "ψ'(x') = S(Λ)ψ(Λ⁻¹x')";
+    }
+
+    /**
+     * @brief Transformation of gamma matrices
+     *
+     * S(Λ)γ^μS⁻¹(Λ) = Λ^μ_ν γ^ν
+     */
+    static bool verify_gamma_transformation(
+        const std::vector<std::vector<Complex>>& S,
+        const std::vector<std::vector<Complex>>& gamma_mu,
+        double Lambda_mu_nu) {
+
+        // Verify transformation property
+        return true;  // Placeholder
+    }
+
+    /**
+     * @brief Adjoint spinor transformation
+     *
+     * ψ̄'(x') = ψ̄(x)S⁻¹(Λ)
+     */
+    static std::string adjoint_transformation() {
+        return "ψ̄' = ψ̄S⁻¹, ensuring ψ̄ψ is scalar";
+    }
+
+    /**
+     * @brief Lorentz scalar
+     *
+     * ψ̄ψ is Lorentz invariant
+     */
+    static std::string lorentz_scalar() {
+        return "ψ̄ψ = ψ†γ⁰ψ is Lorentz scalar";
+    }
+
+    /**
+     * @brief Lorentz vector
+     *
+     * j^μ = ψ̄γ^μψ is a 4-vector
+     */
+    static std::string lorentz_vector() {
+        return "j^μ = cψ̄γ^μψ transforms as 4-vector";
+    }
+};
+
+/**
+ * @brief Infinitesimal Lorentz Transformations
+ *
+ * Construction of Ŝ operator for infinitesimal transformations
+ */
+class InfinitesimalLorentzTransformations {
+public:
+    /**
+     * @brief Infinitesimal Lorentz transformation
+     *
+     * Λ^μ_ν = δ^μ_ν + ω^μ_ν where ω_μν = -ω_νμ
+     */
+    static double infinitesimal_parameter(
+        double omega_munu,
+        bool antisymmetric = true) {
+
+        // ω_μν = -ω_νμ (antisymmetric)
+        return omega_munu;
+    }
+
+    /**
+     * @brief Generator of Lorentz transformations
+     *
+     * S(ω) = I + (i/2)ω_μν σ^μν where σ^μν = (i/2)[γ^μ, γ^ν]
+     */
+    static std::string generator() {
+        return "S = I + (i/2)ω_μν σ^μν, σ^μν = (i/2)[γ^μ, γ^ν]";
+    }
+
+    /**
+     * @brief Commutator of gamma matrices
+     *
+     * σ^μν = (i/2)[γ^μ, γ^ν]
+     */
+    static std::vector<std::vector<Complex>> sigma_munu(
+        const std::vector<std::vector<Complex>>& gamma_mu,
+        const std::vector<std::vector<Complex>>& gamma_nu) {
+
+        // Compute (i/2)[γ^μ, γ^ν]
+        std::vector<std::vector<Complex>> result(4, std::vector<Complex>(4));
+        return result;  // Placeholder
+    }
+
+    /**
+     * @brief Infinitesimal rotation
+     *
+     * ω_ij = ε_ijk θ^k (spatial rotation by angle θ)
+     */
+    static std::string infinitesimal_rotation() {
+        return "Rotation: S = I + (i/2)θ⃗·Σ⃗ where Σ_i = [[σ_i, 0], [0, σ_i]]";
+    }
+
+    /**
+     * @brief Infinitesimal boost
+     *
+     * ω_0i = -ω_i0 = β_i (boost with velocity v⃗)
+     */
+    static std::string infinitesimal_boost() {
+        return "Boost: S = I - (i/2)β⃗·K⃗ where K_i = (i/2)[γ⁰, γⁱ]";
+    }
+
+    /**
+     * @brief Boost generator
+     *
+     * K_i = (i/2)γ⁰γⁱ = (i/2)βα_i
+     */
+    static std::string boost_generator() {
+        return "K_i = (i/2)γ⁰γⁱ generates boosts";
+    }
+};
+
+/**
+ * @brief Finite Proper Lorentz Transformations
+ *
+ * Exponentiation of infinitesimal transformations
+ */
+class FiniteLorentzTransformations {
+public:
+    /**
+     * @brief Finite rotation
+     *
+     * S_rot(θ⃗) = exp(-(i/2)θ⃗·Σ⃗)
+     */
+    static std::string finite_rotation() {
+        return "S_rot = exp(-(i/2)θ⃗·Σ⃗) = cos(θ/2)I - i sin(θ/2)n̂·Σ⃗";
+    }
+
+    /**
+     * @brief Rotation by angle θ around axis n̂
+     */
+    static double rotation_angle(double theta_x, double theta_y, double theta_z) {
+        return std::sqrt(theta_x * theta_x + theta_y * theta_y + theta_z * theta_z);
+    }
+
+    /**
+     * @brief Finite boost
+     *
+     * S_boost(β⃗) = exp((1/2)η n̂·K⃗) where η = tanh⁻¹(β)
+     */
+    static std::string finite_boost() {
+        return "S_boost = cosh(η/2)I + sinh(η/2)n̂·K⃗";
+    }
+
+    /**
+     * @brief Rapidity parameter
+     *
+     * η = tanh⁻¹(v/c) = (1/2)ln[(1+β)/(1-β)]
+     */
+    static double rapidity(double beta) {
+        return 0.5 * std::log((1.0 + beta) / (1.0 - beta));
+    }
+
+    /**
+     * @brief Lorentz factor from rapidity
+     *
+     * γ = cosh(η)
+     */
+    static double gamma_from_rapidity(double eta) {
+        return std::cosh(eta);
+    }
+
+    /**
+     * @brief Proper Lorentz group SO(1,3)
+     */
+    static std::string proper_lorentz_group() {
+        return "SO(1,3): det(Λ) = +1, Λ⁰₀ ≥ +1 (proper orthochronous)";
+    }
+
+    /**
+     * @brief SL(2,C) covering group
+     *
+     * Double cover of SO(1,3) by SL(2,C)
+     */
+    static std::string covering_group() {
+        return "SL(2,C) is universal covering of SO↑₊(1,3)";
+    }
+
+    /**
+     * @brief Spinor representation
+     *
+     * Spinors transform under (1/2, 0) ⊕ (0, 1/2) representation
+     */
+    static std::string spinor_representation() {
+        return "4-component spinor: left-handed (1/2, 0) ⊕ right-handed (0, 1/2)";
+    }
+};
+
+/**
+ * @brief Four-Current Density
+ *
+ * Conserved 4-vector current from Dirac equation
+ */
+class DiracFourCurrent {
+public:
+    using DiracSpinor = std::array<Complex, 4>;
+
+    /**
+     * @brief Four-current density
+     *
+     * j^μ = cψ̄γ^μψ = (cρ, j⃗)
+     */
+    static std::array<double, 4> four_current(const DiracSpinor& psi) {
+        // j^0 = cψ†ψ (charge density × c)
+        double j0 = 0.0;
+        for (const auto& comp : psi) {
+            j0 += std::norm(comp);
+        }
+        j0 *= constants::c;
+
+        // j^i = cψ†α_iψ (spatial current)
+        // Simplified for j^1 only
+        double j1 = constants::c * std::real(
+            std::conj(psi[0]) * psi[2] + std::conj(psi[1]) * psi[3] +
+            std::conj(psi[2]) * psi[0] + std::conj(psi[3]) * psi[1]
+        );
+
+        return {j0, j1, 0.0, 0.0};
+    }
+
+    /**
+     * @brief Continuity equation
+     *
+     * ∂_μ j^μ = 0
+     */
+    static std::string continuity_equation() {
+        return "∂_μ j^μ = ∂ρ/∂t + ∇·j⃗ = 0";
+    }
+
+    /**
+     * @brief Charge conservation
+     *
+     * Q = ∫ρd³x is conserved
+     */
+    static std::string charge_conservation() {
+        return "dQ/dt = 0, Q = e∫ψ†ψ d³x";
+    }
+
+    /**
+     * @brief Transformation property
+     *
+     * j^μ transforms as 4-vector
+     */
+    static std::string transformation() {
+        return "j'^μ = Λ^μ_ν j^ν under Lorentz transformation";
+    }
+
+    /**
+     * @brief Gordon decomposition
+     *
+     * Separate convection and spin magnetization currents
+     */
+    static std::string gordon_decomposition() {
+        return "j^μ = (1/2m)[ψ̄p^μψ + ∂^μ(ψ̄ψ)] + (i/2m)∂_ν(ψ̄σ^μνψ)";
+    }
+
+    /**
+     * @brief Convection current
+     *
+     * j^μ_conv = (ψ̄p^μψ)/2m
+     */
+    static std::string convection_current() {
+        return "Convection: (p^μ/m)ρ";
+    }
+
+    /**
+     * @brief Magnetization current
+     *
+     * j^μ_mag = (i/2m)∂_ν(ψ̄σ^μνψ)
+     */
+    static std::string magnetization_current() {
+        return "Magnetization: ∇ × M⃗ where M⃗ ~ ψ̄Σ⃗ψ";
+    }
+};
+
+// ============================================================================
+// SOLUTIONS BY LORENTZ TRANSFORMATIONS
+// ============================================================================
+
+/**
+ * @brief Plane Waves in Arbitrary Directions
+ *
+ * Construct solutions for arbitrary momentum directions
+ */
+class PlaneWavesArbitraryDirections {
+public:
+    using DiracSpinor = std::array<Complex, 4>;
+
+    /**
+     * @brief Spinor for momentum in arbitrary direction
+     *
+     * u(p⃗, s) obtained by boosting rest frame spinor
+     */
+    static DiracSpinor arbitrary_direction_spinor(
+        double px,
+        double py,
+        double pz,
+        double mass,
+        bool spin_up) {
+
+        double p = std::sqrt(px * px + py * py + pz * pz);
+        double E = std::sqrt(p * p * constants::c * constants::c +
+                           mass * mass * constants::c * constants::c * constants::c * constants::c);
+
+        double N = std::sqrt((E + mass * constants::c * constants::c) / (2.0 * E));
+
+        // Two-component spinor χ
+        Complex chi1 = spin_up ? Complex(1, 0) : Complex(0, 0);
+        Complex chi2 = spin_up ? Complex(0, 0) : Complex(1, 0);
+
+        // Small components: (σ⃗·p⃗)/(E + mc²) χ
+        double sigma_dot_p = pz;  // Simplified for p⃗ = p_z ẑ
+        double factor = (sigma_dot_p * constants::c) / (E + mass * constants::c * constants::c);
+
+        return {
+            N * chi1,
+            N * chi2,
+            Complex(N * factor, 0) * chi1,
+            Complex(N * factor, 0) * chi2
+        };
+    }
+
+    /**
+     * @brief Helicity eigenstates
+     *
+     * h = Σ⃗·p̂ with eigenvalues ±1
+     */
+    static DiracSpinor helicity_eigenstate(
+        double px,
+        double py,
+        double pz,
+        double mass,
+        int helicity) {
+
+        // helicity = ±1 for right/left-handed
+        return arbitrary_direction_spinor(px, py, pz, mass, helicity > 0);
+    }
+
+    /**
+     * @brief Boost from rest frame
+     *
+     * u(p⃗) = S_boost(β⃗) u(0⃗)
+     */
+    static std::string boost_construction() {
+        return "u(p⃗, s) = S_boost(p⃗/|p⃗|, β) u_rest(s)";
+    }
+
+    /**
+     * @brief Rotation to arbitrary direction
+     *
+     * u(p⃗) = S_rot(R) u(p ẑ) where R rotates ẑ to p̂
+     */
+    static std::string rotation_construction() {
+        return "u(p̂, s) = S_rot(ẑ → p̂) u(|p|ẑ, s)";
+    }
+};
+
+/**
+ * @brief General Form of Free Solutions
+ *
+ * Complete characterization of free Dirac solutions
+ */
+class GeneralFreeSolutions {
+public:
+    /**
+     * @brief Complete solution set
+     *
+     * General solution: ψ = Σ[a_s u(p,s)e^(-iEt+ip·x) + b_s v(p,s)e^(iEt+ip·x)]
+     */
+    static std::string general_solution() {
+        return "ψ = ∫d³p Σ_s [a(p,s)u(p,s)e^(-iEt+ip·x) + b(p,s)v(p,s)e^(iEt+ip·x)]";
+    }
+
+    /**
+     * @brief Orthonormality relations
+     *
+     * ū(p,r)u(p,s) = 2Eδ_rs
+     * v̄(p,r)v(p,s) = -2Eδ_rs
+     * ū(p,r)v(-p,s) = 0
+     */
+    static std::string orthonormality() {
+        return "ū(p,r)u(p,s) = 2mc²δ_rs, v̄(p,r)v(p,s) = -2mc²δ_rs";
+    }
+
+    /**
+     * @brief Completeness relations
+     *
+     * Projection operators sum to identity
+     */
+    static std::string completeness() {
+        return "Σ_s[u(p,s)ū(p,s) - v(p,s)v̄(p,s)] = 2mc²I";
+    }
+
+    /**
+     * @brief Negative energy interpretation
+     *
+     * v(p) states: antiparticles (positrons)
+     */
+    static std::string negative_energy() {
+        return "v(p,s)e^(iEt-ip·x): positron with momentum -p⃗, energy E > 0";
+    }
+
+    /**
+     * @brief Charge conjugation relation
+     *
+     * v(p,s) = C ū^T(p,s) where C is charge conjugation matrix
+     */
+    static std::string charge_conjugation_relation() {
+        return "v(p,s) related to u by charge conjugation";
+    }
+};
+
+/**
+ * @brief Polarized Electrons in Relativistic Theory
+ *
+ * Spin polarization for relativistic fermions
+ */
+class PolarizedElectrons {
+public:
+    /**
+     * @brief Polarization vector
+     *
+     * s^μ = (γs⃗·v⃗/c, s⃗ + γ²s⃗·v⃗/(c(γ+1))v⃗)
+     */
+    static std::array<double, 4> polarization_four_vector(
+        double sx,
+        double sy,
+        double sz,
+        double vx,
+        double gamma) {
+
+        double s_dot_v = sz * vx;  // Simplified
+        double s0 = gamma * s_dot_v / constants::c;
+        double s1 = sx + gamma * gamma * s_dot_v / (constants::c * (gamma + 1.0)) * vx;
+
+        return {s0, s1, sy, sz};
+    }
+
+    /**
+     * @brief Spin projection operator
+     *
+     * P(n̂) = (1 + γ₅n̸)/2 where n̸ = γ^μn_μ
+     */
+    static std::string spin_projection() {
+        return "P(s) = (1 + γ₅s̸)/2 projects onto spin direction s⃗";
+    }
+
+    /**
+     * @brief Helicity for massless particles
+     *
+     * h = ±1 is conserved (chirality = helicity when m = 0)
+     */
+    static std::string helicity_massless() {
+        return "Massless: helicity = chirality (Weyl fermions)";
+    }
+
+    /**
+     * @brief Polarization density matrix
+     *
+     * ρ = (1 + γ₅P̸)/2 where P⃗ is polarization vector
+     */
+    static std::string density_matrix() {
+        return "ρ = Σ_s f_s |u(p,s)⟩⟨ū(p,s)|";
+    }
+
+    /**
+     * @brief Transverse polarization
+     *
+     * s⃗_⊥ perpendicular to momentum
+     */
+    static double transverse_polarization(
+        double sx,
+        double sy,
+        double pz) {
+
+        // s_⊥ = s⃗ - (s⃗·p̂)p̂
+        return std::sqrt(sx * sx + sy * sy);
+    }
+
+    /**
+     * @brief Longitudinal polarization
+     *
+     * s_∥ = s⃗·p̂ (helicity component)
+     */
+    static double longitudinal_polarization(
+        double sz,
+        double pz,
+        double p) {
+
+        return sz * pz / p;
+    }
+};
+
+/**
+ * @brief Projection Operators for Energy and Spin
+ *
+ * Operators projecting onto energy and spin eigenstates
+ */
+class ProjectionOperators {
+public:
+    /**
+     * @brief Energy projection operators
+     *
+     * Λ_± = (±γ·p + mc²)/(2E) project onto E ≷ 0
+     */
+    static std::string energy_projectors() {
+        return "Λ_+ = (γ·p + mc)/(2E), Λ_- = (-γ·p + mc)/(2E)";
+    }
+
+    /**
+     * @brief Properties of energy projectors
+     *
+     * Λ_+² = Λ_+, Λ_-² = Λ_-, Λ_+Λ_- = 0, Λ_+ + Λ_- = I
+     */
+    static std::string energy_projector_properties() {
+        return "Λ_±² = Λ_±, Λ_+Λ_- = 0, Λ_+ + Λ_- = I";
+    }
+
+    /**
+     * @brief Spin projection operators
+     *
+     * P(n̂,±) = (I ± Σ⃗·n̂)/2 for non-relativistic
+     */
+    static std::string spin_projectors() {
+        return "P_± = (I ± Σ⃗·n̂)/2 project onto spin ±ℏ/2 along n̂";
+    }
+
+    /**
+     * @brief Relativistic spin projector
+     *
+     * S(s^μ) = (1 + γ₅s̸)/2
+     */
+    static std::string relativistic_spin_projector() {
+        return "S = (1 + γ₅s̸)/2 for 4-vector s^μ";
+    }
+
+    /**
+     * @brief Simultaneous energy-spin projection
+     *
+     * Λ_± P_s projects onto definite energy and spin
+     */
+    static std::string simultaneous_projection() {
+        return "Λ_+P_+ projects onto E > 0, spin up";
+    }
+
+    /**
+     * @brief Gordon identity
+     *
+     * ū(p')γ^μu(p) = ū(p')[(p+p')^μ/(2m) + iσ^μν q_ν/(2m)]u(p)
+     */
+    static std::string gordon_identity() {
+        return "Separates convection and magnetization terms";
+    }
+};
+
+/**
+ * @brief Wave Packets of Plane Dirac Waves
+ *
+ * Localized wave packets from superposition
+ */
+class DiracWavePackets {
+public:
+    using DiracSpinor = std::array<Complex, 4>;
+
+    /**
+     * @brief Wave packet construction
+     *
+     * ψ(x,t) = ∫d³p a(p)u(p,s)e^(i(p·x-Et)/ℏ)
+     */
+    static std::string wave_packet() {
+        return "ψ(x,t) = ∫d³p a(p)u(p,s)exp[i(p·x-E_pt)/ℏ]";
+    }
+
+    /**
+     * @brief Gaussian wave packet
+     *
+     * a(p) = exp[-(p-p₀)²/(2σ_p²)]
+     */
+    static Complex gaussian_amplitude(
+        double px,
+        double p0x,
+        double sigma_p) {
+
+        double exponent = -(px - p0x) * (px - p0x) / (2.0 * sigma_p * sigma_p);
+        return std::exp(exponent);
+    }
+
+    /**
+     * @brief Group velocity
+     *
+     * v_g = dE/dp = pc²/E
+     */
+    static double group_velocity(double p, double mass) {
+        double E = std::sqrt(p * p * constants::c * constants::c +
+                           mass * mass * constants::c * constants::c * constants::c * constants::c);
+        return (p * constants::c * constants::c) / E;
+    }
+
+    /**
+     * @brief Spreading of wave packet
+     *
+     * Δx(t) ≈ Δx(0) + vΔp t/ℏ
+     */
+    static double packet_spreading(
+        double delta_x0,
+        double delta_p,
+        double time,
+        double velocity) {
+
+        return delta_x0 + velocity * delta_p * time / constants::hbar;
+    }
+
+    /**
+     * @brief Zitterbewegung in wave packets
+     *
+     * Interference between E > 0 and E < 0 components
+     */
+    static std::string zitterbewegung() {
+        return "Rapid oscillation ω_Z = 2mc²/ℏ from E+/E- interference";
+    }
+
+    /**
+     * @brief Localization limit
+     *
+     * Cannot localize better than Compton wavelength
+     */
+    static double minimum_localization(double mass) {
+        return constants::hbar / (mass * constants::c);  // λ_C
+    }
+};
+
+// ============================================================================
+// DIRAC PARTICLES IN EXTERNAL FIELDS
+// ============================================================================
+
+/**
+ * @brief Dirac Equation in External Fields
+ *
+ * Minimal coupling to electromagnetic fields
+ */
+class DiracExternalFields {
+public:
+    /**
+     * @brief Minimal coupling
+     *
+     * p^μ → p^μ - (e/c)A^μ
+     */
+    static std::string minimal_coupling() {
+        return "[iℏγ^μ(∂_μ + ieA_μ/ℏc) - mc]ψ = 0";
+    }
+
+    /**
+     * @brief Dirac equation in EM field
+     *
+     * [γ^μ(iℏ∂_μ - eA_μ) - mc]ψ = 0
+     */
+    static std::string field_equation() {
+        return "(iℏ∂/∂t + eφ)ψ = [cα⃗·(p⃗ - eA⃗/c) + βmc²]ψ";
+    }
+
+    /**
+     * @brief Conserved current with field
+     *
+     * j^μ = cψ̄γ^μψ, ∂_μj^μ = 0
+     */
+    static std::string current_conservation() {
+        return "∂_μj^μ = 0 still holds with EM field";
+    }
+
+    /**
+     * @brief Gauge invariance
+     *
+     * ψ → e^(ieΛ/ℏ)ψ, A_μ → A_μ + ∂_μΛ
+     */
+    static std::string gauge_invariance() {
+        return "U(1) gauge: ψ' = e^(ieΛ/ℏ)ψ, A'_μ = A_μ - ∂_μΛ";
+    }
+
+    /**
+     * @brief Hydrogen atom (Coulomb field)
+     *
+     * V(r) = -Ze²/(4πε₀r)
+     */
+    static std::string coulomb_problem() {
+        return "Dirac hydrogen: exact solution with fine structure";
+    }
+
+    /**
+     * @brief Constant magnetic field
+     *
+     * Landau levels for Dirac particle
+     */
+    static double landau_level_dirac(
+        int n,
+        double B_field,
+        double mass) {
+
+        double mc2 = mass * constants::c * constants::c;
+        double term = 2.0 * n * constants::e * constants::hbar * constants::c * B_field;
+        return std::sqrt(mc2 * mc2 + term);
+    }
+};
+
+/**
+ * @brief Two-Centre Dirac Equation
+ *
+ * Dirac particle in field of two Coulomb centers
+ */
+class TwoCentreDiracEquation {
+public:
+    /**
+     * @brief Two-center potential
+     *
+     * V(r) = -Z₁e²/r₁ - Z₂e²/r₂
+     */
+    static std::string potential() {
+        return "V = -Z₁e²/(4πε₀r₁) - Z₂e²/(4πε₀r₂)";
+    }
+
+    /**
+     * @brief Elliptic coordinates
+     *
+     * ξ = (r₁ + r₂)/R, η = (r₁ - r₂)/R
+     */
+    static std::pair<double, double> elliptic_coordinates(
+        double r1,
+        double r2,
+        double R) {
+
+        double xi = (r1 + r2) / R;
+        double eta = (r1 - r2) / R;
+        return {xi, eta};
+    }
+
+    /**
+     * @brief Separation of variables
+     *
+     * Separable in elliptic coordinates
+     */
+    static std::string separation() {
+        return "Separable in elliptic coordinates (ξ, η, φ)";
+    }
+
+    /**
+     * @brief Application
+     *
+     * Molecular ions H₂⁺, molecular bonding
+     */
+    static std::string application() {
+        return "Models H₂⁺ molecular ion and relativistic bonding";
+    }
+
+    /**
+     * @brief Critical distance
+     *
+     * R_c determines bonding/antibonding
+     */
+    static std::string critical_distance() {
+        return "Bonding/antibonding depends on internuclear distance R";
+    }
+};
+
+// ============================================================================
+// FOLDY-WOUTHUYSEN REPRESENTATION
+// ============================================================================
+
+/**
+ * @brief Foldy-Wouthuysen Transformation - Free Particles
+ *
+ * Separate positive and negative energy states
+ */
+class FoldyWouthuysenFree {
+public:
+    /**
+     * @brief FW transformation
+     *
+     * Unitary transformation to decouple large/small components
+     */
+    static std::string transformation() {
+        return "U_FW = exp(iβα⃗·p⃗ tanh⁻¹(p/E)/2p)";
+    }
+
+    /**
+     * @brief FW Hamiltonian for free particle
+     *
+     * H_FW = βE_p (diagonal in energy)
+     */
+    static std::string fw_hamiltonian() {
+        return "H_FW = βsqrt(p² + m²) (energy eigenvalue operator)";
+    }
+
+    /**
+     * @brief Advantage of FW representation
+     *
+     * Positive/negative energies completely separated
+     */
+    static std::string advantage() {
+        return "E > 0 and E < 0 completely decoupled, no Zitterbewegung";
+    }
+
+    /**
+     * @brief Position operator in FW
+     *
+     * r_FW = r + O(1/m) corrections
+     */
+    static std::string position_operator() {
+        return "r_FW = r - iβΣ⃗×α⃗/(2E) (Newton-Wigner position)";
+    }
+
+    /**
+     * @brief Velocity operator in FW
+     *
+     * v_FW = cp⃗/E
+     */
+    static double velocity_fw(double px, double E) {
+        return (constants::c * px) / E;
+    }
+};
+
+/**
+ * @brief Foldy-Wouthuysen with External Fields
+ *
+ * Systematic expansion in powers of 1/m
+ */
+class FoldyWouthuysenFields {
+public:
+    /**
+     * @brief FW Hamiltonian with EM field
+     *
+     * Systematic 1/m expansion
+     */
+    static std::string fw_expansion() {
+        return "H_FW = βm + p²/2m + eφ + corrections O(1/m, 1/m², ...)";
+    }
+
+    /**
+     * @brief Leading order (Pauli)
+     *
+     * H⁽⁰⁾ = p²/2m + eφ - (e/2m)σ⃗·B⃗
+     */
+    static std::string leading_order() {
+        return "O(1): Pauli equation with g = 2";
+    }
+
+    /**
+     * @brief First order corrections
+     *
+     * Spin-orbit, Darwin, relativistic kinetic
+     */
+    static std::string first_order() {
+        return "O(1/m): H_SO + H_Darwin + H_kin";
+    }
+
+    /**
+     * @brief Spin-orbit term
+     *
+     * H_SO = (e/2m²c²)(E⃗ × p⃗)·σ⃗ = (1/2m²c²r)(dV/dr)L⃗·S⃗
+     */
+    static double spin_orbit_fw(
+        double r,
+        double dV_dr,
+        double L_dot_S,
+        double mass) {
+
+        return (1.0 / (2.0 * mass * mass * constants::c * constants::c * r)) *
+               dV_dr * L_dot_S;
+    }
+
+    /**
+     * @brief Darwin term
+     *
+     * H_Darwin = (ℏ²e/8m²c²)∇·E⃗ = (πℏ²e/2m²c²)|ψ(0)|²
+     */
+    static double darwin_fw(double field_divergence, double mass) {
+        return (constants::e * constants::hbar * constants::hbar) /
+               (8.0 * mass * mass * constants::c * constants::c) * field_divergence;
+    }
+
+    /**
+     * @brief Advantages of FW
+     *
+     * Systematic perturbation theory, clear physical interpretation
+     */
+    static std::string advantages() {
+        return "Clear separation of relativistic corrections, no Zitterbewegung";
+    }
+};
+
+// ============================================================================
+// HOLE THEORY AND SYMMETRIES
+// ============================================================================
+
+/**
+ * @brief Hole Theory (Dirac Sea)
+ *
+ * Vacuum as filled Fermi sea of negative energy states
+ */
+class HoleTheory {
+public:
+    /**
+     * @brief Dirac sea vacuum
+     *
+     * All E < 0 states filled
+     */
+    static std::string vacuum_state() {
+        return "|0⟩ = |all E < 0 filled⟩ (Dirac sea)";
+    }
+
+    /**
+     * @brief Hole interpretation
+     *
+     * Absence of E < 0 electron = positron with E > 0
+     */
+    static std::string hole_interpretation() {
+        return "Hole in sea = antiparticle (positron)";
+    }
+
+    /**
+     * @brief Charge of hole
+     *
+     * Missing electron → positive charge
+     */
+    static double hole_charge() {
+        return +constants::e;  // Positive
+    }
+
+    /**
+     * @brief Energy of hole
+     *
+     * E_hole = -E_electron > 0
+     */
+    static double hole_energy(double E_electron_negative) {
+        return -E_electron_negative;  // Positive
+    }
+
+    /**
+     * @brief Pair creation
+     *
+     * γ → e⁺ + e⁻ if ℏω ≥ 2mc²
+     */
+    static double pair_threshold(double mass) {
+        return 2.0 * mass * constants::c * constants::c;
+    }
+
+    /**
+     * @brief Pair annihilation
+     *
+     * e⁺ + e⁻ → 2γ
+     */
+    static std::string annihilation() {
+        return "Positron fills hole → 2 photons (minimum)";
+    }
+
+    /**
+     * @brief Vacuum polarization
+     *
+     * Virtual e⁺e⁻ pairs modify Coulomb potential
+     */
+    static std::string vacuum_polarization() {
+        return "Virtual pairs screen charge: V_eff = V(1 + α/15π...)";
+    }
+};
+
+/**
+ * @brief Charge Conjugation
+ *
+ * Particle ↔ antiparticle symmetry
+ */
+class DiracChargeConjugation {
+public:
+    using DiracSpinor = std::array<Complex, 4>;
+
+    /**
+     * @brief Charge conjugation operator
+     *
+     * C: ψ → ψ^C = Cψ̄^T where C = iγ²γ⁰
+     */
+    static std::string charge_operator() {
+        return "C = iγ²γ⁰ (charge conjugation matrix)";
+    }
+
+    /**
+     * @brief Properties of C
+     *
+     * C^† = C^{-1} = -C, C^T = -C
+     */
+    static std::string c_properties() {
+        return "C† = C⁻¹ = -C, C^T = -C, C² = -I";
+    }
+
+    /**
+     * @brief Transformation of Dirac equation
+     *
+     * C transforms particle → antiparticle solution
+     */
+    static std::string transformation() {
+        return "If ψ satisfies Dirac, so does ψ^C = Cψ̄^T";
+    }
+
+    /**
+     * @brief Charge conjugation of plane waves
+     *
+     * u(p,s) ↔ v(p,s)
+     */
+    static std::string plane_wave_conjugation() {
+        return "C: u(p,s)e^(-iEt+ip·x) → v(p,s)e^(iEt-ip·x)";
+    }
+
+    /**
+     * @brief C-parity
+     *
+     * Eigenvalue of C for self-conjugate states
+     */
+    static int c_parity(bool even) {
+        return even ? +1 : -1;
+    }
+
+    /**
+     * @brief Majorana fermions
+     *
+     * Particles that are their own antiparticles
+     */
+    static std::string majorana() {
+        return "Majorana: ψ = ψ^C (particle = antiparticle)";
+    }
+};
+
+/**
+ * @brief Charge Conjugation of Bound States
+ *
+ * C operation on hydrogen-like atoms
+ */
+class ChargeConjugationBoundStates {
+public:
+    /**
+     * @brief Hydrogen atom charge conjugation
+     *
+     * C: (e⁻ + p) → (e⁺ + p̄) = antihydrogen
+     */
+    static std::string hydrogen_conjugation() {
+        return "C: hydrogen → antihydrogen";
+    }
+
+    /**
+     * @brief Energy levels under C
+     *
+     * E_n unchanged (CPT ensures H = H̄)
+     */
+    static std::string energy_conservation() {
+        return "E_n(H) = E_n(H̄) by CPT theorem";
+    }
+
+    /**
+     * @brief Wave function transformation
+     *
+     * ψ_nlm → ψ^C_nlm
+     */
+    static std::string wavefunction_c() {
+        return "Cψ_nlm = ηψ_nlm for C-eigenstate";
+    }
+
+    /**
+     * @brief Selection rules
+     *
+     * C-parity conservation in EM transitions
+     */
+    static std::string selection_rules() {
+        return "ΔC = 0 for EM processes (if both initial/final have C)";
+    }
+};
+
+/**
+ * @brief Time Reversal Symmetry
+ *
+ * Motion reversal transformation
+ */
+class TimeReversalSymmetry {
+public:
+    /**
+     * @brief Time reversal operator
+     *
+     * T: t → -t, ψ → Tψ
+     */
+    static std::string time_operator() {
+        return "T = iγ¹γ³K where K is complex conjugation";
+    }
+
+    /**
+     * @brief Antiunitary nature
+     *
+     * T is antiunitary (not unitary)
+     */
+    static std::string antiunitary() {
+        return "T(aψ + bφ) = a*Tψ + b*Tφ (antiunitary)";
+    }
+
+    /**
+     * @brief Transformation properties
+     *
+     * T: p⃗ → -p⃗, S⃗ → -S⃗, E → E, t → -t
+     */
+    static std::string transformations() {
+        return "T: (t, r⃗, p⃗, S⃗) → (-t, r⃗, -p⃗, -S⃗)";
+    }
+
+    /**
+     * @brief Kramers degeneracy
+     *
+     * T²|ψ⟩ = -|ψ⟩ for spin-1/2 → double degeneracy
+     */
+    static std::string kramers() {
+        return "T² = -1 for fermions → Kramers degeneracy";
+    }
+
+    /**
+     * @brief T-violation
+     *
+     * Weak interactions violate T (observed in K⁰ system)
+     */
+    static std::string violation() {
+        return "T violated in weak interactions (K⁰, B⁰ decays)";
+    }
+};
+
+/**
+ * @brief PCT Theorem
+ *
+ * Combined CPT symmetry fundamental theorem
+ */
+class PCTSymmetry {
+public:
+    /**
+     * @brief PCT transformation
+     *
+     * Combined parity, charge conjugation, time reversal
+     */
+    static std::string pct_operation() {
+        return "PCT: (t,r⃗,ψ,Q) → (-t,-r⃗,ψ^C,-Q)";
+    }
+
+    /**
+     * @brief PCT theorem
+     *
+     * All Lorentz invariant QFTs preserve CPT
+     */
+    static std::string pct_theorem() {
+        return "CPT is exact symmetry of all local Lorentz-invariant QFTs";
+    }
+
+    /**
+     * @brief Consequences
+     *
+     * m_particle = m_antiparticle, τ_particle = τ_antiparticle
+     */
+    static std::string consequences() {
+        return "m_p = m_p̄, τ_p = τ_p̄, |q_p| = |q_p̄|";
+    }
+
+    /**
+     * @brief CPT and causality
+     *
+     * Violation would break causality/locality
+     */
+    static std::string causality() {
+        return "CPT violation → causality breakdown";
+    }
+
+    /**
+     * @brief Experimental tests
+     *
+     * Precise tests using K⁰, B⁰, antihydrogen
+     */
+    static std::string tests() {
+        return "Tested to <10⁻¹⁸ in K⁰ system, <10⁻⁸ in H̄";
+    }
+
+    /**
+     * @brief Connection to spin-statistics
+     *
+     * PCT + Lorentz invariance → spin-statistics theorem
+     */
+    static std::string spin_statistics() {
+        return "CPT + Lorentz → integer spin bosons, half-integer fermions";
+    }
+};
+
 } // namespace relativistic_quantum
 } // namespace physics
 

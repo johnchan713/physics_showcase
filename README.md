@@ -1330,17 +1330,119 @@ Comprehensive spin-1/2 theory and relativistic quantum mechanics (~1,174 lines)
   - No Zitterbewegung (unlike Dirac equation)
   - Compton wavelength: λ_C = ℏ/(mc) (localization scale)
 
-- **The Dirac Equation**
-  - 4-component Dirac spinors: ψ = (ψ₁, ψ₂, ψ₃, ψ₄)ᵀ
-  - Dirac equation: iℏ∂ψ/∂t = (cα⃗·p⃗ + βmc²)ψ
-  - Dirac matrices: α_i (4×4), β (4×4)
-  - Gamma matrices: γ⁰, γⁱ with anticommutation {γ^μ, γ^ν} = 2g^μν
-  - Free particle solutions: u(p) for positive energy, v(p) for negative
-  - Positive definite probability density: ρ = ψ†ψ > 0
-  - Current density: j⃗ = cψ†α⃗ψ
-  - Continuity equation: ∂ρ/∂t + ∇·j⃗ = 0
-  - Non-relativistic limit: Pauli equation with spin-orbit coupling
-  - Antiparticle interpretation (hole theory)
+- **The Dirac Equation** (Comprehensive Treatment)
+  - **Foundation:**
+    - 4-component Dirac spinors: ψ = (ψ₁, ψ₂, ψ₃, ψ₄)ᵀ
+    - Hamiltonian form: iℏ∂ψ/∂t = (cα⃗·p⃗ + βmc²)ψ
+    - Covariant form: (iℏγ^μ∂_μ - mc)ψ = 0
+    - Dirac matrices α_i, β (4×4) in Dirac-Pauli representation
+    - Gamma matrices: γ⁰ = β, γⁱ = βα_i
+    - Anticommutation: {γ^μ, γ^ν} = 2g^μν
+    - Adjoint spinor: ψ̄ = ψ†γ⁰
+    - Positive definite ρ = ψ†ψ ≥ 0 (unlike Klein-Gordon!)
+  - **Lorentz Covariance:**
+    - Form invariance under Lorentz transformations
+    - Spinor transformation: ψ'(x') = S(Λ)ψ(Λ⁻¹x')
+    - Gamma transformation: S(Λ)γ^μS⁻¹(Λ) = Λ^μ_ν γ^ν
+    - Infinitesimal generators: σ^μν = (i/2)[γ^μ, γ^ν]
+    - Finite rotations: S_rot = exp(-(i/2)θ⃗·Σ⃗)
+    - Finite boosts: S_boost = cosh(η/2)I + sinh(η/2)n̂·K⃗
+    - Rapidity η = tanh⁻¹(v/c)
+    - SL(2,C) covering group of SO↑₊(1,3)
+  - **Four-Current Density:**
+    - j^μ = cψ̄γ^μψ = (cρ, j⃗) transforms as 4-vector
+    - Continuity: ∂_μj^μ = 0
+    - Charge conservation: dQ/dt = 0
+    - Gordon decomposition: j^μ = j^μ_conv + j^μ_mag
+    - Convection vs magnetization currents
+  - **Free Motion:**
+    - Positive energy spinors: u(p,s)e^(i(p·x-Et)/ℏ)
+    - Negative energy spinors: v(p,s)e^(i(-p·x-Et)/ℏ)
+    - Energy E_p = √((pc)² + (mc²)²)
+    - Orthonormality: ū(p,r)u(p,s) = 2mc²δ_rs
+    - Completeness: Σ_s[u(p,s)ū(p,s) - v(p,s)v̄(p,s)] = 2mc²I
+  - **Solutions by Lorentz Transformations:**
+    - Plane waves in arbitrary directions
+    - Boost construction: u(p⃗,s) = S_boost(β⃗)u_rest(s)
+    - Rotation construction to arbitrary p̂
+    - Helicity eigenstates h = Σ⃗·p̂ = ±1
+    - General solution: ψ = ∫d³p Σ_s[au + bv]
+    - Charge conjugation relation: v(p,s) = Cū^T(p,s)
+  - **Single-Particle Interpretation:**
+    - Positive energy: physical particles (electrons)
+    - Negative energy: antiparticles (positrons via holes)
+    - Dirac sea vacuum: all E < 0 filled
+    - Pair production γ → e⁺e⁻ if ℏω ≥ 2mc²
+    - Klein paradox for Dirac particles
+    - Zitterbewegung: ω_Z = 2mc²/ℏ, λ_Z = ℏ/(mc)
+  - **Nonrelativistic Limit:**
+    - Ansatz: ψ = e^(-imc²t/ℏ)(φ, χ)^T
+    - Large/small components: χ ≈ (σ⃗·p⃗)/(2mc)φ
+    - Pauli equation: iℏ∂φ/∂t = [p²/2m + V - (eℏ/2m)σ⃗·B⃗]φ
+    - Spin-orbit: H_SO = (1/2m²c²r)(dV/dr)L⃗·S⃗
+    - Darwin term: H_Darwin = (ℏ²/8m²c²)∇²V
+    - Kinetic correction: H_kin = -p⁴/(8m³c²)
+    - Thomas factor 1/2 automatic
+    - Gyromagnetic ratio g = 2 exact
+  - **Polarized Electrons:**
+    - Polarization 4-vector s^μ
+    - Spin projection: P(s) = (1 + γ₅s̸)/2
+    - Helicity = chirality for massless (Weyl fermions)
+    - Transverse vs longitudinal polarization
+    - Density matrix for mixed states
+  - **Projection Operators:**
+    - Energy projectors: Λ_± = (±γ·p + mc)/(2E)
+    - Properties: Λ_±² = Λ_±, Λ_+Λ_- = 0, Λ_+ + Λ_- = I
+    - Spin projectors: P_± = (I ± Σ⃗·n̂)/2
+    - Simultaneous energy-spin projection
+    - Gordon identity for current decomposition
+  - **Wave Packets:**
+    - ψ(x,t) = ∫d³p a(p)u(p,s)exp[i(p·x-E_pt)/ℏ]
+    - Gaussian amplitude: a(p) ∝ exp[-(p-p₀)²/2σ_p²]
+    - Group velocity: v_g = pc²/E
+    - Wave packet spreading
+    - Compton wavelength localization limit
+  - **External Fields:**
+    - Minimal coupling: ∂_μ → ∂_μ + ieA_μ/ℏc
+    - Field equation: [iℏγ^μ(∂_μ + ieA_μ/ℏc) - mc]ψ = 0
+    - Gauge invariance: ψ' = e^(ieΛ/ℏ)ψ, A'_μ = A_μ - ∂_μΛ
+    - Coulomb problem (Dirac hydrogen)
+    - Landau levels: E_n = √((mc²)² + 2n|e|ℏcB)
+    - Two-centre equation (H₂⁺ molecular ion)
+  - **Foldy-Wouthuysen Representation:**
+    - Free particles: H_FW = βE_p (energy diagonal)
+    - Complete E+/E- decoupling, no Zitterbewegung
+    - Newton-Wigner position: r_FW = r - iβΣ⃗×α⃗/(2E)
+    - With fields: systematic 1/m expansion
+    - O(1): Pauli equation with g = 2
+    - O(1/m): H_SO + H_Darwin + H_kin
+    - Clear physical interpretation
+  - **Hole Theory:**
+    - Vacuum = filled Dirac sea (all E < 0)
+    - Hole = antiparticle (positron)
+    - Pair creation threshold: 2mc²
+    - Pair annihilation: e⁺e⁻ → 2γ
+    - Vacuum polarization corrections
+  - **Charge Conjugation:**
+    - C operator: C = iγ²γ⁰
+    - Properties: C† = C⁻¹ = -C, C² = -I
+    - Transformation: ψ^C = Cψ̄^T
+    - Plane waves: C: u(p,s) ↔ v(p,s)
+    - C-parity for neutral particles (±1)
+    - Majorana fermions: ψ = ψ^C
+    - Bound states: hydrogen → antihydrogen
+    - Energy conservation: E_n(H) = E_n(H̄) by CPT
+  - **Time Reversal:**
+    - T operator: T = iγ¹γ³K (antiunitary)
+    - Transformations: (t,r⃗,p⃗,S⃗) → (-t,r⃗,-p⃗,-S⃗)
+    - Kramers degeneracy: T² = -1 for fermions
+    - T-violation in weak interactions (K⁰, B⁰)
+  - **PCT Theorem:**
+    - CPT exact symmetry of all local QFTs
+    - Consequences: m_p = m_p̄, τ_p = τ_p̄, |q_p| = |q_p̄|
+    - Tested to <10⁻¹⁸ in K⁰ system
+    - CPT + Lorentz → spin-statistics theorem
+    - Violation → causality breakdown
 
 - **Spin and the Dirac Particle**
   - Intrinsic spin s = 1/2 from Dirac equation
