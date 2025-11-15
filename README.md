@@ -50,7 +50,7 @@ physics_showcase/
 ### Advanced Mathematics
 
 ### Differential Algebra (`maths/advanced/algebra/differential_algebra.hpp`)
-**~1700 lines | Chapters I-IX from Ritt's "Differential Algebra"**
+**Chapters I-IX from Ritt's "Differential Algebra"**
 
 - **Differential Polynomials & Fields (Ch. I)**
   - Polynomial rings with derivation operator D
@@ -100,7 +100,7 @@ physics_showcase/
 - Wave equation: u_tt - c²u_xx = 0
 
 ### Fourier Analysis (`maths/advanced/analysis/fourier_analysis.hpp`)
-**~1200 lines | Discrete & continuous Fourier theory**
+**Discrete & continuous Fourier theory**
 
 - **Discrete & Fast Fourier Transform**
   - DFT: O(N²) naive algorithm
@@ -135,7 +135,7 @@ physics_showcase/
   - Chirp signal detection
 
 ### Advanced Subdifferentials (`maths/advanced/analysis/advanced_subdifferentials.hpp`)
-**~900 lines | Nonsmooth analysis & variational calculus**
+**Nonsmooth analysis & variational calculus**
 
 - **Clarke Subdifferential** ∂_C f(x)
 - **Limiting (Mordukhovich) Subdifferential** ∂_L f(x)
@@ -146,7 +146,7 @@ physics_showcase/
 - **Metric Regularity Criterion**
 
 ### Nonsmooth Algorithms (`maths/advanced/analysis/nonsmooth_algorithms.hpp`)
-**~800 lines | Optimization algorithms**
+**Optimization algorithms**
 
 - **Proximal Operators**
   - Soft thresholding for L1
@@ -167,7 +167,7 @@ physics_showcase/
   - Dual variable updates
 
 ### Stochastic Methods (`maths/advanced/stochastic/monte_carlo.hpp`)
-**~1000 lines | Monte Carlo methods and stochastic algorithms**
+**Monte Carlo methods and stochastic algorithms**
 
 - **Monte Carlo Integration**
   - Basic Monte Carlo integration
@@ -202,7 +202,7 @@ physics_showcase/
 **Applications:** Finance (option pricing), physics (molecular dynamics), Bayesian inference, machine learning
 
 ### Variational Calculus (`maths/advanced/geometry/variational_calculus.hpp`)
-**~1200 lines | Lagrangians, Poincaré-Cartan Forms, and variational principles**
+**Lagrangians, Poincaré-Cartan Forms, and variational principles**
 
 - **Contact Geometry**
   - Contact structures on jet bundles J^1(R,R)
@@ -241,7 +241,7 @@ physics_showcase/
 **Applications:** Classical mechanics, field theory, optimal control, integrable systems
 
 ### Differential Equations and Dynamical Systems (`maths/advanced/dynamical_systems/ode_dynamical_systems.hpp`)
-**~1500 lines | Comprehensive ODE theory and chaos**
+**Comprehensive ODE theory and chaos**
 
 **Classical ODE Theory:**
 - **Newton's Equations**: Second-order to first-order conversion, autonomous equations, equilibria
@@ -270,7 +270,7 @@ physics_showcase/
 **Applications**: Physics (pendulum, Lorenz), biology (population dynamics), engineering (nonlinear control)
 
 ### Partial Differential Equations (`maths/advanced/pde/partial_differential_equations.hpp`)
-**~1500 lines | Classical PDE theory and method of characteristics**
+**Classical PDE theory and method of characteristics**
 
 **PDE Classification and Fundamentals:**
 - **Order and Linearity**: First/second/higher order, linear/quasi-linear/semi-linear/fully nonlinear
@@ -297,7 +297,7 @@ physics_showcase/
 **Applications**: Heat diffusion, wave propagation, fluid mechanics, electrostatics, quantum mechanics, optimal control
 
 ### PDE Solution Methods (`maths/advanced/pde/pde_solution_methods.hpp`)
-**~1500 lines | Classical solution techniques for PDEs**
+**Classical solution techniques for PDEs**
 
 **Linear Equations with Constant Coefficients:**
 - **Inverse Operators**: Differential operator D = d/dx, inverse operator D⁻¹ (integration)
@@ -345,8 +345,173 @@ physics_showcase/
 
 **Applications**: Vibrating strings, heat conduction, electrostatic potential, quantum mechanics (particle in box), acoustics, diffusion processes
 
+### PDE Transform Methods (`maths/advanced/pde/pde_transform_methods.hpp`)
+**Laplace and Fourier transforms for solving PDEs**
+
+**Laplace Transforms:**
+- **Definition and Notation**: L{f(t)} = F(s) = ∫₀^∞ e^(-st) f(t) dt
+- **Transform Pairs**: Exponentials, polynomials, trigonometric functions, hyperbolic functions
+- **Properties**:
+  - Linearity: L{af + bg} = aL{f} + bL{g}
+  - First shifting theorem: L{e^(at)f(t)} = F(s-a)
+  - Second shifting theorem (time delay): L{f(t-a)u(t-a)} = e^(-as)F(s)
+  - Transform of derivatives: L{f'(t)} = sF(s) - f(0), L{f''(t)} = s²F(s) - sf(0) - f'(0)
+  - Transform of integrals: L{∫₀ᵗ f(τ)dτ} = F(s)/s
+- **Convolution Theorem**: L{f * g} = F(s)G(s)
+- **Inverse Transform**: Partial fraction decomposition, residue method
+
+**Fourier Transforms:**
+- **Fourier Integral**: F{f(x)} = F(k) = ∫₋∞^∞ f(x) e^(-ikx) dx
+- **Inverse Transform**: f(x) = (1/2π) ∫₋∞^∞ F(k) e^(ikx) dk
+- **Transform Pairs**: Gaussian, rectangular pulse, Dirac delta, double exponential
+- **Properties**:
+  - Linearity, time shifting, frequency shifting, scaling
+  - Differentiation: F{f'(x)} = ikF(k), F{f^(n)(x)} = (ik)^n F(k)
+  - Multiplication by x: F{xf(x)} = iF'(k)
+- **Parseval's Theorem**: ∫ |f(x)|² dx = (1/2π) ∫ |F(k)|² dk (energy conservation)
+- **Convolution Theorem**: F{f * g} = F{f} · F{g}
+
+**Fourier Sine and Cosine Transforms:**
+- **Sine Transform**: Fs{f(x)} = ∫₀^∞ f(x) sin(kx) dx for odd extensions
+- **Cosine Transform**: Fc{f(x)} = ∫₀^∞ f(x) cos(kx) dx for even extensions
+- **Inverse Transforms**: f(x) = (2/π) ∫₀^∞ Fs(k) sin(kx) dk
+- **Derivative Properties**: Fs{f''(x)} = -k²Fs{f(x)} - kf(0)
+
+**Finite Fourier Transforms:**
+- **Finite Sine Transform**: Fsn = ∫₀^L f(x) sin(nπx/L) dx
+- **Finite Cosine Transform**: Fcn = ∫₀^L f(x) cos(nπx/L) dx
+- **Applications**: Heat equation on finite intervals, boundary value problems
+
+**Applications**: Transform methods for ODEs, heat equation, wave equation, diffusion problems, signal processing
+
+### PDE Classification Solutions (`maths/advanced/pde/pde_classification_solutions.hpp`)
+**Detailed solutions for parabolic, elliptic, and hyperbolic PDEs**
+
+**Parabolic Equations (Heat/Diffusion):**
+- **Heat Equation**: u_t = α u_xx (one-dimensional diffusion)
+- **Fundamental Solution**: Heat kernel G(x,t;ξ) = 1/√(4παt) exp(-(x-ξ)²/4αt)
+- **Infinite Domain Solutions**: Convolution with initial data
+- **Bounded Domain Solutions**:
+  - Dirichlet BC: u(x,t) = ∑ Aₙ exp(-α(nπ/L)²t) sin(nπx/L)
+  - Neumann BC: u(x,t) = A₀ + ∑ Aₙ exp(-α(nπ/L)²t) cos(nπx/L)
+- **Maximum Principles**: Weak and strong maximum principles
+- **2D Heat Equation**: Rectangular and circular domains
+- **Properties**: Infinite speed of propagation, smoothing effect, irreversibility
+
+**Elliptic Equations (Laplace/Poisson):**
+- **Laplace Equation**: Δu = 0 (harmonic functions)
+- **Poisson Equation**: Δu = f (with source term)
+- **Mean Value Property**: u(x₀,y₀) = (1/2πr) ∫ u on circle
+- **Maximum Principles**: Maximum and minimum on boundary
+- **Green's Functions**: G(x,y;ξ,η) = -(1/2π) ln(r) for 2D unbounded domain
+- **Rectangular Domains**: Separation of variables with sinh/cosh solutions
+- **Circular Domains**: Poisson integral formula
+- **Harmonic Functions**: Solutions satisfy mean value property
+- **Properties**: No time evolution, boundary value problems, smoothness
+
+**Hyperbolic Equations (Wave):**
+- **Wave Equation**: u_tt = c² u_xx (one-dimensional)
+- **d'Alembert's Solution**: u(x,t) = ½[f(x+ct) + f(x-ct)] + 1/(2c) ∫ g(s) ds
+- **Domain of Dependence**: Solution at (x,t) depends only on [x-ct, x+ct]
+- **Standing Waves**: u(x,t) = ∑ (Aₙcos(ωₙt) + Bₙsin(ωₙt))sin(nπx/L)
+- **Energy Conservation**: E = ½∫[u_t² + c²u_x²]dx is constant
+- **2D Wave Equation**: Rectangular domains, eigenfrequencies ωₘₙ = c√(λₘ² + μₙ²)
+- **Characteristic Cones**: Causality and light cones in spacetime
+- **Finite Speed of Propagation**: Disturbances travel at speed c
+- **Properties**: Reversible, energy conserving, finite propagation speed
+
+**Key Concepts**: Well-posedness, uniqueness, regularity, stability, physical interpretation
+
+**Applications**: Heat conduction, diffusion processes, electrostatics, membrane vibrations, acoustic waves, electromagnetic waves
+
+### PDE Variational Methods (`maths/advanced/pde/pde_variational_methods.hpp`)
+**Weak formulations and variational methods for PDEs**
+
+**Line Integrals and Variational Notation:**
+- **Line Integrals**: ∫_C F·dr along curves for variational formulations
+- **Variational Derivatives**: δF/δu via Gateaux derivatives
+- **Functional Derivatives**: Euler-Lagrange equations for functionals
+
+**Multiple Integrals:**
+- **Double and Triple Integrals**: Change of variables, Jacobians
+- **Divergence Theorem**: ∫_Ω div(F) dV = ∫_∂Ω F·n dS
+- **Green's Identities**: First and second identities for integration by parts
+
+**Weak Variational Formulation:**
+- **Test Functions**: Compact support, smoothness requirements
+- **Trial Functions**: Finite-dimensional approximations
+- **Weak Derivatives**: Distributional derivatives
+- **Sobolev Spaces**: H¹, H₀¹ function spaces
+- **Weak Solutions**: ∫_Ω ∇u·∇v dx = ∫_Ω fv dx for all test functions v
+
+**Galerkin Method:**
+- **Finite Element Approximation**: Basis function expansion
+- **Hat Functions**: Piecewise linear basis
+- **Stiffness Matrix**: a(φᵢ, φⱼ) assembly
+- **Load Vector**: L(φᵢ) computation
+- **Galerkin Orthogonality**: Optimal approximation in energy norm
+
+**Rayleigh-Ritz Method:**
+- **Energy Minimization**: E[u] = ½∫(u')² dx - ∫fu dx
+- **Rayleigh Quotient**: R[u] = ∫(u')² dx / ∫u² dx for eigenvalues
+- **Ritz Coefficients**: Minimize energy functional
+- **Upper Bounds**: Eigenvalue estimates
+
+**Transient Problems:**
+- **Semi-Discrete Methods**: Spatial discretization first
+- **Time Stepping**: Backward Euler, Crank-Nicolson
+- **Mass and Stiffness Matrices**: (M + Δt·K)u^(n+1) = Mu^n + Δt·F
+- **Energy Stability**: ½d/dt(∫u² dx) ≤ 0
+
+**Applications**: Finite element analysis, structural mechanics, computational fluid dynamics, elasticity
+
+### PDE Numerical Methods (`maths/advanced/pde/pde_numerical_methods.hpp`)
+**Numerical approximation and finite difference schemes**
+
+**Taylor Series Expansions:**
+- **Forward Difference**: f'(x) ≈ (f(x+h) - f(x))/h, O(h) error
+- **Backward Difference**: f'(x) ≈ (f(x) - f(x-h))/h, O(h) error
+- **Central Difference**: f'(x) ≈ (f(x+h) - f(x-h))/(2h), O(h²) error
+- **Second Derivative**: f''(x) ≈ (f(x+h) - 2f(x) + f(x-h))/h²
+- **Higher Order Schemes**: 4th order accurate central differences
+- **Truncation Error Analysis**: Leading error terms
+
+**Successive Approximations:**
+- **Picard Iteration**: u_{n+1}(t) = u₀ + ∫ f(s, u_n(s)) ds
+- **Fixed Point Methods**: u_{n+1} = G(u_n), convergence criteria
+- **Successive Over-Relaxation (SOR)**: ω-parameter for acceleration
+- **Convergence**: Banach fixed point theorem
+
+**Boundary Perturbations:**
+- **Regular Perturbation**: u = u₀ + εu₁ + ε²u₂ + ...
+- **Singular Perturbation**: Boundary layers, matched asymptotics
+- **Boundary Layer Thickness**: δ ~ √ε for second order problems
+- **Inner and Outer Expansions**: Composite solutions
+
+**Finite Difference Schemes for First Order Equations:**
+- **Upwind Scheme**: Backward difference for c > 0, first order accurate
+- **Lax-Friedrichs**: Central difference with averaging, stable
+- **Lax-Wendroff**: Second order in space and time
+- **CFL Condition**: |c|Δt/Δx ≤ 1 for stability
+- **Stability Analysis**: Von Neumann stability analysis
+
+**Finite Difference Schemes for Second Order Equations:**
+- **Explicit Heat Equation**: u_i^{n+1} = u_i^n + r(u_{i+1}^n - 2u_i^n + u_{i-1}^n)
+  - Stable if r = αΔt/Δx² ≤ 1/2
+- **Implicit (Backward Euler)**: Unconditionally stable, first order in time
+- **Crank-Nicolson**: θ = 1/2, unconditionally stable, second order in time
+- **ADI (Alternating Direction Implicit)**: Efficient 2D solver
+  - Step 1: Implicit in x, explicit in y
+  - Step 2: Explicit in x, implicit in y
+- **Stability**: Amplification factor analysis, von Neumann method
+- **Tridiagonal Systems**: Thomas algorithm O(n) solution
+
+**Key Algorithms**: Upwind, Lax-Friedrichs, Lax-Wendroff, Crank-Nicolson, ADI, SOR, Picard iteration
+
+**Applications**: Computational fluid dynamics, heat transfer, wave propagation, image processing, option pricing
+
 ### Probability & Statistics (`maths/advanced/probability/distributions.hpp`)
-**~920 lines | Comprehensive probability distributions**
+**Comprehensive probability distributions**
 
 **Discrete Distributions:**
 - **Bernoulli**: P(X=1) = p
@@ -483,7 +648,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Differential Algebra Demos
 
-1. **`differential_algebra_demo`** (~400 lines)
+1. **`differential_algebra_demo`**
    - Basic differential polynomials and fields
    - Characteristic sets and reduction
    - Differential ideals
@@ -491,7 +656,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
    - Elimination theory
    - Low power theorem
 
-2. **`differential_algebra_advanced_demo`** (~350 lines)
+2. **`differential_algebra_advanced_demo`**
    - Manifold intersections (Kronecker's theorem)
    - Orthonomic systems (Riquier)
    - Partial differential algebra
@@ -500,7 +665,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Analysis Demos
 
-3. **`fourier_analysis_demo`** (~350 lines)
+3. **`fourier_analysis_demo`**
    - DFT vs FFT performance (11x speedup on N=256)
    - Circulant matrices and convolution theorem
    - Haar and Daubechies-4 wavelets
@@ -508,14 +673,14 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
    - STFT and spectrogram
    - Chirp signal detection
 
-4. **`nonsmooth_algorithms_demo`** (~500 lines)
+4. **`nonsmooth_algorithms_demo`**
    - Proximal operators (soft thresholding)
    - Subgradient descent
    - ISTA and FISTA comparison
    - ADMM consensus optimization
    - Sparse signal recovery (L1 minimization)
 
-5. **`advanced_subdifferentials_demo`** (~500 lines)
+5. **`advanced_subdifferentials_demo`**
    - Clarke subdifferential computation
    - Normal and tangent cones
    - Limiting subdifferentials
@@ -524,7 +689,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Stochastic Methods Demos
 
-6. **`stochastic_methods_demo`** (~450 lines)
+6. **`stochastic_methods_demo`**
    - Monte Carlo integration (basic, importance, stratified sampling)
    - Markov chains and stationary distributions
    - MCMC sampling (Metropolis-Hastings, Gibbs)
@@ -535,7 +700,7 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
 
 ### Variational Calculus Demos
 
-7. **`variational_calculus_demo`** (~400 lines)
+7. **`variational_calculus_demo`**
    - Contact geometry and contact structures
    - Lagrangians and Euler-Lagrange equations
    - Poincaré-Cartan forms and integral invariants
@@ -591,10 +756,9 @@ done
 
 ## 📊 Statistics
 
-- **Total Lines**: ~20,000+ lines of computational mathematics and physics
 - **Mathematics Modules**:
   - Basic: 4 modules (calculus, linear algebra, trigonometry, transforms)
-  - Advanced: 9 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability, PDEs)
+  - Advanced: 13 modules (differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms, stochastic methods, variational calculus, dynamical systems, probability, PDEs - classification, solutions, transforms, variational methods, numerical methods)
   - Applied: 3 modules (finance, actuarial, econometrics)
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
@@ -616,6 +780,20 @@ done
   - Orthogonal polynomial expansions (Legendre, Chebyshev, Hermite, Laguerre)
   - Bessel function computations and zero-finding
   - Fourier series coefficient computation
+  - Laplace transforms and inverse transforms
+  - Fourier transforms (full, sine, cosine, finite)
+  - d'Alembert's solution for wave equation
+  - Heat kernel and fundamental solutions
+  - Green's functions for Poisson equation
+  - Poisson integral formula
+  - Galerkin finite element method
+  - Rayleigh-Ritz energy minimization
+  - Upwind, Lax-Friedrichs, Lax-Wendroff schemes
+  - ADI (Alternating Direction Implicit)
+  - Crank-Nicolson time stepping
+  - SOR (Successive Over-Relaxation)
+  - Picard iteration
+  - Von Neumann stability analysis
 
 ## 🎓 Educational Value
 
@@ -630,7 +808,14 @@ Each module serves as both:
    - Stochastic methods and Monte Carlo simulations
    - Classical and quantum field theory
    - Statistical mechanics and computational physics
-   - PDE theory: heat diffusion, wave propagation, fluid mechanics
+   - PDE theory: parabolic (heat), elliptic (Laplace/Poisson), hyperbolic (wave)
+   - Transform methods: Laplace and Fourier transforms for PDEs
+   - Boundary value problems and initial value problems
+   - Green's functions and fundamental solutions
+   - Weak formulations and variational methods
+   - Finite element methods and Galerkin approximations
+   - Finite difference schemes and numerical stability
+   - Computational fluid dynamics and heat transfer
 
 ## 📝 License
 
