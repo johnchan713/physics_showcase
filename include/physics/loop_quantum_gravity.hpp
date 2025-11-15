@@ -1385,7 +1385,1157 @@ public:
     }
 };
 
+/**
+ * @brief Loop Quantum Cosmology (LQC)
+ *
+ * Application of LQG to cosmology
+ */
+class LoopQuantumCosmology {
+public:
+    /**
+     * @brief Big Bounce
+     *
+     * Quantum geometry replaces Big Bang singularity with bounce
+     */
+    static std::string big_bounce() {
+        return "Big Bang singularity → Big Bounce (ρ ≤ ρ_max ~ ρ_Planck)";
+    }
+
+    /**
+     * @brief Maximum density
+     *
+     * ρ_max ~ 0.41 ρ_Planck (quantum geometry bound)
+     */
+    static double max_density_ratio() {
+        return 0.41;  // ρ_max/ρ_Planck
+    }
+
+    /**
+     * @brief Friedmann equation modification
+     *
+     * H² = (8πG/3)ρ(1 - ρ/ρ_crit) (LQC correction)
+     */
+    static std::string modified_friedmann() {
+        return "H² = (8πG/3)ρ(1 - ρ/ρ_crit) (bounce when ρ = ρ_crit)";
+    }
+
+    /**
+     * @brief Volume quantization
+     *
+     * Universe volume quantized: V_n = n V_0
+     */
+    static std::string volume_quantization() {
+        return "V_universe = n × V_Planck (discrete quantum geometry)";
+    }
+
+    /**
+     * @brief Effective dynamics
+     *
+     * Quantum corrections to classical cosmology
+     */
+    static std::string effective_dynamics() {
+        return "Effective equation: quantum corrections ∝ ρ/ρ_Planck";
+    }
+
+    /**
+     * @brief Pre-big-bang
+     *
+     * Universe existed before bounce (contracting phase)
+     */
+    static std::string pre_big_bang() {
+        return "Contracting universe → bounce → expanding universe";
+    }
+
+    /**
+     * @brief Observational signatures
+     *
+     * CMB anomalies, tensor-to-scalar ratio
+     */
+    static std::string observations() {
+        return "CMB: suppressed power at large scales, r < 0.01";
+    }
+};
+
+/**
+ * @brief Inflation in LQC
+ *
+ * Inflationary cosmology in loop quantum framework
+ */
+class InflationLQC {
+public:
+    /**
+     * @brief Quantum bounce inflation
+     *
+     * Bounce can seed inflation naturally
+     */
+    static std::string bounce_inflation() {
+        return "Bounce → high energy density → slow-roll inflation";
+    }
+
+    /**
+     * @brief Slow-roll conditions
+     *
+     * Modified in LQC: ε, η slow-roll parameters
+     */
+    static std::string slow_roll() {
+        return "Slow-roll: ε = (1/2)(V'/V)² << 1, η = V''/V << 1";
+    }
+
+    /**
+     * @brief Power spectrum
+     *
+     * P(k) = (H²/2π)² (1/2ε) (quantum corrections)
+     */
+    static std::string power_spectrum() {
+        return "P(k) modified: LQC corrections at trans-Planckian scales";
+    }
+
+    /**
+     * @brief Tensor-to-scalar ratio
+     *
+     * r = 16ε (observable prediction)
+     */
+    static double tensor_to_scalar(double epsilon) {
+        return 16.0 * epsilon;
+    }
+
+    /**
+     * @brief Pre-inflationary dynamics
+     *
+     * Quantum geometry before inflation
+     */
+    static std::string pre_inflation() {
+        return "Pre-inflation: quantum bounce sets initial conditions";
+    }
+
+    /**
+     * @brief Trans-Planckian problem
+     *
+     * LQC provides UV completion
+     */
+    static std::string trans_planckian() {
+        return "Trans-Planckian modes: LQC discrete geometry = natural cutoff";
+    }
+
+    /**
+     * @brief Graceful exit
+     *
+     * Transition from inflation to radiation era
+     */
+    static std::string graceful_exit() {
+        return "Reheating after inflation (quantum corrections small)";
+    }
+};
+
+/**
+ * @brief Black Hole Thermodynamics - Statistical Ensemble
+ *
+ * Microcanonical ensemble for black holes
+ */
+class BHStatisticalEnsemble {
+public:
+    /**
+     * @brief Horizon as boundary
+     *
+     * Isolated horizon: inner boundary condition
+     */
+    static std::string isolated_horizon() {
+        return "Isolated horizon Δ: (null, non-expanding, weakly isolated)";
+    }
+
+    /**
+     * @brief Horizon area
+     *
+     * Area A = 4πr²_s (Schwarzschild radius)
+     */
+    static double schwarzschild_area(double mass) {
+        double r_s = 2.0 * constants::G * mass / (constants::c * constants::c);
+        return 4.0 * M_PI * r_s * r_s;
+    }
+
+    /**
+     * @brief Chern-Simons theory
+     *
+     * Horizon degrees of freedom from SU(2) CS theory
+     */
+    static std::string chern_simons() {
+        return "Horizon: U(1) CS theory → punctures with spins";
+    }
+
+    /**
+     * @brief Microstate counting
+     *
+     * Ω(A) = number of spin network punctures on horizon
+     */
+    static std::string microstates() {
+        return "Microstates: spin network punctures piercing horizon";
+    }
+
+    /**
+     * @brief Entropy formula
+     *
+     * S = k_B ln Ω(A)
+     */
+    static std::string entropy() {
+        return "S = k_B ln Ω (Boltzmann entropy from microstate counting)";
+    }
+
+    /**
+     * @brief Quantum geometry on horizon
+     *
+     * Horizon = 2D quantum surface
+     */
+    static std::string quantum_horizon() {
+        return "Horizon: 2D spin network with quantized area";
+    }
+};
+
+/**
+ * @brief Derivation of Bekenstein-Hawking Entropy
+ *
+ * S_BH = A/(4l_P²) from LQG
+ */
+class BekensteinHawkingEntropy {
+public:
+    /**
+     * @brief Area constraint
+     *
+     * Horizon area A = Σ_p a_p where a_p = 8πγl_P²√(j_p(j_p+1))
+     */
+    static std::string area_constraint() {
+        return "A_horizon = Σ_p 8πγl_P²√(j_p(j_p+1)) (sum over punctures)";
+    }
+
+    /**
+     * @brief Number of punctures
+     *
+     * N ~ A/(8πγl_P²√(j(j+1))) for dominant spin j
+     */
+    static double number_of_punctures(double area, double gamma_IP, int twice_j) {
+        double j = twice_j / 2.0;
+        double a_j = 8.0 * M_PI * gamma_IP * constants::l_P * constants::l_P *
+                     std::sqrt(j * (j + 1.0));
+        return area / a_j;
+    }
+
+    /**
+     * @brief Counting formula
+     *
+     * Ω(A,N) = combinatorial count of configurations
+     */
+    static std::string counting() {
+        return "Ω(A,N): count spin assignments {j_p} with Σ a_p = A";
+    }
+
+    /**
+     * @brief Dominant contribution
+     *
+     * j = 1/2 punctures dominate for large A
+     */
+    static std::string dominant_spin() {
+        return "Dominant: j = 1/2 (minimal area quanta)";
+    }
+
+    /**
+     * @brief Entropy calculation
+     *
+     * S = k_B ln Ω ≈ γ₀ A/(4l_P²) where γ₀ ≈ 0.2375
+     */
+    static double entropy(double area, double gamma_IP) {
+        return constants::k_B * area / (4.0 * gamma_IP * constants::l_P * constants::l_P);
+    }
+
+    /**
+     * @brief Immirzi parameter fixing
+     *
+     * γ fixed by matching S = A/(4l_P²)
+     */
+    static std::string immirzi_fixing() {
+        return "γ ≈ ln(2)/(π√3) ≈ 0.2375 from S_BH match";
+    }
+
+    /**
+     * @brief Bekenstein-Hawking formula
+     *
+     * S_BH = k_B A/(4l_P²) = k_B c³A/(4ℏG)
+     */
+    static std::string bh_formula() {
+        return "S_BH = k_B c³ A/(4ℏG) (exact agreement with Hawking!)";
+    }
+
+    /**
+     * @brief Quantum corrections
+     *
+     * Leading correction: logarithmic in A
+     */
+    static std::string corrections() {
+        return "S = A/(4γl_P²) - (3/2)ln(A/l_P²) + O(1) (quantum corrections)";
+    }
+};
+
+/**
+ * @brief Ringing Modes Frequencies
+ *
+ * Quasi-normal modes of black holes from LQG
+ */
+class RingingModes {
+public:
+    /**
+     * @brief Quasi-normal modes
+     *
+     * Damped oscillations: ω = ω_R - iω_I
+     */
+    static std::string qnm() {
+        return "QNM: h(t) ~ e^(-ω_I t) e^(iω_R t) (ringdown)";
+    }
+
+    /**
+     * @brief Bohr correspondence
+     *
+     * ℏω ~ ΔE between horizon quantum states
+     */
+    static std::string bohr() {
+        return "ℏω_R ~ ΔA/A (area quantum transitions)";
+    }
+
+    /**
+     * @brief Area spectrum
+     *
+     * A_n = 8πγl_P² Σ_{i=1}^n √(j_i(j_i+1))
+     */
+    static std::string area_spectrum() {
+        return "Discrete area: ΔA_min = 8πγl_P²√(j(j+1))";
+    }
+
+    /**
+     * @brief Frequency formula
+     *
+     * ω ~ c/(r_s) × (area quantum)
+     */
+    static double frequency_estimate(double mass) {
+        double r_s = 2.0 * constants::G * mass / (constants::c * constants::c);
+        return constants::c / r_s;
+    }
+
+    /**
+     * @brief Damping time
+     *
+     * τ = 1/ω_I ~ r_s/c (light crossing time)
+     */
+    static std::string damping() {
+        return "τ_damp ~ r_s/c (horizon crossing time)";
+    }
+
+    /**
+     * @brief Overtones
+     *
+     * Multiple frequencies from different j transitions
+     */
+    static std::string overtones() {
+        return "Overtone spectrum: ω_n from different Δj transitions";
+    }
+
+    /**
+     * @brief Observable via gravitational waves
+     *
+     * LIGO/Virgo detection of ringdown
+     */
+    static std::string observability() {
+        return "GW ringdown: test LQG via QNM spectrum";
+    }
+};
+
+/**
+ * @brief Bekenstein-Mukhanov Effect
+ *
+ * Discrete area spectrum → discrete entropy
+ */
+class BekensteinMukhanovEffect {
+public:
+    /**
+     * @brief Area quantization
+     *
+     * Area comes in discrete quanta
+     */
+    static std::string quantization() {
+        return "ΔA = 8πγl_P²√(j(j+1)) (area quantum)";
+    }
+
+    /**
+     * @brief Entropy spacing
+     *
+     * ΔS ~ k_B (entropy increases by discrete steps)
+     */
+    static std::string entropy_spacing() {
+        return "ΔS ~ k_B ΔA/(4γl_P²) ~ k_B (discrete entropy!)";
+    }
+
+    /**
+     * @brief Evaporation discrete
+     *
+     * Hawking radiation emitted in quanta
+     */
+    static std::string discrete_evaporation() {
+        return "BH evaporation: discrete jumps ΔA (not continuous)";
+    }
+
+    /**
+     * @brief Mukhanov proposal
+     *
+     * Entropy eigenvalue spacing constant
+     */
+    static std::string mukhanov() {
+        return "Mukhanov: ΔS = k_B ln(n) for some integer n";
+    }
+
+    /**
+     * @brief LQG realization
+     *
+     * Adding one j=1/2 puncture
+     */
+    static std::string lqg_realization() {
+        return "LQG: ΔS from adding j=1/2 puncture to horizon";
+    }
+
+    /**
+     * @brief Observational prospects
+     *
+     * Final stages of BH evaporation
+     */
+    static std::string observations() {
+        return "Observable: Planck-mass BH evaporation (discrete bursts)";
+    }
+};
+
+/**
+ * @brief Observable Effects
+ *
+ * Testable predictions of LQG
+ */
+class ObservableEffects {
+public:
+    /**
+     * @brief Modified dispersion relations
+     *
+     * E² = p²c² + m²c⁴ + ξ(l_P/λ)E³ (Planck-scale corrections)
+     */
+    static std::string dispersion() {
+        return "Modified: E² ≈ p²c² + α(l_P/λ)E³ (Lorentz violation at l_P)";
+    }
+
+    /**
+     * @brief Time-of-flight delays
+     *
+     * Different energies arrive at different times
+     */
+    static std::string time_delay() {
+        return "Δt ~ ΔE × l_P/c × D (D = distance to source)";
+    }
+
+    /**
+     * @brief Gamma-ray bursts
+     *
+     * High-energy photons from GRBs test quantum gravity
+     */
+    static std::string grb() {
+        return "GRB: E ~ 10 GeV, D ~ Gpc → Δt ~ μs (testable!)";
+    }
+
+    /**
+     * @brief CMB anomalies
+     *
+     * LQC predicts large-scale power suppression
+     */
+    static std::string cmb() {
+        return "CMB: suppressed power at l < 30 (LQC bounce signature)";
+    }
+
+    /**
+     * @brief Black hole shadows
+     *
+     * Quantum corrections to photon sphere
+     */
+    static std::string bh_shadow() {
+        return "BH shadow: quantum corrections Δr/r ~ (l_P/r_s)²";
+    }
+
+    /**
+     * @brief Gravitational wave echoes
+     *
+     * Quantum structure near horizon
+     */
+    static std::string gw_echoes() {
+        return "GW echoes: reflections from quantum horizon structure";
+    }
+
+    /**
+     * @brief Primordial gravitational waves
+     *
+     * r < 0.01 (tensor-to-scalar ratio from LQC)
+     */
+    static std::string primordial_gw() {
+        return "Primordial GW: r < 0.01 (LQC bounce → low tensor modes)";
+    }
+
+    /**
+     * @brief Current constraints
+     *
+     * No Lorentz violation detected to 10^-17 eV
+     */
+    static std::string constraints() {
+        return "Current limits: Lorentz violation ξ < 10⁻² (Fermi-LAT)";
+    }
+};
+
+/**
+ * @brief From Loops to Spinfoams
+ *
+ * Transition from canonical to covariant formulation
+ */
+class FromLoopsToSpinfoams {
+public:
+    /**
+     * @brief Canonical vs covariant
+     *
+     * LQG (3+1) vs spinfoams (4D covariant)
+     */
+    static std::string canonical_vs_covariant() {
+        return "Canonical LQG: evolution in time; Spinfoams: spacetime histories";
+    }
+
+    /**
+     * @brief Path integral
+     *
+     * Z = Σ_geometries e^(iS/ℏ) (sum over 4-geometries)
+     */
+    static std::string path_integral() {
+        return "Spinfoam: Z = Σ_σ A(σ) (sum over 2-complexes σ)";
+    }
+
+    /**
+     * @brief Spacetime foam
+     *
+     * 4D analogue of Feynman path integral
+     */
+    static std::string foam() {
+        return "Spinfoam = quantum 4-geometry (spacetime histories)";
+    }
+
+    /**
+     * @brief Spin networks as boundaries
+     *
+     * Spin networks = boundary states of spinfoams
+     */
+    static std::string boundaries() {
+        return "∂(spinfoam) = spin network (3D boundary of 4D geometry)";
+    }
+
+    /**
+     * @brief Amplitude
+     *
+     * A(σ) = transition amplitude between spin network states
+     */
+    static std::string amplitude() {
+        return "A(σ): ⟨s_f|e^(-iĤt)|s_i⟩ (boundary spin networks s_i, s_f)";
+    }
+
+    /**
+     * @brief Wheeler-DeWitt
+     *
+     * Ĥ|Ψ⟩ = 0 → spinfoam sum
+     */
+    static std::string wheeler_dewitt() {
+        return "Hamiltonian constraint → sum over spacetime histories";
+    }
+
+    /**
+     * @brief Discrete vs continuum
+     *
+     * Spinfoam = discrete approximation to path integral
+     */
+    static std::string discrete_continuum() {
+        return "Spinfoam: discretized path integral (Regge-like)";
+    }
+};
+
+/**
+ * @brief Spinfoam Formalism
+ *
+ * Mathematical structure of spinfoams
+ */
+class SpinfoamFormalism {
+public:
+    /**
+     * @brief 2-complex
+     *
+     * Σ = (faces F, edges E, vertices V) dual to triangulation
+     */
+    static std::string two_complex() {
+        return "2-complex σ: vertices V, edges E, faces F (dual to triangulation)";
+    }
+
+    /**
+     * @brief Labeling
+     *
+     * Faces → spins j_f, edges → intertwiners i_e
+     */
+    static std::string labeling() {
+        return "Faces: spins j_f, Edges: intertwiners i_e, Vertices: amplitudes";
+    }
+
+    /**
+     * @brief Amplitude formula
+     *
+     * A(σ) = Σ_{j,i} Π_f (2j_f+1) Π_v A_v({j,i})
+     */
+    static std::string amplitude() {
+        return "A(σ) = Σ_{j,i} Π_f d_j Π_v A_v (vertex amplitude A_v)";
+    }
+
+    /**
+     * @brief Vertex amplitude
+     *
+     * A_v from 15j symbol (10 faces, 15 edges around vertex)
+     */
+    static std::string vertex_amplitude() {
+        return "A_v = {15j symbol} (Wigner symbol for 4-simplex)";
+    }
+
+    /**
+     * @brief Face amplitude
+     *
+     * (2j+1) = dimension of SU(2) irrep
+     */
+    static std::string face_amplitude() {
+        return "Face: d_j = 2j+1 (dimension weight)";
+    }
+
+    /**
+     * @brief Partition function
+     *
+     * Z = Σ_σ A(σ) (sum over 2-complexes)
+     */
+    static std::string partition_function() {
+        return "Z = Σ_σ A(σ) (sum over all labelings)";
+    }
+
+    /**
+     * @brief Transition amplitude
+     *
+     * ⟨s_f|s_i⟩ = Σ_σ A(σ) with ∂σ = s_i ∪ s_f
+     */
+    static std::string transition() {
+        return "⟨s_f|s_i⟩ = Σ_{σ:∂σ=s_i∪s_f} A(σ)";
+    }
+};
+
+/**
+ * @brief Spinfoam Boundaries
+ *
+ * Boundary conditions for spinfoams
+ */
+class SpinfoamBoundaries {
+public:
+    /**
+     * @brief Boundary spin networks
+     *
+     * ∂σ consists of spin networks on initial/final slices
+     */
+    static std::string boundary_sn() {
+        return "∂σ = s_initial ∪ s_final (3D spin networks)";
+    }
+
+    /**
+     * @brief Gluing
+     *
+     * Spinfoams glued along common boundaries
+     */
+    static std::string gluing() {
+        return "Gluing: σ₁ ∪_{s} σ₂ (compose along shared boundary s)";
+    }
+
+    /**
+     * @brief Cylindrical consistency
+     *
+     * ⟨s|s⟩ = 1 (normalization)
+     */
+    static std::string cylindrical() {
+        return "Cylindrical: ⟨s|s⟩ = 1 (probability conservation)";
+    }
+
+    /**
+     * @brief No boundary
+     *
+     * Closed spinfoam: ∂σ = ∅ (universe with no boundary)
+     */
+    static std::string no_boundary() {
+        return "∂σ = ∅: closed universe (Hartle-Hawking state)";
+    }
+
+    /**
+     * @brief Time evolution
+     *
+     * Hamiltonian from boundary deformation
+     */
+    static std::string evolution() {
+        return "Ĥ generates boundary deformation (discrete time step)";
+    }
+};
+
+/**
+ * @brief 3D Quantum Gravity
+ *
+ * Toy model for spinfoams
+ */
+class ThreeDQuantumGravity {
+public:
+    /**
+     * @brief Topological theory
+     *
+     * 3D gravity has no local degrees of freedom
+     */
+    static std::string topological() {
+        return "3D gravity: topological (no local DOF, only global)";
+    }
+
+    /**
+     * @brief Ponzano-Regge model
+     *
+     * 3D spinfoam: 6j symbols at tetrahedra
+     */
+    static std::string ponzano_regge() {
+        return "Z = Σ_{j} Π_tetrahedra {6j symbols} (Ponzano-Regge)";
+    }
+
+    /**
+     * @brief Turaev-Viro model
+     *
+     * Quantum group version (q = root of unity)
+     */
+    static std::string turaev_viro() {
+        return "Turaev-Viro: quantum 6j at q^k = 1 (finite sum)";
+    }
+
+    /**
+     * @brief Exactly solvable
+     *
+     * 3D gravity exactly solvable (pedagogical model)
+     */
+    static std::string solvable() {
+        return "Exactly solvable: partition function computable";
+    }
+
+    /**
+     * @brief BTZ black hole
+     *
+     * 3D black hole solution
+     */
+    static std::string btz() {
+        return "BTZ: 3D rotating BH, horizon entropy from Chern-Simons";
+    }
+};
+
+/**
+ * @brief BF Theory
+ *
+ * Topological BF theory as starting point
+ */
+class BFTheory {
+public:
+    /**
+     * @brief BF action
+     *
+     * S = ∫ Tr(B ∧ F) where F = dA + A ∧ A
+     */
+    static std::string action() {
+        return "S_BF = ∫ Tr(B ∧ F) (topological, gauge invariant)";
+    }
+
+    /**
+     * @brief Plebanski formulation
+     *
+     * GR = constrained BF theory
+     */
+    static std::string plebanski() {
+        return "GR: BF + simplicity constraints (B ~ e ∧ e)";
+    }
+
+    /**
+     * @brief Simplicity constraints
+     *
+     * B^IJ = *(e^I ∧ e^J) (Plebanski constraint)
+     */
+    static std::string simplicity() {
+        return "Simplicity: B^IJ ~ ε^IJKL e_K ∧ e_L (relates B to metric)";
+    }
+
+    /**
+     * @brief Quantization
+     *
+     * BF theory quantizes to TQFT
+     */
+    static std::string quantization() {
+        return "Quantum BF: exactly solvable TQFT (state sum)";
+    }
+
+    /**
+     * @brief Spinfoam from BF
+     *
+     * Impose simplicity → gravity spinfoam
+     */
+    static std::string to_spinfoam() {
+        return "BF + simplicity (quantum) → gravity spinfoam models";
+    }
+};
+
+/**
+ * @brief Spinfoam/GFT Duality
+ *
+ * Group field theory formulation
+ */
+class SpinfoamGFTDuality {
+public:
+    /**
+     * @brief Group field theory
+     *
+     * Field φ on G^×4 (four copies of SU(2))
+     */
+    static std::string gft() {
+        return "GFT: field φ(g₁,g₂,g₃,g₄) on SU(2)^×4";
+    }
+
+    /**
+     * @brief Feynman diagrams = spinfoams
+     *
+     * GFT Feynman graphs are spinfoams
+     */
+    static std::string duality() {
+        return "GFT Feynman diagrams ↔ spinfoams (dual description)";
+    }
+
+    /**
+     * @brief Action
+     *
+     * S_GFT = kinetic + interaction terms
+     */
+    static std::string action() {
+        return "S = ∫ φ̄ K φ + λ ∫ φ⁵ + ... (field theory action)";
+    }
+
+    /**
+     * @brief Vertices = simplices
+     *
+     * GFT interaction vertex = 4-simplex
+     */
+    static std::string vertices() {
+        return "5-valent vertex in GFT = 4-simplex in spinfoam";
+    }
+
+    /**
+     * @brief Condensates
+     *
+     * GFT condensate → macroscopic geometry
+     */
+    static std::string condensate() {
+        return "⟨φ⟩ ≠ 0: condensate → emergent continuum spacetime";
+    }
+
+    /**
+     * @brief Cosmology from GFT
+     *
+     * GFT condensate cosmology
+     */
+    static std::string cosmology() {
+        return "GFT condensate → FRW cosmology (emergent)";
+    }
+};
+
+/**
+ * @brief BC (Barrett-Crane) Models
+ *
+ * Early spinfoam models
+ */
+class BCModels {
+public:
+    /**
+     * @brief Barrett-Crane model
+     *
+     * Euclidean 4D spinfoam with SO(4) gauge group
+     */
+    static std::string barrett_crane() {
+        return "BC: vertex = 10j symbol from SO(4) recoupling";
+    }
+
+    /**
+     * @brief Euclidean signature
+     *
+     * SO(4) = SU(2) × SU(2)
+     */
+    static std::string euclidean() {
+        return "SO(4): j_f = (j_+, j_-) (self-dual/anti-self-dual)";
+    }
+
+    /**
+     * @brief Simplicity constraints
+     *
+     * j_+ = j_- (simple representation)
+     */
+    static std::string simplicity() {
+        return "Simplicity: j_+ = j_- (Barrett-Crane constraint)";
+    }
+
+    /**
+     * @brief Problems
+     *
+     * BC model has issues (wrong classical limit)
+     */
+    static std::string problems() {
+        return "Problems: no propagating DOF, wrong n-point functions";
+    }
+
+    /**
+     * @brief Superseded
+     *
+     * Replaced by EPRL/FK models
+     */
+    static std::string superseded() {
+        return "BC superseded by EPRL/FK models (correct semiclassical limit)";
+    }
+};
+
+/**
+ * @brief Group Field Theory
+ *
+ * Detailed GFT formalism
+ */
+class GroupFieldTheory {
+public:
+    /**
+     * @brief Field definition
+     *
+     * φ: G^×n → ℂ (field on group manifold)
+     */
+    static std::string field() {
+        return "φ(g₁,...,g_n): field on SU(2)^×n (n = 3 or 4)";
+    }
+
+    /**
+     * @brief Gauge invariance
+     *
+     * φ(g₁h,...,g_nh) = φ(g₁,...,g_n) for h ∈ G
+     */
+    static std::string gauge_invariance() {
+        return "Right invariance: φ(g_i h) = φ(g_i)";
+    }
+
+    /**
+     * @brief Kinetic term
+     *
+     * ∫ φ̄(g) K(g,g') φ(g') (Laplacian on G)
+     */
+    static std::string kinetic() {
+        return "Kinetic: ∫ φ̄ (Δ_G + m²) φ (Laplacian on group)";
+    }
+
+    /**
+     * @brief Interaction
+     *
+     * Vertex with n strands (n = d+1 in d dimensions)
+     */
+    static std::string interaction() {
+        return "Interaction: ∫ φ^{d+1} (d = spacetime dimension)";
+    }
+
+    /**
+     * @brief Propagator
+     *
+     * ⟨φ(g)φ̄(g')⟩ (Green's function on group)
+     */
+    static std::string propagator() {
+        return "Propagator: ⟨φφ̄⟩ = Σ_j d_j χ_j(gg'^{-1}) (Peter-Weyl)";
+    }
+
+    /**
+     * @brief Renormalization
+     *
+     * GFT renormalization program (ongoing)
+     */
+    static std::string renormalization() {
+        return "Renormalization: scale-dependent couplings (active research)";
+    }
+
+    /**
+     * @brief Mean field
+     *
+     * Saddle point approximation
+     */
+    static std::string mean_field() {
+        return "Mean field: δS/δφ = 0 → classical field equation";
+    }
+};
+
+/**
+ * @brief Lorentzian Models
+ *
+ * Lorentzian signature spinfoams (physical spacetime)
+ */
+class LorentzianModels {
+public:
+    /**
+     * @brief EPRL model
+     *
+     * Engle-Pereira-Rovelli-Livine model (Lorentzian)
+     */
+    static std::string eprl() {
+        return "EPRL: SL(2,C) spinfoam with Immirzi parameter γ";
+    }
+
+    /**
+     * @brief FK model
+     *
+     * Freidel-Krasnov model (alternative Lorentzian)
+     */
+    static std::string fk() {
+        return "FK: closely related to EPRL (same semiclassical limit)";
+    }
+
+    /**
+     * @brief Gauge group
+     *
+     * SL(2,C) for Lorentzian signature
+     */
+    static std::string gauge_group() {
+        return "SL(2,C): double cover of SO↑(1,3) (Lorentz group)";
+    }
+
+    /**
+     * @brief Representations
+     *
+     * (ρ, k) labels for SL(2,C) irreps
+     */
+    static std::string representations() {
+        return "SL(2,C) reps: (ρ,k) where ρ ∈ ℝ⁺, k ∈ ℤ/2";
+    }
+
+    /**
+     * @brief Vertex amplitude
+     *
+     * A_v from SL(2,C) 15j symbol (complex)
+     */
+    static std::string vertex() {
+        return "A_v: SL(2,C) {15j} symbol (Lorentzian geometry)";
+    }
+
+    /**
+     * @brief Semiclassical limit
+     *
+     * Large spins → Regge geometry
+     */
+    static std::string semiclassical() {
+        return "j → ∞: EPRL/FK → Regge action (correct limit!)";
+    }
+
+    /**
+     * @brief Asymptotics
+     *
+     * Stationary phase approximation
+     */
+    static std::string asymptotics() {
+        return "A_v ~ e^(iS_Regge/ℏ) for large j (WKB)";
+    }
+
+    /**
+     * @brief n-point functions
+     *
+     * Graviton propagator from boundary correlators
+     */
+    static std::string n_point() {
+        return "⟨h_μν(x) h_ρσ(y)⟩: graviton 2-point function";
+    }
+};
+
+/**
+ * @brief Physics from Spinfoams
+ *
+ * Physical observables and predictions
+ */
+class PhysicsFromSpinfoams {
+public:
+    /**
+     * @brief Graviton propagator
+     *
+     * 2-point function of metric perturbations
+     */
+    static std::string graviton_propagator() {
+        return "⟨h(x)h(y)⟩ ~ 1/|x-y|² (from boundary correlators)";
+    }
+
+    /**
+     * @brief Particle scattering
+     *
+     * Matter coupled to quantum geometry
+     */
+    static std::string scattering() {
+        return "S-matrix: ⟨out|in⟩ from spinfoam with matter insertions";
+    }
+
+    /**
+     * @brief Minkowski vacuum
+     *
+     * Flat space as spinfoam state
+     */
+    static std::string minkowski() {
+        return "η_μν: sum over flat spinfoams (coherent state)";
+    }
+
+    /**
+     * @brief Coherent states
+     *
+     * Semiclassical geometries as coherent superpositions
+     */
+    static std::string coherent() {
+        return "|g_μν⟩ ~ Σ_σ e^(-||σ-g||²) |σ⟩ (peaked on classical g)";
+    }
+
+    /**
+     * @brief Quantum corrections
+     *
+     * Deviations from GR at Planck scale
+     */
+    static std::string corrections() {
+        return "⟨O⟩ = ⟨O⟩_GR + ℏ ⟨O⟩_(1) + ℏ² ⟨O⟩_(2) + ...";
+    }
+
+    /**
+     * @brief Cosmological constant
+     *
+     * Λ from spinfoam asymptotics?
+     */
+    static std::string cosmological_constant() {
+        return "Λ_eff from large-scale spinfoam structure (speculative)";
+    }
+
+    /**
+     * @brief Emergence of locality
+     *
+     * How does local spacetime emerge?
+     */
+    static std::string locality() {
+        return "Locality emerges from fine-grained spinfoam (coarse graining)";
+    }
+
+    /**
+     * @brief Continuum limit
+     *
+     * Refinement limit of triangulation
+     */
+    static std::string continuum() {
+        return "Continuum: ε → 0 limit of spinfoam (triangulation refined)";
+    }
+};
+
 } // namespace loop_quantum_gravity
 } // namespace physics
 
 #endif // PHYSICS_LOOP_QUANTUM_GRAVITY_HPP
+

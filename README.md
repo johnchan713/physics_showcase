@@ -1882,7 +1882,154 @@ Comprehensive spin-1/2 theory and relativistic quantum mechanics (~1,174 lines)
   - For ε << L: effective GR + quantum corrections ~ (l_P/L)²
   - Planck lattice: regular weave at scale l_P
 
-**Applications:** Quantum gravity, quantum cosmology (Big Bounce, singularity resolution), black hole thermodynamics (entropy counting, information paradox), Planck-scale physics, quantum spacetime, spin foams (covariant dynamics), canonical quantization of GR, background-independent quantum theory
+**Loop Quantum Cosmology (LQC):**
+- **Big Bounce:**
+  - Singularity resolution: Big Bang → Big Bounce
+  - Maximum density: ρ_max ~ 0.41 ρ_Planck (quantum bound)
+  - Modified Friedmann: H² = (8πG/3)ρ(1 - ρ/ρ_crit)
+  - Pre-big-bang: contracting → bounce → expanding
+- **Volume Quantization:**
+  - V_universe = n × V_Planck (discrete)
+  - Effective dynamics: quantum corrections ∝ ρ/ρ_Planck
+- **Observational Signatures:**
+  - CMB: suppressed power at l < 30 (large scales)
+  - Tensor-to-scalar ratio: r < 0.01
+- **Inflation in LQC:**
+  - Bounce → high energy → slow-roll inflation
+  - Power spectrum: P(k) with LQC corrections
+  - Trans-Planckian problem: LQC provides UV cutoff
+  - Slow-roll: ε = (1/2)(V'/V)² << 1, η = V''/V << 1
+  - Graceful exit: reheating after inflation
+
+**Black Hole Thermodynamics:**
+- **Statistical Ensemble:**
+  - Isolated horizon: Δ (null, non-expanding, weakly isolated)
+  - Area: A = 4πr²_s (Schwarzschild)
+  - Chern-Simons theory: U(1) CS on horizon
+  - Microstates: spin network punctures on horizon
+  - Entropy: S = k_B ln Ω (Boltzmann counting)
+- **Bekenstein-Hawking Entropy Derivation:**
+  - Area constraint: A = Σ_p 8πγl_P²√(j_p(j_p+1))
+  - Puncture counting: N ~ A/(area quantum)
+  - Dominant spin: j = 1/2 (minimal quanta)
+  - S = k_B A/(4γl_P²) (exact Bekenstein-Hawking!)
+  - Immirzi parameter: γ ≈ ln(2)/(π√3) ≈ 0.2375 fixed
+  - Quantum corrections: S = A/(4γl_P²) - (3/2)ln(A/l_P²) + ...
+- **Ringing Modes (Quasi-Normal Modes):**
+  - QNM: h(t) ~ e^(-ω_I t) e^(iω_R t) (damped oscillations)
+  - Bohr correspondence: ℏω_R ~ ΔA (area transitions)
+  - Discrete area spectrum: ΔA_min = 8πγl_P²√(j(j+1))
+  - Frequency: ω ~ c/r_s × (area quantum)
+  - Damping: τ ~ r_s/c (horizon crossing)
+  - Observable: LIGO/Virgo ringdown → test LQG
+- **Bekenstein-Mukhanov Effect:**
+  - Discrete area → discrete entropy
+  - ΔS ~ k_B (entropy spacing)
+  - BH evaporation: discrete jumps (not continuous!)
+  - Hawking radiation in quanta
+  - Observable: Planck-mass BH evaporation
+
+**Observable Effects:**
+- **Modified Dispersion Relations:**
+  - E² ≈ p²c² + α(l_P/λ)E³ (Lorentz violation at l_P)
+  - Time-of-flight delays: Δt ~ ΔE × l_P/c × D
+  - Current limits: ξ < 10⁻² (Fermi-LAT GRBs)
+- **Gamma-Ray Bursts:**
+  - E ~ 10 GeV, D ~ Gpc → Δt ~ μs (testable!)
+- **CMB Anomalies:**
+  - Suppressed power at l < 30 (LQC bounce signature)
+  - Tensor modes: r < 0.01
+- **Black Hole Observations:**
+  - BH shadows: quantum corrections Δr/r ~ (l_P/r_s)²
+  - GW echoes: reflections from quantum horizon
+  - Ringdown: QNM spectrum tests
+- **Primordial Gravitational Waves:**
+  - r < 0.01 from LQC bounce
+
+**Spinfoams (Covariant LQG):**
+- **From Loops to Spinfoams:**
+  - Canonical LQG (3+1) → Spinfoams (4D covariant)
+  - Path integral: Z = Σ_σ A(σ) (sum over 2-complexes)
+  - Spacetime foam: quantum 4-geometries
+  - Spin networks as boundaries: ∂(spinfoam) = spin network
+  - Amplitude: A(σ) = ⟨s_f|e^(-iĤt)|s_i⟩
+  - Wheeler-DeWitt: Ĥ|Ψ⟩ = 0 → spinfoam sum
+- **Spinfoam Formalism:**
+  - 2-complex σ: vertices V, edges E, faces F (dual to triangulation)
+  - Labeling: faces → spins j_f, edges → intertwiners i_e
+  - Amplitude: A(σ) = Σ_{j,i} Π_f d_j Π_v A_v
+  - Vertex amplitude: A_v = {15j symbol} (4-simplex)
+  - Face amplitude: d_j = 2j+1 (dimension)
+  - Transition: ⟨s_f|s_i⟩ = Σ_{σ:∂σ=s_i∪s_f} A(σ)
+- **Boundaries:**
+  - ∂σ = s_initial ∪ s_final (3D spin networks)
+  - Gluing: σ₁ ∪_s σ₂ (compose along boundary)
+  - Cylindrical: ⟨s|s⟩ = 1 (probability conservation)
+  - No boundary: ∂σ = ∅ (closed universe, Hartle-Hawking)
+
+**Spinfoam Models:**
+- **3D Quantum Gravity:**
+  - Topological (no local DOF)
+  - Ponzano-Regge: Z = Σ_j Π_tetrahedra {6j symbols}
+  - Turaev-Viro: quantum 6j at q^k = 1
+  - Exactly solvable
+  - BTZ black hole: 3D rotating BH
+- **BF Theory:**
+  - Action: S_BF = ∫ Tr(B ∧ F) (topological)
+  - Plebanski: GR = BF + simplicity constraints
+  - Simplicity: B^IJ ~ ε^IJKL e_K ∧ e_L
+  - Quantum BF: TQFT (exactly solvable)
+  - BF + simplicity → gravity spinfoam
+- **Spinfoam/GFT Duality:**
+  - GFT: field φ(g₁,g₂,g₃,g₄) on SU(2)^×4
+  - Feynman diagrams ↔ spinfoams (dual!)
+  - Action: S = ∫ φ̄ K φ + λ ∫ φ⁵ + ...
+  - 5-valent vertex = 4-simplex
+  - Condensate: ⟨φ⟩ ≠ 0 → continuum spacetime
+  - GFT cosmology: condensate → FRW
+- **BC (Barrett-Crane) Models:**
+  - Euclidean: vertex = 10j (SO(4) = SU(2) × SU(2))
+  - Simplicity: j_+ = j_- (simple rep)
+  - Problems: no propagating DOF, wrong n-point functions
+  - Superseded by EPRL/FK
+- **Group Field Theory:**
+  - Field: φ: SU(2)^×n → ℂ
+  - Gauge invariance: φ(g_i h) = φ(g_i)
+  - Kinetic: ∫ φ̄ (Δ_G + m²) φ
+  - Interaction: ∫ φ^{d+1} (d = dimension)
+  - Propagator: ⟨φφ̄⟩ = Σ_j d_j χ_j(gg'^{-1})
+  - Renormalization: ongoing research
+- **Lorentzian Models:**
+  - EPRL (Engle-Pereira-Rovelli-Livine): SL(2,C) spinfoam
+  - FK (Freidel-Krasnov): alternative Lorentzian
+  - Gauge group: SL(2,C) (Lorentz double cover)
+  - Representations: (ρ,k) where ρ ∈ ℝ⁺, k ∈ ℤ/2
+  - Vertex: SL(2,C) {15j} symbol
+  - Semiclassical: j → ∞ → Regge action (correct limit!)
+  - Asymptotics: A_v ~ e^(iS_Regge/ℏ) (WKB)
+
+**Physics from Spinfoams:**
+- **Graviton Propagator:**
+  - ⟨h(x)h(y)⟩ ~ 1/|x-y|² (from boundary correlators)
+  - 2-point function of metric perturbations
+- **Particle Scattering:**
+  - S-matrix: ⟨out|in⟩ from spinfoam + matter
+  - Matter coupled to quantum geometry
+- **Minkowski Vacuum:**
+  - η_μν: sum over flat spinfoams (coherent state)
+  - Flat space as quantum state
+- **Coherent States:**
+  - |g_μν⟩ ~ Σ_σ e^(-||σ-g||²) |σ⟩ (peaked on classical)
+  - Semiclassical geometries
+- **Quantum Corrections:**
+  - ⟨O⟩ = ⟨O⟩_GR + ℏ ⟨O⟩_(1) + ℏ² ⟨O⟩_(2) + ...
+  - Deviations from GR at l_P
+- **Emergence:**
+  - Locality emerges from fine-grained spinfoam
+  - Continuum limit: ε → 0 (triangulation refined)
+  - Cosmological constant: Λ_eff from spinfoam structure?
+
+**Applications:** Quantum gravity (canonical and covariant), quantum cosmology (Big Bounce, singularity resolution, inflation), black hole thermodynamics (entropy derivation, information paradox, ringing modes, discrete evaporation), Planck-scale physics (modified dispersion, time-of-flight delays), quantum spacetime (spinfoams, GFT), observational tests (CMB anomalies, GRB delays, GW echoes, BH shadows), background-independent quantum theory, semiclassical limit and emergence of GR
 
 ## 🚀 Usage
 
@@ -1949,7 +2096,7 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
     - **Advanced Quantum Mechanics** (~1,650 lines): Kummer's functions, Hamiltonian mechanics, perturbation theory, Stark effect, Pauli exclusion, electron spin, helium atom
     - **Quantum Chemistry** (~1,300 lines): Atomic structure (Hartree-Fock, Slater orbitals, multiplet theory), molecular structure (Born-Oppenheimer, diatomic molecules, H₂⁺, H₂, chemical bonding, VSEPR, Hückel MO theory)
     - **Relativistic Quantum Mechanics** (~4,957 lines): Comprehensive Klein-Gordon equation (12 topics), comprehensive Dirac equation (16 topics: foundation, Lorentz covariance, free motion, solutions by transformations, single-particle interpretation, nonrelativistic limit, polarized electrons, projection operators, wave packets, external fields, Foldy-Wouthuysen, hole theory, charge conjugation, time reversal, PCT), Klein's paradox, Weyl equation and neutrino physics, wave equations for arbitrary spins (Proca, Kemmer, Maxwell, Rarita-Schwinger), comprehensive Lorentz group theory (O(4), Poincaré, conformal), complete representation theory (tensor, spinor, SL(2,C), SO(3), Lorentz group Lₚ, spin-rotation)
-    - **Loop Quantum Gravity** (~1,391 lines): Quantum space structure (Planck scale), kinematical state space 𝓚 (cylindrical functions, Ashtekar-Lewandowski measure), gauge invariance 𝓚₀ (spin networks, intertwiners), diffeomorphism invariance 𝓚_Diff (s-knots, separability), connection and momentum operators (Â, Ê), quanta of area (A = 8πγl_P²√(j(j+1)), black hole entropy), quanta of volume (discrete spectrum, singularity resolution), recoupling theory (6j, 9j symbols), quantum geometry (discrete chunks, polymer structure), weaves (texture of space, semiclassical limit)
+    - **Loop Quantum Gravity** (~2,541 lines): Quantum space structure (Planck scale, background independence), kinematical state space 𝓚 (cylindrical functions, Ashtekar-Lewandowski measure, Peter-Weyl), gauge invariance 𝓚₀ (spin networks, intertwiners, recoupling), diffeomorphism invariance 𝓚_Diff (s-knots, separability), operators (connection Â, momentum Ê), quantum geometry (area/volume quanta, black hole entropy), weaves (semiclassical limit), Loop Quantum Cosmology (Big Bounce, inflation, CMB predictions), black hole thermodynamics (entropy derivation, ringing modes, Bekenstein-Mukhanov), observable effects (modified dispersion, GRB delays, GW echoes), spinfoams (covariant formulation, path integral, 2-complexes, boundaries), spinfoam models (3D gravity, BF theory, BC models, EPRL/FK, GFT), physics from spinfoams (graviton propagator, scattering, Minkowski vacuum, emergence)
   - Advanced: 23+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
 - **Probability Distributions**: 14 distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, Student's t, F-distribution)
 - **Key Algorithms**:
