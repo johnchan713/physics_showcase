@@ -36,6 +36,7 @@ physics_showcase/
 │   │   ├── pde_transform_methods.hpp
 │   │   ├── pde_variational_methods.hpp
 │   │   ├── polar_transforms.hpp
+│   │   ├── stochastic_differential_equations.hpp
 │   │   ├── trigonometry_identities.hpp
 │   │   ├── variational_calculus.hpp
 │   │   └── vectors.hpp
@@ -206,6 +207,53 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
   - Low autocorrelation chains
 
 **Applications:** Finance (option pricing), physics (molecular dynamics), Bayesian inference, machine learning
+
+### Stochastic Differential Equations (`maths/stochastic_differential_equations.hpp`)
+**Itô calculus and stochastic processes**
+
+- **Itô Integrals**
+  - Construction of Itô integrals: ∫ f(t, W) dW
+  - Itô isometry: E[|∫ f dW|²] = E[∫ f² dt]
+  - Quadratic variation and properties
+  - Extensions for adapted processes
+
+- **Itô's Lemma**
+  - Change of variables formula for SDEs
+  - Application to geometric Brownian motion
+  - Multidimensional Itô formula
+  - Derivation of Black-Scholes PDE
+
+- **Stochastic Differential Equations**
+  - Euler-Maruyama method (strong order 0.5)
+  - Milstein method (strong order 1.0)
+  - Ornstein-Uhlenbeck process (mean-reverting)
+  - Stochastic analogs of classical ODEs
+
+- **Filtering Problems**
+  - Kalman filter (prediction and update steps)
+  - Optimal state estimation
+  - Linear Gaussian systems
+  - Innovation and Kalman gain
+
+- **Optimal Stopping**
+  - American option pricing
+  - Dynamic programming approach
+  - Optimal stopping times
+  - Reward maximization problems
+
+- **Stochastic Control**
+  - Hamilton-Jacobi-Bellman equation
+  - Linear-Quadratic-Gaussian (LQG) control
+  - Merton's portfolio optimization
+  - Optimal investment strategies
+
+- **Mathematical Finance Applications**
+  - Heston stochastic volatility model
+  - Cox-Ingersoll-Ross (CIR) interest rate model
+  - Vasicek model for term structure
+  - Multi-factor models
+
+**Applications:** Quantitative finance, optimal control, signal processing, filtering theory, economics
 
 ### Variational Calculus (`maths/variational_calculus.hpp`)
 **Lagrangians, Poincaré-Cartan Forms, and variational principles**
@@ -764,9 +812,10 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
 
 ## 📊 Statistics
 
-- **Mathematics Modules**: 22 header-only modules in flat structure
+- **Mathematics Modules**: 23 header-only modules in flat structure
   - Differential algebra, Fourier analysis, subdifferentials, nonsmooth algorithms
-  - Monte Carlo & MCMC methods, variational calculus, dynamical systems & chaos
+  - Monte Carlo & MCMC methods, stochastic differential equations (SDEs) & Itô calculus
+  - Variational calculus, dynamical systems & chaos
   - Partial differential equations (6 modules: classification, solutions, transforms, variational, numerical methods, plus main PDE module)
   - Probability distributions, matrices, vectors, calculus, trigonometry
   - Financial mathematics, actuarial science, econometrics
@@ -779,6 +828,8 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
   - ISTA, FISTA (O(1/k²) convergence)
   - ADMM, Ritt's algorithm
   - Monte Carlo, MCMC (Metropolis-Hastings, Gibbs, HMC)
+  - Itô integrals, Itô's lemma, Euler-Maruyama, Milstein methods
+  - Kalman filter, optimal stopping, stochastic control
   - Euler-Lagrange, Noether's theorem, Legendre transforms
   - RK4, Picard iteration, Floquet theory
   - Lyapunov exponents, bifurcation diagrams, fractal dimensions
@@ -817,10 +868,12 @@ Each module serves as both:
 2. **Educational reference** showing how abstract mathematics translates to algorithms
 3. **Research tool** for:
    - Ordinary and partial differential equations
+   - Stochastic differential equations and Itô calculus
    - Dynamical systems, chaos theory, and bifurcation analysis
    - Nonsmooth optimization and variational calculus
    - Signal processing and Fourier analysis
-   - Stochastic methods and Monte Carlo simulations
+   - Monte Carlo methods, MCMC, and stochastic simulations
+   - Filtering theory (Kalman filter), optimal stopping, stochastic control
    - Classical and quantum field theory
    - Statistical mechanics and computational physics
    - PDE theory: parabolic (heat), elliptic (Laplace/Poisson), hyperbolic (wave)
@@ -831,6 +884,7 @@ Each module serves as both:
    - Finite element methods and Galerkin approximations
    - Finite difference schemes and numerical stability
    - Computational fluid dynamics and heat transfer
+   - Mathematical finance and quantitative modeling
 
 ## 📝 License
 
