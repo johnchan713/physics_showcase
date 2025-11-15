@@ -1698,6 +1698,582 @@ public:
 };
 
 /**
+ * @class TriangularDistribution
+ * @brief Triangular distribution on [a, c] with mode b
+ *
+ * PDF: f(x) = 2(x-a)/((c-a)(b-a)) for a ≤ x < b
+ *           = 2(c-x)/((c-a)(c-b)) for b ≤ x ≤ c
+ * Often used when limited data is available
+ */
+class TriangularDistribution : public Distribution {
+private:
+    double a;  // minimum
+    double b;  // mode
+    double c;  // maximum
+
+public:
+    TriangularDistribution(double min_val, double mode_val, double max_val)
+        : a(min_val), b(mode_val), c(max_val) {
+        if (!(a < b && b < c)) {
+            throw std::invalid_argument("Must have a < b < c");
+        }
+    }
+
+    double pdf(double x) const {
+        if (x < a || x > c) return 0.0;
+
+        if (x < b) {
+            return 2.0 * (x - a) / ((c - a) * (b - a));
+        } else {
+            return 2.0 * (c - x) / ((c - a) * (c - b));
+        }
+    }
+
+    double cdf(double x) const {
+        if (x <= a) return 0.0;
+        if (x >= c) return 1.0;
+
+        if (x < b) {
+            return (x - a) * (x - a) / ((c - a) * (b - a));
+        } else {
+            return 1.0 - (c - x) * (c - x) / ((c - a) * (c - b));
+        }
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+
+        double fc = (b - a) / (c - a);
+
+        if (p < fc) {
+            return a + std::sqrt(p * (c - a) * (b - a));
+        } else {
+            return c - std::sqrt((1.0 - p) * (c - a) * (c - b));
+        }
+    }
+
+    double mean() const override {
+        return (a + b + c) / 3.0;
+    }
+
+    double variance() const override {
+        return (a * a + b * b + c * c - a * b - a * c - b * c) / 18.0;
+    }
+
+    double sample() const {
+        std::uniform_real_distribution<double> uniform(0.0, 1.0);
+        return quantile(uniform(gen));
+    }
+
+    double mode() const { return b; }
+};
+
+/**
+ * @class WeibullDistribution
+ * @brief Weibull distribution
+ *
+ * PDF: f(x) = (k/λ)(x/λ)^(k-1) exp(-(x/λ)^k) for x ≥ 0
+ * Used in reliability engineering, survival analysis, wind speed modeling
+ */
+class WeibullDistribution : public Distribution {
+private:
+    double lambda;  // scale parameter
+    double k;       // shape parameter
+
+public:
+    WeibullDistribution(double scale, double shape) : lambda(scale), k(shape) {
+        if (lambda <= 0.0 || k <= 0.0) {
+            throw std::invalid_argument("Scale and shape must be positive");
+        }
+    }
+
+    double pdf(double x) const {
+        if (x < 0.0) return 0.0;
+        double z = x / lambda;
+        return (k / lambda) * std::pow(z, k - 1.0) * std::exp(-std::pow(z, k));
+    }
+
+    double cdf(double x) const {
+        if (x < 0.0) return 0.0;
+        return 1.0 - std::exp(-std::pow(x / lambda, k));
+    }
+
+    double quantile(double p) const {
+        if (p <= 0.0 || p >= 1.0) throw std::invalid_argument("Probability must be in (0,1)");
+        return lambda * std::pow(-std::log(1.0 - p), 1.0 / k);
+    }
+
+    double mean() const override {
+        return lambda * gamma_function(1.0 + 1.0 / k);
+    }
+
+    double variance() const override {
+        double g1 = gamma_function(1.0 + 1.0 / k);
+        double g2 = gamma_function(1.0 + 2.0 / k);
+        return lambda * lambda * (g2 - g1 * g1);
+    }
+
+    double sample() const {
+        std::weibull_distribution<double> dist(k, lambda);
+        return dist(gen);
+    }
+
+    /**
+     * @brief Hazard rate (failure rate): h(x) = (k/λ)(x/λ)^(k-1)
+     */
+    double hazard_rate(double x) const {
+        if (x < 0.0) return 0.0;
+        return (k / lambda) * std::pow(x / lambda, k - 1.0);
+    }
+};
+
+/**
+ * @class StandardNormalExtensions
+ * @brief Extended functions for standard normal distribution
+ *
+ * Critical values, tolerance factors, circular probabilities
+ */
+class StandardNormalExtensions {
+public:
+    /**
+     * @brief Critical value z_α such that P(Z > z_α) = α
+     *
+     * Commonly used: z_0.05 = 1.645, z_0.025 = 1.960, z_0.01 = 2.326
+     */
+    static double critical_value(double alpha) {
+        if (alpha <= 0.0 || alpha >= 1.0) {
+            throw std::invalid_argument("Alpha must be in (0,1)");
+        }
+
+        // Common critical values
+        if (std::abs(alpha - 0.05) < 1e-6) return 1.6448536269514722;
+        if (std::abs(alpha - 0.025) < 1e-6) return 1.9599639845400545;
+        if (std::abs(alpha - 0.01) < 1e-6) return 2.3263478740408408;
+        if (std::abs(alpha - 0.005) < 1e-6) return 2.5758293035489004;
+
+        // Binary search for general case
+        double low = -5.0, high = 5.0;
+        NormalDistribution N(0.0, 1.0);
+
+        for (int iter = 0; iter < 100; ++iter) {
+            double mid = (low + high) / 2.0;
+            double p = 1.0 - N.cdf(mid);
+
+            if (std::abs(p - alpha) < 1e-9) return mid;
+
+            if (p > alpha) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+
+        return (low + high) / 2.0;
+    }
+
+    /**
+     * @brief Tolerance factor k for normal distribution
+     *
+     * k such that P(μ - kσ ≤ X ≤ μ + kσ) ≥ β with confidence γ
+     * Used in quality control and tolerance intervals
+     */
+    static double tolerance_factor(double beta, double gamma, int n) {
+        if (beta <= 0.0 || beta >= 1.0) throw std::invalid_argument("Beta must be in (0,1)");
+        if (gamma <= 0.0 || gamma >= 1.0) throw std::invalid_argument("Gamma must be in (0,1)");
+        if (n <= 1) throw std::invalid_argument("Sample size must be > 1");
+
+        // Simplified approximation
+        double z_beta = critical_value((1.0 - beta) / 2.0);
+        double chi_sq_gamma = std::sqrt(2.0 * n - 2.0) * critical_value((1.0 - gamma) / 2.0);
+
+        return z_beta * std::sqrt((n - 1.0) / n) * (1.0 + 1.0 / (2.0 * n));
+    }
+
+    /**
+     * @brief Circular error probable (CEP)
+     *
+     * Radius of circle centered at mean containing 50% of points
+     * For bivariate normal with σ_x = σ_y = σ
+     */
+    static double circular_error_probable(double sigma) {
+        // CEP ≈ 1.1774σ for equal variance bivariate normal
+        return 1.1774100225154747 * sigma;
+    }
+
+    /**
+     * @brief Circular normal probability
+     *
+     * P(X² + Y² ≤ r²) where X, Y ~ N(0, σ²) independent
+     */
+    static double circular_normal_probability(double r, double sigma) {
+        if (r < 0.0) return 0.0;
+        // This is a chi-squared distribution with 2 DOF scaled by σ²
+        return 1.0 - std::exp(-r * r / (2.0 * sigma * sigma));
+    }
+
+    /**
+     * @brief Operating characteristic (OC) curve value
+     *
+     * Probability of accepting hypothesis when true mean is μ₁
+     * Used in hypothesis testing and quality control
+     */
+    static double operating_characteristic(
+        double mu0, double mu1, double sigma, int n, double alpha) {
+
+        double z_alpha = critical_value(alpha);
+        double z = (mu1 - mu0) / (sigma / std::sqrt(n));
+
+        NormalDistribution N(0.0, 1.0);
+        return N.cdf(z_alpha - z);
+    }
+
+    /**
+     * @brief Two-sided tolerance limit
+     *
+     * Returns [lower, upper] such that P(lower ≤ X ≤ upper) ≥ β with confidence γ
+     */
+    static std::pair<double, double> tolerance_limits(
+        double mean, double std_dev, double beta, double gamma, int n) {
+
+        double k = tolerance_factor(beta, gamma, n);
+        return {mean - k * std_dev, mean + k * std_dev};
+    }
+};
+
+/**
+ * @class DistributionRelationships
+ * @brief Documents and computes relationships among probability distributions
+ *
+ * Special cases, limiting forms, transformations
+ */
+class DistributionRelationships {
+public:
+    /**
+     * @brief Check if distribution is a special case of another
+     *
+     * Examples:
+     * - Exponential(λ) = Gamma(1, λ)
+     * - Chi-squared(k) = Gamma(k/2, 1/2)
+     * - Rayleigh(σ) is magnitude of bivariate normal with σ
+     */
+    static std::string relationship(const std::string& dist_name) {
+        if (dist_name == "Exponential") {
+            return "Exponential(λ) = Gamma(α=1, β=λ)";
+        } else if (dist_name == "Chi-squared") {
+            return "χ²(k) = Gamma(α=k/2, β=1/2)";
+        } else if (dist_name == "Erlang") {
+            return "Erlang(k, λ) = Gamma(α=k, β=λ) with integer k";
+        } else if (dist_name == "Rayleigh") {
+            return "Rayleigh(σ) = √(X² + Y²) where X, Y ~ N(0, σ²) independent";
+        } else if (dist_name == "Student-t") {
+            return "t(ν) → N(0,1) as ν → ∞";
+        } else if (dist_name == "Binomial") {
+            return "Binomial(n,p) → Poisson(λ=np) as n→∞, p→0";
+        } else if (dist_name == "Poisson") {
+            return "Poisson(λ) → N(λ, λ) as λ → ∞";
+        }
+        return "Unknown distribution";
+    }
+
+    /**
+     * @brief Sum of independent distributions
+     *
+     * Z = X + Y, find distribution of Z
+     */
+    static std::string sum_distribution(const std::string& X_dist, const std::string& Y_dist) {
+        if (X_dist == "Normal" && Y_dist == "Normal") {
+            return "Normal(μ₁+μ₂, σ₁²+σ₂²)";
+        } else if (X_dist == "Poisson" && Y_dist == "Poisson") {
+            return "Poisson(λ₁+λ₂)";
+        } else if (X_dist == "Gamma" && Y_dist == "Gamma") {
+            return "Gamma(α₁+α₂, β) if same rate β";
+        } else if (X_dist == "Chi-squared" && Y_dist == "Chi-squared") {
+            return "Chi-squared(k₁+k₂)";
+        }
+        return "Use convolution or MGF";
+    }
+
+    /**
+     * @brief Limiting distribution as n → ∞
+     */
+    static std::string limiting_distribution(const std::string& dist, const std::string& limit_type) {
+        if (dist == "Binomial" && limit_type == "np→λ") {
+            return "Poisson(λ)";
+        } else if (dist == "Binomial" && limit_type == "CLT") {
+            return "Normal(np, np(1-p))";
+        } else if (dist == "Student-t" && limit_type == "ν→∞") {
+            return "Normal(0, 1)";
+        } else if (dist == "F" && limit_type == "d₁→∞") {
+            return "χ²(d₂)/d₂";
+        }
+        return "Not a standard limit";
+    }
+};
+
+/**
+ * @class StatisticalEstimation
+ * @brief Parameter estimation via method of moments and maximum likelihood
+ *
+ * Implements:
+ * - Cramér-Rao lower bound
+ * - Method of moments
+ * - Maximum likelihood estimation
+ * - Fisher information
+ * - Asymptotic properties
+ */
+class StatisticalEstimation {
+public:
+    /**
+     * @brief Cramér-Rao lower bound for variance of unbiased estimator
+     *
+     * Var(θ̂) ≥ 1/I(θ) where I(θ) is Fisher information
+     *
+     * For location parameter of normal: I(μ) = n/σ²
+     */
+    static double cramer_rao_bound(const std::string& distribution,
+                                   double param, int n) {
+        if (distribution == "Normal-mean") {
+            double sigma = 1.0;  // Assuming known σ = 1
+            return sigma * sigma / n;
+        } else if (distribution == "Normal-variance") {
+            // For variance estimation: I(σ²) = n/(2σ⁴)
+            double sigma_sq = param;
+            return 2.0 * sigma_sq * sigma_sq / n;
+        } else if (distribution == "Exponential") {
+            double lambda = param;
+            return lambda * lambda / n;
+        } else if (distribution == "Poisson") {
+            double lambda = param;
+            return lambda / n;
+        }
+
+        throw std::invalid_argument("Unknown distribution for Cramér-Rao bound");
+    }
+
+    /**
+     * @brief Fisher information for single parameter
+     *
+     * I(θ) = E[(∂/∂θ log f(X;θ))²] = -E[∂²/∂θ² log f(X;θ)]
+     */
+    static double fisher_information(const std::string& distribution,
+                                     double param, int n) {
+        if (distribution == "Normal-mean") {
+            double sigma = 1.0;
+            return n / (sigma * sigma);
+        } else if (distribution == "Exponential") {
+            double lambda = param;
+            return n / (lambda * lambda);
+        } else if (distribution == "Poisson") {
+            double lambda = param;
+            return n / lambda;
+        }
+
+        throw std::invalid_argument("Unknown distribution for Fisher information");
+    }
+
+    /**
+     * @brief Method of moments estimation
+     *
+     * Equate sample moments to population moments and solve for parameters
+     *
+     * Example: Normal(μ, σ²)
+     *   μ̂ = X̄ (sample mean)
+     *   σ̂² = (1/n)∑(Xᵢ - X̄)² (second central moment)
+     */
+    static std::vector<double> method_of_moments(
+        const std::string& distribution,
+        const std::vector<double>& data) {
+
+        int n = data.size();
+        double mean = std::accumulate(data.begin(), data.end(), 0.0) / n;
+
+        double m2 = 0.0;  // Second moment
+        for (double x : data) {
+            m2 += (x - mean) * (x - mean);
+        }
+        m2 /= n;
+
+        if (distribution == "Normal") {
+            return {mean, std::sqrt(m2)};
+        } else if (distribution == "Exponential") {
+            // E[X] = 1/λ ⟹ λ̂ = 1/X̄
+            return {1.0 / mean};
+        } else if (distribution == "Gamma") {
+            // E[X] = α/β, Var(X) = α/β²
+            // ⟹ α̂ = E²/Var, β̂ = E/Var
+            double alpha = mean * mean / m2;
+            double beta = mean / m2;
+            return {alpha, beta};
+        } else if (distribution == "Uniform") {
+            // Uniform[a, b]: E[X] = (a+b)/2, Var(X) = (b-a)²/12
+            double range = std::sqrt(12.0 * m2);
+            double a = mean - range / 2.0;
+            double b = mean + range / 2.0;
+            return {a, b};
+        }
+
+        throw std::invalid_argument("Unknown distribution for method of moments");
+    }
+
+    /**
+     * @brief Maximum likelihood estimation
+     *
+     * Find θ̂ that maximizes L(θ) = ∏f(xᵢ; θ)
+     * Equivalently, maximize log L(θ) = ∑log f(xᵢ; θ)
+     */
+    static std::vector<double> maximum_likelihood(
+        const std::string& distribution,
+        const std::vector<double>& data) {
+
+        int n = data.size();
+        double mean = std::accumulate(data.begin(), data.end(), 0.0) / n;
+
+        if (distribution == "Normal") {
+            // MLE: μ̂ = X̄, σ̂² = (1/n)∑(Xᵢ - X̄)²
+            double var = 0.0;
+            for (double x : data) {
+                var += (x - mean) * (x - mean);
+            }
+            var /= n;
+            return {mean, std::sqrt(var)};
+        } else if (distribution == "Exponential") {
+            // MLE: λ̂ = 1/X̄
+            return {1.0 / mean};
+        } else if (distribution == "Poisson") {
+            // MLE: λ̂ = X̄
+            return {mean};
+        } else if (distribution == "Uniform") {
+            // MLE: â = min(X), b̂ = max(X)
+            double a = *std::min_element(data.begin(), data.end());
+            double b = *std::max_element(data.begin(), data.end());
+            return {a, b};
+        }
+
+        throw std::invalid_argument("Unknown distribution for MLE");
+    }
+
+    /**
+     * @brief Log-likelihood function
+     *
+     * ℓ(θ) = ∑ᵢ log f(xᵢ; θ)
+     */
+    static double log_likelihood(
+        const std::string& distribution,
+        const std::vector<double>& data,
+        const std::vector<double>& params) {
+
+        double log_lik = 0.0;
+
+        if (distribution == "Normal") {
+            double mu = params[0];
+            double sigma = params[1];
+            NormalDistribution N(mu, sigma);
+
+            for (double x : data) {
+                log_lik += std::log(N.pdf(x));
+            }
+        } else if (distribution == "Exponential") {
+            double lambda = params[0];
+            ExponentialDistribution E(lambda);
+
+            for (double x : data) {
+                log_lik += std::log(E.pdf(x));
+            }
+        } else if (distribution == "Poisson") {
+            double lambda = params[0];
+            PoissonDistribution P(lambda);
+
+            for (double x : data) {
+                log_lik += std::log(P.pmf(static_cast<int>(x)));
+            }
+        } else {
+            throw std::invalid_argument("Unknown distribution for log-likelihood");
+        }
+
+        return log_lik;
+    }
+
+    /**
+     * @brief Invariance property of MLEs
+     *
+     * If θ̂ is MLE of θ, then g(θ̂) is MLE of g(θ)
+     *
+     * Example: If σ̂² is MLE of σ², then σ̂ = √σ̂² is MLE of σ
+     */
+    static double mle_transformed(
+        double theta_hat,
+        std::function<double(double)> g) {
+        return g(theta_hat);
+    }
+
+    /**
+     * @brief Asymptotic distribution of MLE
+     *
+     * √n(θ̂ - θ) →ᵈ N(0, 1/I(θ)) as n → ∞
+     *
+     * Returns asymptotic variance: 1/(n·I(θ))
+     */
+    static double asymptotic_variance(
+        const std::string& distribution,
+        double true_param, int n) {
+
+        double I_theta = fisher_information(distribution, true_param, 1);
+        return 1.0 / (n * I_theta);
+    }
+
+    /**
+     * @brief Efficiency of estimator
+     *
+     * Eff(θ̂) = [Cramér-Rao bound] / Var(θ̂)
+     * Efficient estimator has Eff = 1
+     */
+    static double efficiency(
+        double estimator_variance,
+        const std::string& distribution,
+        double param, int n) {
+
+        double cr_bound = cramer_rao_bound(distribution, param, n);
+        return cr_bound / estimator_variance;
+    }
+
+    /**
+     * @brief Bias of estimator
+     *
+     * Bias(θ̂) = E[θ̂] - θ
+     */
+    static double bias(double expected_value, double true_value) {
+        return expected_value - true_value;
+    }
+
+    /**
+     * @brief Mean squared error
+     *
+     * MSE(θ̂) = Var(θ̂) + [Bias(θ̂)]²
+     */
+    static double mean_squared_error(double variance, double bias_value) {
+        return variance + bias_value * bias_value;
+    }
+
+    /**
+     * @brief Consistent estimator check
+     *
+     * θ̂ₙ is consistent if θ̂ₙ →ᵖ θ as n → ∞
+     * Sufficient condition: E[θ̂ₙ] → θ and Var(θ̂ₙ) → 0
+     */
+    static bool is_consistent(
+        std::function<double(int)> expected_value,
+        std::function<double(int)> variance,
+        double true_value,
+        int large_n = 10000) {
+
+        double exp_val = expected_value(large_n);
+        double var_val = variance(large_n);
+
+        return (std::abs(exp_val - true_value) < 1e-6) && (var_val < 1e-6);
+    }
+};
+
+/**
  * @class StatisticalTests
  * @brief Hypothesis testing and statistical inference
  */
