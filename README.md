@@ -1444,6 +1444,177 @@ Comprehensive spin-1/2 theory and relativistic quantum mechanics (~1,174 lines)
     - CPT + Lorentz → spin-statistics theorem
     - Violation → causality breakdown
 
+- **Klein's Paradox**
+  - Step potential problem: V(x) = V₀θ(x)
+  - Critical condition: V₀ > E + mc² → T > 1 (paradoxical transmission)
+  - Resolution: spontaneous pair production e⁺e⁻ in strong field
+  - Physical interpretation: reflected wave = positron forward in time
+  - Schwinger limit: E_crit ≈ m²c³/(eℏ) ≈ 10¹⁶ V/cm for electrons
+  - Connection to Zitterbewegung (rapid oscillations at λ_C scale)
+  - QED resolution: vacuum → e⁺e⁻ pair creation
+  - No true paradox in second quantization
+
+- **The Weyl Equation - Massless Spin-1/2**
+  - **Weyl Equation:**
+    - Two-component equation: iℏ∂ψ/∂t = ±cσ⃗·p⃗ψ
+    - Covariant form: iℏσ^μ∂_μψ_L = 0 (left), iℏσ̄^μ∂_μψ_R = 0 (right)
+    - Definite chirality: γ⁵ψ_L = -ψ_L, γ⁵ψ_R = +ψ_R
+    - Energy: E = ±|p|c (massless dispersion)
+    - Helicity = chirality for m = 0
+  - **Neutrino Physics:**
+    - Three flavors: νₑ, νμ, ντ (electron, muon, tau)
+    - Standard Model: only ν_L and ν̄_R (V-A interaction)
+    - Tiny mass: m_ν < 1 eV (from oscillations)
+    - Majorana vs Dirac nature: ν = ν̄ ?
+    - Neutrinoless double beta decay: 0νββ test for Majorana
+    - Oscillations: P(νₐ→νᵦ) depends on Δm², L/E, mixing angles
+    - See-saw mechanism: m_ν ~ m_D²/M_R (explains smallness)
+  - **Relation to Dirac:**
+    - Weyl = m → 0 limit of Dirac
+    - Dirac = ψ_L + ψ_R (left + right Weyl)
+    - Mass term couples ψ_L and ψ_R
+
+- **Wave Equations for Arbitrary Spins**
+  - **General Framework:**
+    - Lorentz covariance requirement
+    - Mass shell: (p² - m²c²)ψ = 0
+    - Massive: 2s+1 polarizations
+    - Massless: 2 helicity states (h = ±s)
+    - Subsidiary conditions eliminate unphysical components
+  - **Spin-1 Massive (Proca Equations):**
+    - Proca equation: ∂_μF^μν + (mc/ℏ)²A^ν = 0
+    - Lorenz gauge: ∂_μA^μ = 0 (automatic for m ≠ 0)
+    - 3 polarizations: 2 transverse + 1 longitudinal
+    - Klein-Gordon form: (□ + (mc/ℏ)²)A^μ = 0
+    - Applications: W± (80.4 GeV), Z⁰ (91.2 GeV) bosons
+    - Massless limit m → 0: Proca → Maxwell (loses longitudinal)
+  - **Kemmer Equation:**
+    - Unified formalism: (iℏβ^μ∂_μ - mc)ψ = 0
+    - β-matrix algebra: {β^μ,β^ν}β^λ + β^λ{β^μ,β^ν} = g^μνβ^λ + ...
+    - 5×5 matrices: spin-0 (equivalent to Klein-Gordon)
+    - 10×10 matrices: spin-1 (equivalent to Proca)
+    - Dirac-like structure for bosons
+  - **Spin-1 Massless (Maxwell Equations):**
+    - Maxwell: ∂_μF^μν = 0, Bianchi: ∂_λF_μν + cyclic = 0
+    - Wave equation: □A^μ = 0 (Lorenz gauge)
+    - Gauge freedom: A'^μ = A^μ + ∂^μΛ
+    - 2 transverse polarizations
+    - Helicity h = ±1 (circular polarization)
+    - Photon: m = 0, s = 1, h = ±1
+  - **Spin-3/2 (Rarita-Schwinger Equation):**
+    - Vector-spinor field: (iℏγ^μ∂_μ - mc)ψ_ν = 0
+    - 16 components: 4 (Lorentz) × 4 (spinor)
+    - Constraints: γ^μψ_μ = 0, ∂^μψ_μ = 0
+    - Massive: 2s+1 = 4 DOF
+    - Massless: h = ±3/2 (2 DOF)
+    - Applications: Δ⁺⁺, Ω⁻ baryons, gravitino (SUSY)
+
+- **Lorentz Invariance and Relativistic Symmetry Principles**
+  - **Orthogonal Transformations O(1,3):**
+    - Definition: Λᵀη Λ = η, η = diag(1,-1,-1,-1)
+    - Determinant: det Λ = ±1 (proper/improper)
+    - Time ordering: Λ⁰₀ ≥ 1 (orthochronous) or ≤ -1
+    - Four components: SO↑₊ ∪ SO↑₋ ∪ SO↓₊ ∪ SO↓₋
+    - Proper orthochronous: SO↑₊(1,3) (restricted Lorentz)
+    - Discrete: P (parity), T (time reversal), PT
+    - 6 parameters: 3 rotations + 3 boosts
+  - **Infinitesimal Transformations and so(1,3):**
+    - Infinitesimal: Λ^μ_ν = δ^μ_ν + ω^μ_ν, antisymmetric ω
+    - Generators: (J_μν)^ρ_σ = i(η_μρδ^ρ_ν - η_νρδ^ρ_μ)
+    - Lie algebra: [J_μν, J_ρσ] = i(η_νρJ_μσ - η_μρJ_νσ - ...)
+    - Rotation generators: J⃗ (J_i = ε_ijk J^jk/2)
+    - Boost generators: K⃗ (K_i = J^0i)
+    - Commutators: [J_i,J_j]=iε_ijk J_k, [J_i,K_j]=iε_ijk K_k, [K_i,K_j]=-iε_ijk J_k
+    - Casimirs: C₁ = J² - K², C₂ = J⃗·K⃗
+  - **Classification of O(4) Subgroups:**
+    - SO(3): spatial rotations (compact)
+    - SO(1,1): boosts in one direction (non-compact, hyperbolic)
+    - Little group: SO(3) for massive, ISO(2) for massless
+    - Wick rotation: x⁰ = iτ → SO(4) Euclidean (compact)
+    - SO(4) ≅ SU(2)_L × SU(2)_R
+    - Complexification: so(1,3) ⊗ ℂ ≅ su(2) ⊕ su(2)
+  - **Inhomogeneous Lorentz Group (Poincaré):**
+    - Transformation: x'^μ = Λ^μ_ν x^ν + a^μ
+    - Group structure: ISO(1,3) = SO(1,3) ⋉ ℝ⁴ (10 parameters)
+    - Generators: J_μν (6) and P_μ (4)
+    - Algebra: [P_μ,P_ν]=0, [J_μν,P_ρ]=i(η_μρP_ν-η_νρP_μ)
+    - Casimirs: P² = m²c² (mass), W² = -m²s(s+1)ℏ² (spin)
+    - Pauli-Lubanski: W_μ = (1/2)ε_μνρσ J^νρ P^σ
+    - Wigner classification: (m²,s) for m>0 or (0,h) for m=0
+    - Particle states: |p,s,σ⟩
+  - **Conformal Group:**
+    - Angle-preserving: g'_μν = Ω²(x)g_μν
+    - Dilatation: x^μ → λx^μ (scaling)
+    - Special conformal: x'^μ = (x^μ + b^μx²)/(1 + 2b·x + b²x²)
+    - Group: Conf(1,3) ≅ SO(2,4) (15 parameters)
+    - Generators: P_μ(4), J_μν(6), D(1), K_μ(4)
+    - Algebra: [D,P_μ]=iP_μ, [D,K_μ]=-iK_μ, [K_μ,P_ν]=2i(η_μνD-J_μν)
+    - Applications: CFT, critical phenomena, AdS/CFT
+    - Requires massless theories
+  - **Tensor Representations:**
+    - Scalar: φ'(x') = φ(Λ⁻¹x') (1 component)
+    - Vector: V'^μ = Λ^μ_ν V^ν (4 components)
+    - Rank-2: T'^μν = Λ^μ_ρ Λ^ν_σ T^ρσ (16 components)
+    - Antisymmetric: F^μν = -F^νμ (6 independent, EM field)
+    - Dual: *F^μν = (1/2)ε^μνρσ F_ρσ (E⃗ ↔ B⃗)
+    - Decomposition: symmetric traceless + antisymmetric + trace
+    - Rank-n: 4^n components
+  - **Spinor Representations:**
+    - SL(2,C) covering: SL(2,C) → SO↑₊(1,3) (2:1)
+    - Weyl spinors: ψ_L (1/2,0), ψ_R (0,1/2) [2 components each]
+    - Transformation: ψ_L → Mψ_L, ψ_R → M*ψ_R (M ∈ SL(2,C))
+    - Dirac spinor: ψ = (ψ_L, ψ_R)ᵀ [4 components, (1/2,0)⊕(0,1/2)]
+    - Majorana: ψ = ψ^C (4 components, 2 real DOF)
+    - Dotted/undotted: ψ_α (1/2,0), χ̄_α̇ (0,1/2)
+    - Van der Waerden: V^μ = V^αα̇ (vector as spinor bilinear)
+    - Spinor metric: ε^αβ antisymmetric, ε^12 = 1
+  - **SL(2,C) Representations:**
+    - Definition: SL(2,C) = {M ∈ GL(2,C) | det M = 1}
+    - Fundamental: ψ_α → M^β_α ψ_β (2-dimensional)
+    - Conjugate: χ̄_α̇ → (M*)^β̇_α̇ χ̄_β̇
+    - (j₁,j₂): symmetric tensor products, dim = (2j₁+1)(2j₂+1)
+    - Pauli matrices: σ^μ = (I,σ⃗), σ̄^μ = (I,-σ⃗)
+    - Generators: M = exp(iθ⃗·σ⃗/2 - η⃗·σ⃗/2)
+    - Vector from spinors: V^μ = ψ_α σ^μ_αα̇ χ̄^α̇
+    - Casimirs: C₁ ~ j₁² + j₂², C₂ ~ j₁² - j₂²
+  - **SO(3) Representations:**
+    - Definition: SO(3) = {R | R^T R = I, det R = 1}
+    - Irreps D^(j): j = 0,1/2,1,3/2,... (dimension 2j+1)
+    - Integer j: true SO(3), Half-integer: SU(2) double-valued
+    - SU(2) → SO(3) covering (2:1, kernel {±I})
+    - Generators: [J_i, J_j] = iε_ijk J_k
+    - Casimir: J² = j(j+1)ℏ²
+    - Clebsch-Gordan: j₁ ⊗ j₂ = |j₁-j₂| ⊕ ... ⊕ j₁+j₂
+    - Spherical harmonics: Y_ℓm basis for D^(ℓ)
+    - Wigner D-matrices: D^(j)_mm'(α,β,γ)
+    - Character: χ^(j)(θ) = sin((2j+1)θ/2)/sin(θ/2)
+  - **Lorentz Group Lₚ Representations:**
+    - SO↑₊(1,3): proper orthochronous Lorentz group
+    - Universal cover: SL(2,C) → SO↑₊(1,3)
+    - Finite irreps: (j₁,j₂), dim = (2j₁+1)(2j₂+1)
+    - Non-unitary (except trivial, due to non-compact boosts)
+    - Common: (0,0) scalar, (1/2,0) ψ_L, (0,1/2) ψ_R, (1/2,1/2) vector
+    - Spin content: s = |j₁-j₂|
+    - SO(3) decomposition: (j₁,j₂) → |j₁-j₂| ⊕ ... ⊕ j₁+j₂
+    - Integer j₁,j₂: tensors, Half-integer: spinors
+    - Self-dual (j,0), anti-self-dual (0,j)
+    - Field equations: (0,0):KG, (1/2,0)⊕(0,1/2):Dirac, (1/2,1/2):Maxwell
+    - Physical particles: infinite-dimensional unitary reps
+  - **Spin and Rotation Group:**
+    - Spin s: intrinsic angular momentum (0,1/2,1,3/2,...)
+    - Spin-s: (2s+1)-dimensional SU(2) representation
+    - Spin-1/2: χ = (χ₊,χ₋)ᵀ Pauli spinor
+    - Rotation: χ → exp(-iθ⃗·σ⃗/2)χ
+    - 4π rotation: U(2π) = -I, U(4π) = +I (spinor phase)
+    - Pauli matrices: [σ_i,σ_j] = 2iε_ijk σ_k
+    - Spin operators: S⃗ = (ℏ/2)σ⃗, [S_i,S_j] = iℏε_ijk S_k
+    - Higher spin: S² = s(s+1)ℏ²I
+    - Spin-statistics: integer → bosons, half-integer → fermions
+    - Addition: j⃗₁ + j⃗₂ via Clebsch-Gordan coefficients
+    - Magnetic quantum number: S_z|s,m⟩ = mℏ|s,m⟩
+    - Ladder operators: S_±|s,m⟩ = ℏ√(s∓m)(s±m+1)|s,m±1⟩
+    - Larmor precession: dS⃗/dt = γ B⃗ × S⃗
+
 - **Spin and the Dirac Particle**
   - Intrinsic spin s = 1/2 from Dirac equation
   - Spin angular momentum: |S| = (√3/2)ℏ
@@ -1556,7 +1727,7 @@ g++ -std=c++17 -I./include your_program.cpp -o your_program -lm
     - **Quantum Foundations** (~1,000 lines): Historical development from Planck to Schrödinger, Bohr model, matrix mechanics, uncertainty relations
     - **Advanced Quantum Mechanics** (~1,650 lines): Kummer's functions, Hamiltonian mechanics, perturbation theory, Stark effect, Pauli exclusion, electron spin, helium atom
     - **Quantum Chemistry** (~1,300 lines): Atomic structure (Hartree-Fock, Slater orbitals, multiplet theory), molecular structure (Born-Oppenheimer, diatomic molecules, H₂⁺, H₂, chemical bonding, VSEPR, Hückel MO theory)
-    - **Relativistic Quantum Mechanics** (~2,156 lines): Spin-1/2 theory (Pauli matrices, Bloch sphere, Stern-Gerlach), atomic spectra (spin-orbit coupling, Zeeman effect), comprehensive Klein-Gordon equation (12 topics: notation, equation, nonrelativistic limit, free particles, energy-momentum tensor, Schrödinger form, charge conjugation, Feshbach-Villars, EM fields, gauge invariance, operators interpretation), Dirac equation, Dirac hydrogen atom, Landau levels
+    - **Relativistic Quantum Mechanics** (~4,957 lines): Comprehensive Klein-Gordon equation (12 topics), comprehensive Dirac equation (16 topics: foundation, Lorentz covariance, free motion, solutions by transformations, single-particle interpretation, nonrelativistic limit, polarized electrons, projection operators, wave packets, external fields, Foldy-Wouthuysen, hole theory, charge conjugation, time reversal, PCT), Klein's paradox, Weyl equation and neutrino physics, wave equations for arbitrary spins (Proca, Kemmer, Maxwell, Rarita-Schwinger), comprehensive Lorentz group theory (O(4), Poincaré, conformal), complete representation theory (tensor, spinor, SL(2,C), SO(3), Lorentz group Lₚ, spin-rotation)
   - Advanced: 23+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
 - **Probability Distributions**: 14 distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, Student's t, F-distribution)
 - **Key Algorithms**:
