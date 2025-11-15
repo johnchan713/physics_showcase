@@ -3,24 +3,8 @@
 *.obj
 *.exe
 physics_demo
-advanced_demo
-scientific_demo
-matrix_demo
-matrix_advanced
-topology_demo
-finance_demo
-calculus_demo
-nonsmooth_demo
-nonsmooth_algorithms_demo
-advanced_subdifferentials_demo
-fourier_analysis_demo
-differential_algebra_demo
-differential_algebra_advanced_demo
-stochastic_methods_demo
-variational_calculus_demo
-pde_solution_methods_demo
-greens_functions_demo
-variational_wrm_demo
+field_tensor_demo
+*_demo
 
 # CMake
 build/
