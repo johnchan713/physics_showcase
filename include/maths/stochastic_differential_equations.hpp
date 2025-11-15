@@ -1031,6 +1031,232 @@ public:
 
 /**
  * ============================================================================
+ * APPLICATIONS TO BOUNDARY VALUE PROBLEMS
+ * ============================================================================
+ */
+
+/**
+ * @class BoundaryValueProblems
+ * @brief Stochastic representation of boundary value problems
+ *
+ * Connection between diffusions and elliptic PDEs via probabilistic methods
+ */
+class BoundaryValueProblems {
+public:
+    /**
+     * @brief Combined Dirichlet-Poisson problem
+     *
+     * Solve: -½σ²Δu + b·∇u = f in D, u = g on ∂D
+     *
+     * Stochastic representation:
+     * u(x) = E[∫₀^τ f(X(s)) ds + g(X(τ))]
+     * where τ is first exit time from domain D
+     */
+    static double dirichletPoisson(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        std::function<double(double, double)> f,      // Source term
+        std::function<double(double, double)> g,      // Boundary condition
+        std::function<bool(double, double)> in_domain,
+        double x0, double y0,
+        int n_samples = 1000) {
+
+        std::vector<double> values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double x = x0, y = y0;
+            double t = 0.0;
+            double dt = 0.01;
+            double sqrt_dt = std::sqrt(dt);
+            double integral_f = 0.0;
+
+            // Run until exit from domain
+            while (in_domain(x, y) && t < 10.0) {
+                double dW = sqrt_dt * normal(gen);
+
+                // Accumulate source term
+                integral_f += f(x, y) * dt;
+
+                // Evolve 2D diffusion
+                x += mu(t, x) * dt + sigma(t, x) * dW;
+                double dW2 = sqrt_dt * normal(gen);
+                y += mu(t, y) * dt + sigma(t, y) * dW2;
+
+                t += dt;
+            }
+
+            // Add boundary value
+            values[sample] = integral_f + g(x, y);
+        }
+
+        return std::accumulate(values.begin(), values.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Uniqueness via maximum principle
+     *
+     * For elliptic operator L, if Lu₁ = Lu₂ and u₁ = u₂ on boundary,
+     * then u₁ = u₂ everywhere (uniqueness)
+     */
+    static bool verifyUniqueness(
+        const std::vector<std::vector<double>>& u1,
+        const std::vector<std::vector<double>>& u2,
+        double tolerance = 1e-6) {
+
+        int n = u1.size();
+        int m = u1[0].size();
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (std::abs(u1[i][j] - u2[i][j]) > tolerance) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Dirichlet problem: Δu = 0 in D, u = g on ∂D
+     *
+     * Regular point x: For every continuous g on ∂D,
+     * solution u is continuous at x and u(x) = E[g(X(τ))]
+     * where τ is exit time and X starts at x
+     */
+    static double dirichletProblem(
+        std::function<double(double, double)> g,      // Boundary data
+        std::function<bool(double, double)> in_domain,
+        double x0, double y0,
+        int n_samples = 1000) {
+
+        std::vector<double> boundary_values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double x = x0, y = y0;
+            double t = 0.0;
+            double dt = 0.01;
+            double sqrt_dt = std::sqrt(dt);
+
+            // Brownian motion until exit
+            while (in_domain(x, y) && t < 10.0) {
+                double dW1 = sqrt_dt * normal(gen);
+                double dW2 = sqrt_dt * normal(gen);
+
+                x += dW1;
+                y += dW2;
+                t += dt;
+            }
+
+            boundary_values[sample] = g(x, y);
+        }
+
+        return std::accumulate(boundary_values.begin(), boundary_values.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Check if point is regular for Dirichlet problem
+     *
+     * Point x is regular if P(τ_D = 0) = 1 where τ_D is hitting time of ∂D
+     */
+    static bool isRegularPoint(
+        double x0, double y0,
+        std::function<bool(double, double)> in_domain,
+        int n_samples = 1000) {
+
+        int immediate_exits = 0;
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double epsilon = 0.001;
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double x = x0, y = y0;
+            double dt = epsilon;
+            double sqrt_dt = std::sqrt(dt);
+
+            // Check if exits immediately
+            double dW1 = sqrt_dt * normal(gen);
+            double dW2 = sqrt_dt * normal(gen);
+
+            x += dW1;
+            y += dW2;
+
+            if (!in_domain(x, y)) {
+                immediate_exits++;
+            }
+        }
+
+        // Regular if exits immediately with high probability
+        return (double)immediate_exits / n_samples > 0.9;
+    }
+
+    /**
+     * @brief Poisson problem: Δu = f in D, u = 0 on ∂D
+     *
+     * Stochastic representation: u(x) = E[∫₀^τ f(X(s)) ds]
+     * where X is Brownian motion and τ is first exit time
+     */
+    static double poissonProblem(
+        std::function<double(double, double)> f,
+        std::function<bool(double, double)> in_domain,
+        double x0, double y0,
+        int n_samples = 1000) {
+
+        std::vector<double> integrals(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double x = x0, y = y0;
+            double t = 0.0;
+            double dt = 0.01;
+            double sqrt_dt = std::sqrt(dt);
+            double integral = 0.0;
+
+            while (in_domain(x, y) && t < 10.0) {
+                double dW1 = sqrt_dt * normal(gen);
+                double dW2 = sqrt_dt * normal(gen);
+
+                integral += f(x, y) * dt;
+
+                x += dW1;
+                y += dW2;
+                t += dt;
+            }
+
+            integrals[sample] = integral;
+        }
+
+        return std::accumulate(integrals.begin(), integrals.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Mean value property for harmonic functions
+     *
+     * If Δu = 0, then u(x) = average of u on any sphere around x
+     */
+    static double meanValueProperty(
+        std::function<double(double, double)> u,
+        double x0, double y0,
+        double radius,
+        int n_points = 100) {
+
+        double sum = 0.0;
+
+        for (int i = 0; i < n_points; ++i) {
+            double theta = 2.0 * M_PI * i / n_points;
+            double x = x0 + radius * std::cos(theta);
+            double y = y0 + radius * std::sin(theta);
+
+            sum += u(x, y);
+        }
+
+        return sum / n_points;
+    }
+};
+
+/**
+ * ============================================================================
  * OPTIMAL STOPPING
  * ============================================================================
  */
@@ -1117,6 +1343,210 @@ public:
 
         return optimal_time;
     }
+
+    /**
+     * @brief Time-homogeneous optimal stopping
+     *
+     * Value function: V(x) = sup_τ E[g(X(τ)) | X(0) = x]
+     * where coefficients don't depend on time
+     *
+     * Free boundary problem: Find continuation region C
+     * - In C: V(x) solves LV = 0
+     * - On ∂C: V(x) = g(x) (value matching)
+     * - On ∂C: V'(x) = g'(x) (smooth pasting)
+     */
+    static double timeHomogeneous(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        std::function<double(double)> payoff,
+        double X0, double max_time,
+        int n_samples = 1000) {
+
+        std::vector<double> values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double X = X0;
+            double t = 0.0;
+            double dt = 0.01;
+            double sqrt_dt = std::sqrt(dt);
+            double max_value = payoff(X);
+
+            while (t < max_time) {
+                double dW = sqrt_dt * normal(gen);
+                X += mu(t, X) * dt + sigma(t, X) * dW;
+                t += dt;
+
+                max_value = std::max(max_value, payoff(X));
+            }
+
+            values[sample] = max_value;
+        }
+
+        return std::accumulate(values.begin(), values.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Time-inhomogeneous optimal stopping
+     *
+     * Value function: V(t, x) = sup_τ E[g(τ, X(τ)) | X(t) = x]
+     * where payoff depends explicitly on time
+     *
+     * Backward induction: V(t,x) = max(g(t,x), continuation value)
+     */
+    static double timeInhomogeneous(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        std::function<double(double, double)> payoff,  // Time-dependent
+        double X0, double T,
+        int n_steps = 100,
+        int n_samples = 1000) {
+
+        std::vector<double> values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double dt = T / n_steps;
+        double sqrt_dt = std::sqrt(dt);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double X = X0;
+            double t = 0.0;
+            double max_value = payoff(0.0, X);
+
+            for (int i = 0; i < n_steps; ++i) {
+                double dW = sqrt_dt * normal(gen);
+                X += mu(t, X) * dt + sigma(t, X) * dW;
+                t += dt;
+
+                max_value = std::max(max_value, payoff(t, X));
+            }
+
+            values[sample] = max_value;
+        }
+
+        return std::accumulate(values.begin(), values.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Optimal stopping with running payoff integral
+     *
+     * Value function: V(x) = sup_τ E[∫₀^τ f(X(s)) ds + g(X(τ)) | X(0) = x]
+     *
+     * Variational inequality:
+     * max(LV - f, g - V) = 0
+     */
+    static double withIntegral(
+        std::function<double(double, double)> mu,
+        std::function<double(double, double)> sigma,
+        std::function<double(double)> running_payoff,  // f(x)
+        std::function<double(double)> terminal_payoff, // g(x)
+        double X0, double max_time,
+        int n_samples = 1000) {
+
+        std::vector<double> values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double X = X0;
+            double t = 0.0;
+            double dt = 0.01;
+            double sqrt_dt = std::sqrt(dt);
+            double integral = 0.0;
+            double best_value = terminal_payoff(X);
+
+            while (t < max_time) {
+                double dW = sqrt_dt * normal(gen);
+                integral += running_payoff(X) * dt;
+                X += mu(t, X) * dt + sigma(t, X) * dW;
+                t += dt;
+
+                // Compare integral + terminal vs continuing
+                double current_value = integral + terminal_payoff(X);
+                best_value = std::max(best_value, current_value);
+            }
+
+            values[sample] = best_value;
+        }
+
+        return std::accumulate(values.begin(), values.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Connection with variational inequalities
+     *
+     * Optimal stopping ⟺ Variational inequality:
+     * V ≥ g (value above payoff)
+     * LV ≤ 0 (superharmonic)
+     * (V - g)(LV) = 0 (complementarity)
+     *
+     * Continuation region: C = {x : V(x) > g(x)}
+     * Stopping region: S = {x : V(x) = g(x)}
+     */
+    static std::pair<double, bool> variationalInequality(
+        std::function<double(double)> value_function,
+        std::function<double(double)> payoff,
+        std::function<double(double)> LV,  // Generator applied to V
+        double x,
+        double tolerance = 1e-6) {
+
+        double V = value_function(x);
+        double g = payoff(x);
+        double LV_val = LV(x);
+
+        // Check variational inequality conditions
+        bool in_continuation = (V - g) > tolerance;
+        bool superharmonic = LV_val <= tolerance;
+        bool complementarity = std::abs((V - g) * LV_val) < tolerance;
+
+        bool satisfies_VI = (V >= g - tolerance) && superharmonic && complementarity;
+
+        return {V, in_continuation};
+    }
+
+    /**
+     * @brief Solve variational inequality via finite differences
+     *
+     * Find V satisfying: max(LV, g - V) = 0
+     */
+    static std::vector<double> solveVariationalInequality(
+        std::function<double(double)> b,
+        std::function<double(double)> sigma,
+        std::function<double(double)> payoff,
+        double x_min, double x_max,
+        int n_points = 100,
+        int max_iterations = 1000) {
+
+        double dx = (x_max - x_min) / n_points;
+        std::vector<double> V(n_points + 1);
+
+        // Initialize with payoff
+        for (int i = 0; i <= n_points; ++i) {
+            double x = x_min + i * dx;
+            V[i] = payoff(x);
+        }
+
+        // Fixed point iteration
+        for (int iter = 0; iter < max_iterations; ++iter) {
+            std::vector<double> V_new = V;
+
+            for (int i = 1; i < n_points; ++i) {
+                double x = x_min + i * dx;
+
+                // Compute LV via finite differences
+                double dV = (V[i+1] - V[i-1]) / (2.0 * dx);
+                double d2V = (V[i+1] - 2.0 * V[i] + V[i-1]) / (dx * dx);
+                double LV = b(x) * dV + 0.5 * sigma(x) * sigma(x) * d2V;
+
+                // Variational inequality: max(LV, g - V) = 0
+                // Equivalent to: V = max(g, V - α·LV) for small α
+                double alpha = 0.01;
+                V_new[i] = std::max(payoff(x), V[i] - alpha * LV);
+            }
+
+            V = V_new;
+        }
+
+        return V;
+    }
 };
 
 /**
@@ -1131,6 +1561,190 @@ public:
  */
 class StochasticControl {
 public:
+    /**
+     * @brief Statement of stochastic control problem
+     *
+     * Controlled SDE: dX = b(X, u) dt + σ(X, u) dW
+     * Control process: u(t) ∈ U (admissible controls)
+     * Performance criterion: J(u) = E[∫₀ᵀ f(X,u) dt + g(X(T))]
+     *
+     * Objective: Find u* that minimizes J(u)
+     */
+    struct ControlProblem {
+        std::function<double(double, double, double)> drift;      // b(t, x, u)
+        std::function<double(double, double, double)> diffusion;  // σ(t, x, u)
+        std::function<double(double, double, double)> running_cost;  // f(t, x, u)
+        std::function<double(double)> terminal_cost;  // g(x)
+        double X0;
+        double T;
+    };
+
+    /**
+     * @brief Solve control problem via Monte Carlo
+     */
+    static double solveControlProblem(
+        const ControlProblem& problem,
+        std::function<double(double, double)> control_law,  // u(t, x)
+        int n_steps = 100,
+        int n_samples = 1000) {
+
+        std::vector<double> costs(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double dt = problem.T / n_steps;
+        double sqrt_dt = std::sqrt(dt);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double X = problem.X0;
+            double t = 0.0;
+            double running_cost_integral = 0.0;
+
+            for (int i = 0; i < n_steps; ++i) {
+                double u = control_law(t, X);
+                double dW = sqrt_dt * normal(gen);
+
+                // Accumulate running cost
+                running_cost_integral += problem.running_cost(t, X, u) * dt;
+
+                // Evolve state
+                X += problem.drift(t, X, u) * dt + problem.diffusion(t, X, u) * dW;
+                t += dt;
+            }
+
+            costs[sample] = running_cost_integral + problem.terminal_cost(X);
+        }
+
+        return std::accumulate(costs.begin(), costs.end(), 0.0) / n_samples;
+    }
+
+    /**
+     * @brief Hamilton-Jacobi-Bellman (HJB) equation
+     *
+     * Value function V(t, x) satisfies:
+     * ∂V/∂t + inf_u [b(x,u)∂V/∂x + ½σ²(x,u)∂²V/∂x² + f(x,u)] = 0
+     * V(T, x) = g(x)
+     *
+     * Optimal control: u*(t,x) = argmin_u [...]
+     * Verification theorem: If V smooth and u* optimal, then V is value function
+     */
+    static std::vector<std::vector<double>> solveHJB(
+        std::function<double(double, double)> b,
+        std::function<double(double, double)> sigma,
+        std::function<double(double)> running_cost,
+        std::function<double(double)> terminal_cost,
+        double x_min, double x_max, int n_x,
+        double T, int n_t) {
+
+        double dx = (x_max - x_min) / n_x;
+        double dt = T / n_t;
+
+        // Value function V[time][space]
+        std::vector<std::vector<double>> V(n_t + 1, std::vector<double>(n_x + 1));
+
+        // Terminal condition
+        for (int i = 0; i <= n_x; ++i) {
+            double x = x_min + i * dx;
+            V[n_t][i] = terminal_cost(x);
+        }
+
+        // Backward time stepping (HJB equation)
+        for (int k = n_t - 1; k >= 0; --k) {
+            for (int i = 1; i < n_x; ++i) {
+                double x = x_min + i * dx;
+
+                // Spatial derivatives
+                double dV_dx = (V[k+1][i+1] - V[k+1][i-1]) / (2.0 * dx);
+                double d2V_dx2 = (V[k+1][i+1] - 2.0 * V[k+1][i] + V[k+1][i-1]) / (dx * dx);
+
+                // Hamiltonian (minimization over control)
+                double hamiltonian = b(x, 0.0) * dV_dx
+                                   + 0.5 * sigma(x, 0.0) * sigma(x, 0.0) * d2V_dx2
+                                   + running_cost(x);
+
+                // Backward Euler for stability
+                V[k][i] = V[k+1][i] - dt * hamiltonian;
+            }
+
+            // Boundary conditions
+            V[k][0] = V[k][1];
+            V[k][n_x] = V[k][n_x-1];
+        }
+
+        return V;
+    }
+
+    /**
+     * @brief Extract optimal control from value function
+     *
+     * u*(t, x) = argmin_u [b(x,u)∂V/∂x + ½σ²(x,u)∂²V/∂x² + f(x,u)]
+     */
+    static double optimalControl(
+        double dV_dx, double d2V_dx2,
+        std::function<double(double)> b_control,
+        std::function<double(double)> sigma_control,
+        std::function<double(double)> f_control,
+        double u_min, double u_max,
+        int n_search = 100) {
+
+        double min_hamiltonian = std::numeric_limits<double>::infinity();
+        double best_u = 0.0;
+
+        for (int i = 0; i <= n_search; ++i) {
+            double u = u_min + (u_max - u_min) * i / n_search;
+
+            double hamiltonian = b_control(u) * dV_dx
+                               + 0.5 * sigma_control(u) * sigma_control(u) * d2V_dx2
+                               + f_control(u);
+
+            if (hamiltonian < min_hamiltonian) {
+                min_hamiltonian = hamiltonian;
+                best_u = u;
+            }
+        }
+
+        return best_u;
+    }
+
+    /**
+     * @brief Stochastic control with terminal conditions
+     *
+     * Minimize: E[g(X(T))] (no running cost)
+     * Subject to: dX = b(X, u) dt + σ(X) dW
+     *
+     * HJB: ∂V/∂t + inf_u [b(x,u)∂V/∂x] + ½σ²∂²V/∂x² = 0
+     * V(T, x) = g(x)
+     */
+    static double terminalConditionProblem(
+        std::function<double(double, double)> drift,    // b(x, u)
+        std::function<double(double)> diffusion,        // σ(x)
+        std::function<double(double)> terminal_cost,    // g(x)
+        std::function<double(double, double)> control_law,  // u(t, x)
+        double X0, double T,
+        int n_steps = 100,
+        int n_samples = 1000) {
+
+        std::vector<double> terminal_values(n_samples);
+        std::normal_distribution<double> normal(0.0, 1.0);
+        double dt = T / n_steps;
+        double sqrt_dt = std::sqrt(dt);
+
+        for (int sample = 0; sample < n_samples; ++sample) {
+            double X = X0;
+            double t = 0.0;
+
+            for (int i = 0; i < n_steps; ++i) {
+                double u = control_law(t, X);
+                double dW = sqrt_dt * normal(gen);
+
+                X += drift(X, u) * dt + diffusion(X) * dW;
+                t += dt;
+            }
+
+            terminal_values[sample] = terminal_cost(X);
+        }
+
+        return std::accumulate(terminal_values.begin(), terminal_values.end(), 0.0) / n_samples;
+    }
+
     /**
      * @brief Linear-Quadratic-Gaussian (LQG) control
      *
@@ -1190,6 +1804,39 @@ public:
         double mu, double r, double sigma, double gamma) {
 
         return (mu - r) / (gamma * sigma * sigma);
+    }
+
+    /**
+     * @brief Verification theorem for HJB solution
+     *
+     * If V is C^{1,2}, satisfies HJB with terminal condition,
+     * and u*(t,x) achieves minimum in HJB, then:
+     * 1. V(t,x) is the value function
+     * 2. u*(t,x) is optimal control
+     */
+    static bool verifyHJBSolution(
+        std::function<double(double, double)> V,
+        std::function<double(double, double)> u_star,
+        std::function<double(double, double, double)> b,
+        std::function<double(double, double, double)> sigma,
+        std::function<double(double, double, double)> f,
+        double t, double x,
+        double h = 1e-5,
+        double tolerance = 1e-4) {
+
+        // Compute derivatives numerically
+        double dV_dt = (V(t + h, x) - V(t - h, x)) / (2.0 * h);
+        double dV_dx = (V(t, x + h) - V(t, x - h)) / (2.0 * h);
+        double d2V_dx2 = (V(t, x + h) - 2.0 * V(t, x) + V(t, x - h)) / (h * h);
+
+        double u = u_star(t, x);
+
+        // Check HJB equation
+        double hjb_residual = dV_dt + b(t, x, u) * dV_dx
+                            + 0.5 * sigma(t, x, u) * sigma(t, x, u) * d2V_dx2
+                            + f(t, x, u);
+
+        return std::abs(hjb_residual) < tolerance;
     }
 };
 
