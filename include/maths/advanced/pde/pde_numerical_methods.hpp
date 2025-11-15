@@ -13,9 +13,15 @@
  * - Convergence criteria
  *
  * BOUNDARY PERTURBATIONS
- * - Perturbation methods
  * - Regular and singular perturbations
  * - Boundary layer analysis
+ *
+ * PERTURBATION METHODS
+ * - Multiple scales analysis
+ * - Matched asymptotic expansions
+ * - WKB approximation
+ * - Poincare-Lindstedt method
+ * - Asymptotic sequences
  *
  * FINITE DIFFERENCE SCHEMES
  * First Order Equations:
@@ -36,6 +42,7 @@
 
 #include <vector>
 #include <cmath>
+#include <complex>
 #include <functional>
 #include <algorithm>
 #include <stdexcept>
@@ -301,6 +308,275 @@ public:
      */
     static double boundaryLayerThickness(double epsilon) {
         return std::sqrt(epsilon);  // For second order problems
+    }
+};
+
+/**
+ * ============================================================================
+ * PERTURBATION METHODS
+ * ============================================================================
+ */
+
+/**
+ * @class PerturbationMethods
+ * @brief Advanced perturbation and asymptotic methods for PDEs
+ */
+class PerturbationMethods {
+public:
+    /**
+     * @brief Multiple Scales Analysis
+     * For problems with disparate time/space scales
+     * Introduces fast and slow scales: T₀ = t, T₁ = εt, T₂ = ε²t
+     */
+    struct MultipleScales {
+        double epsilon;
+
+        /**
+         * @brief Evaluate solution u(t) = u₀(T₀, T₁) + εu₁(T₀, T₁) + ...
+         */
+        std::vector<std::function<double(double, double)>> scales;  // u_i(T₀, T₁)
+
+        double evaluate(double t, int n_terms) const {
+            double T0 = t;
+            double T1 = epsilon * t;
+
+            double result = 0.0;
+            double eps_power = 1.0;
+
+            for (int i = 0; i < std::min(n_terms, (int)scales.size()); ++i) {
+                result += eps_power * scales[i](T0, T1);
+                eps_power *= epsilon;
+            }
+
+            return result;
+        }
+
+        /**
+         * @brief Solvability condition (eliminate secular terms)
+         * Sets coefficient of resonant terms to zero
+         */
+        static bool checkSolvability(
+            std::function<double(double, double)> secular_coeff,
+            double T1_start, double T1_end) {
+
+            // Check if secular coefficient vanishes
+            int n_points = 100;
+            double dT1 = (T1_end - T1_start) / n_points;
+            double max_coeff = 0.0;
+
+            for (int i = 0; i <= n_points; ++i) {
+                double T1 = T1_start + i * dT1;
+                max_coeff = std::max(max_coeff, std::abs(secular_coeff(T1, 0.0)));
+            }
+
+            return max_coeff < 1e-6;
+        }
+    };
+
+    /**
+     * @brief Matched Asymptotic Expansions
+     * For singular perturbation problems with boundary layers
+     */
+    struct MatchedAsymptoticExpansions {
+        double epsilon;
+
+        /**
+         * @brief Outer expansion (valid away from boundary)
+         * u_outer = u₀(x) + εu₁(x) + ...
+         */
+        std::vector<std::function<double(double)>> outer_terms;
+
+        /**
+         * @brief Inner expansion (valid in boundary layer)
+         * u_inner = v₀(ξ) + εv₁(ξ) + ... where ξ = x/δ(ε)
+         */
+        std::vector<std::function<double(double)>> inner_terms;
+        double boundary_position;  // Location of boundary layer
+
+        /**
+         * @brief Boundary layer thickness δ(ε)
+         */
+        std::function<double(double)> delta;
+
+        /**
+         * @brief Composite expansion: u = u_outer + u_inner - u_common
+         * where u_common is the common part (matching)
+         */
+        double evaluate(double x, int n_terms) const {
+            // Outer expansion
+            double u_outer = 0.0;
+            double eps_power = 1.0;
+            for (int i = 0; i < std::min(n_terms, (int)outer_terms.size()); ++i) {
+                u_outer += eps_power * outer_terms[i](x);
+                eps_power *= epsilon;
+            }
+
+            // Inner expansion
+            double xi = (x - boundary_position) / delta(epsilon);
+            double u_inner = 0.0;
+            eps_power = 1.0;
+            for (int i = 0; i < std::min(n_terms, (int)inner_terms.size()); ++i) {
+                u_inner += eps_power * inner_terms[i](xi);
+                eps_power *= epsilon;
+            }
+
+            // Simplified composite (assumes matching already done)
+            return u_outer + u_inner;
+        }
+
+        /**
+         * @brief Van Dyke matching principle
+         * Inner limit of outer = Outer limit of inner
+         */
+        static double matchingCondition(
+            std::function<double(double)> outer_expansion,
+            std::function<double(double)> inner_expansion,
+            double epsilon) {
+
+            // Evaluate outer at boundary
+            double outer_at_boundary = outer_expansion(0.0);
+
+            // Evaluate inner at infinity (ξ → ∞)
+            double xi_large = 10.0 / epsilon;  // Approximate infinity
+            double inner_at_infinity = inner_expansion(xi_large);
+
+            return std::abs(outer_at_boundary - inner_at_infinity);
+        }
+    };
+
+    /**
+     * @brief WKB (Wentzel-Kramers-Brillouin) Approximation
+     * For problems with rapidly oscillating solutions
+     * u(x) ≈ A(x) exp(iS(x)/ε) where S is the eikonal
+     */
+    struct WKBApproximation {
+        double epsilon;
+
+        /**
+         * @brief Eikonal equation: (dS/dx)² = k²(x)
+         */
+        std::function<double(double)> eikonal;  // S(x)
+
+        /**
+         * @brief Amplitude expansion: A = A₀ + εA₁ + ...
+         */
+        std::vector<std::function<double(double)>> amplitude_terms;
+
+        /**
+         * @brief Evaluate WKB solution
+         */
+        std::complex<double> evaluate(double x, int n_terms) const {
+            // Compute amplitude
+            double A = 0.0;
+            double eps_power = 1.0;
+            for (int i = 0; i < std::min(n_terms, (int)amplitude_terms.size()); ++i) {
+                A += eps_power * amplitude_terms[i](x);
+                eps_power *= epsilon;
+            }
+
+            // Compute phase
+            double phase = eikonal(x) / epsilon;
+
+            return A * std::exp(std::complex<double>(0.0, phase));
+        }
+
+        /**
+         * @brief Connection formulas at turning points
+         * Where k²(x) changes sign
+         */
+        static double turningPointLocation(
+            std::function<double(double)> k_squared,
+            double x_start, double x_end) {
+
+            // Find where k²(x) = 0
+            int n_points = 1000;
+            double dx = (x_end - x_start) / n_points;
+
+            for (int i = 0; i < n_points - 1; ++i) {
+                double x1 = x_start + i * dx;
+                double x2 = x1 + dx;
+
+                if (k_squared(x1) * k_squared(x2) < 0) {
+                    return (x1 + x2) / 2.0;
+                }
+            }
+
+            return NAN;  // No turning point found
+        }
+    };
+
+    /**
+     * @brief Poincare-Lindstedt Method
+     * For nonlinear oscillators: removes secular terms by frequency correction
+     * ω = ω₀ + εω₁ + ε²ω₂ + ...
+     */
+    struct PoincareLindstedt {
+        double epsilon;
+
+        /**
+         * @brief Frequency corrections: ω₀, ω₁, ω₂, ...
+         */
+        std::vector<double> frequency_corrections;
+
+        /**
+         * @brief Solution expansion: u = u₀ + εu₁ + ε²u₂ + ...
+         */
+        std::vector<std::function<double(double)>> solution_terms;
+
+        /**
+         * @brief Effective frequency
+         */
+        double effectiveFrequency() const {
+            double omega = 0.0;
+            double eps_power = 1.0;
+
+            for (size_t i = 0; i < frequency_corrections.size(); ++i) {
+                omega += eps_power * frequency_corrections[i];
+                eps_power *= epsilon;
+            }
+
+            return omega;
+        }
+
+        /**
+         * @brief Evaluate solution with corrected frequency
+         */
+        double evaluate(double t, int n_terms) const {
+            double tau = effectiveFrequency() * t;  // Stretched time
+
+            double result = 0.0;
+            double eps_power = 1.0;
+
+            for (int i = 0; i < std::min(n_terms, (int)solution_terms.size()); ++i) {
+                result += eps_power * solution_terms[i](tau);
+                eps_power *= epsilon;
+            }
+
+            return result;
+        }
+    };
+
+    /**
+     * @brief Asymptotic sequence verification
+     * Check that u_{n+1}/u_n → 0 as ε → 0
+     */
+    static bool isAsymptoticSequence(
+        const std::vector<std::function<double(double)>>& terms,
+        double x, double epsilon) {
+
+        if (terms.size() < 2) return true;
+
+        for (size_t i = 0; i < terms.size() - 1; ++i) {
+            double u_i = terms[i](x);
+            double u_i_plus_1 = terms[i+1](x);
+
+            if (std::abs(u_i) < 1e-10) continue;  // Skip if term is zero
+
+            double ratio = std::abs(u_i_plus_1 / u_i);
+            if (ratio >= 1.0) return false;  // Not asymptotic
+        }
+
+        return true;
     }
 };
 

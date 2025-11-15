@@ -464,7 +464,10 @@ physics_showcase/
 **Multiple Integrals:**
 - **Double and Triple Integrals**: Change of variables, Jacobians
 - **Divergence Theorem**: ∫_Ω div(F) dV = ∫_∂Ω F·n dS
-- **Green's Identities**: First and second identities for integration by parts
+- **Green's Identities**: First, second, and third identities
+  - First identity: ∫_Ω (∇u·∇v + v∇²u) dV = ∫_∂Ω v(∂u/∂n) dS
+  - Second identity: ∫_Ω (v∇²u - u∇²v) dV = ∫_∂Ω (v∂u/∂n - u∂v/∂n) dS
+  - Integration by parts in multiple dimensions
 
 **Weak Variational Formulation:**
 - **Test Functions**: Compact support, smoothness requirements
@@ -472,6 +475,24 @@ physics_showcase/
 - **Weak Derivatives**: Distributional derivatives
 - **Sobolev Spaces**: H¹, H₀¹ function spaces
 - **Weak Solutions**: ∫_Ω ∇u·∇v dx = ∫_Ω fv dx for all test functions v
+
+**Weighted Residual Methods (WRM):**
+- **General Framework**: ∫_Ω w(x) R(x) dx = 0 where R = L[u] - f is residual
+- **Test Function Selection**:
+  - Hat functions (piecewise linear finite elements)
+  - Polynomial basis with boundary conditions
+  - Trigonometric functions (Fourier modes)
+  - Bubble functions for incompressible flow
+  - Completeness and linear independence criteria
+- **Collocation Method**: w(x) = δ(x - xᵢ) at collocation points
+  - Chebyshev nodes for spectral accuracy
+  - Direct enforcement R(xᵢ) = 0
+- **Subdomain Method**: w(x) = 1 on subdomain Ωᵢ, 0 elsewhere
+  - Domain partitioning strategies
+  - Integrated residual minimization
+- **Least Squares Method**: Minimize J = ∫_Ω R² dx
+  - Optimality conditions: ∂J/∂cᵢ = 0
+  - Symmetric positive definite systems
 
 **Galerkin Method:**
 - **Finite Element Approximation**: Basis function expansion
@@ -517,6 +538,25 @@ physics_showcase/
 - **Boundary Layer Thickness**: δ ~ √ε for second order problems
 - **Inner and Outer Expansions**: Composite solutions
 
+**Perturbation Methods:**
+- **Multiple Scales Analysis**: Disparate time/space scales T₀ = t, T₁ = εt
+  - Solvability conditions to eliminate secular terms
+  - Fast and slow scale separation
+- **Matched Asymptotic Expansions**: Singular perturbation problems
+  - Outer expansion (valid away from boundary)
+  - Inner expansion (boundary layer with stretched coordinate ξ = x/δ(ε))
+  - Van Dyke matching principle
+  - Composite solutions
+- **WKB Approximation**: Rapidly oscillating solutions
+  - Eikonal equation: (dS/dx)² = k²(x)
+  - Amplitude expansion: A = A₀ + εA₁ + ...
+  - Connection formulas at turning points
+- **Poincare-Lindstedt Method**: Nonlinear oscillators
+  - Frequency correction: ω = ω₀ + εω₁ + ε²ω₂ + ...
+  - Elimination of secular terms
+  - Stretched time coordinate
+- **Asymptotic Sequence Verification**: Check uₙ₊₁/uₙ → 0 as ε → 0
+
 **Finite Difference Schemes for First Order Equations:**
 - **Upwind Scheme**: Backward difference for c > 0, first order accurate
 - **Lax-Friedrichs**: Central difference with averaging, stable
@@ -535,9 +575,9 @@ physics_showcase/
 - **Stability**: Amplification factor analysis, von Neumann method
 - **Tridiagonal Systems**: Thomas algorithm O(n) solution
 
-**Key Algorithms**: Upwind, Lax-Friedrichs, Lax-Wendroff, Crank-Nicolson, ADI, SOR, Picard iteration
+**Key Algorithms**: Upwind, Lax-Friedrichs, Lax-Wendroff, Crank-Nicolson, ADI, SOR, Picard iteration, multiple scales, matched asymptotics, WKB
 
-**Applications**: Computational fluid dynamics, heat transfer, wave propagation, image processing, option pricing
+**Applications**: Computational fluid dynamics, heat transfer, wave propagation, image processing, option pricing, boundary layer problems, quantum mechanics
 
 ### Probability & Statistics (`maths/advanced/probability/distributions.hpp`)
 **Comprehensive probability distributions**
@@ -757,6 +797,16 @@ All demos compile with: `g++ -std=c++17 -I./include -o demo examples/demo.cpp -l
    - Retarded Green's functions and causality
    - Solutions via convolution with source terms
 
+10. **`variational_wrm_demo`**
+   - Green's identities (first, second, integration by parts)
+   - Weighted Residual Methods framework
+   - Galerkin method for BVPs
+   - Collocation method with Chebyshev nodes
+   - Subdomain method with domain partitioning
+   - Least squares method for optimal approximation
+   - Test function selection (hat, polynomial, trigonometric, bubble functions)
+   - Linear independence verification
+
 ## 🚀 Building and Running
 
 ### Prerequisites
@@ -810,7 +860,7 @@ done
 - **Physics Modules**:
   - Basic: 25+ modules covering classical mechanics, E&M, thermodynamics, optics, modern physics
   - Advanced: 20+ modules in Hamiltonian mechanics, cosmology, fluid dynamics, gauge theory, QFT
-- **Demos**: 9 comprehensive demonstration programs
+- **Demos**: 10 comprehensive demonstration programs
 - **Distributions**: 13 probability distributions (Bernoulli, Binomial, Poisson, Geometric, Negative Binomial, Hypergeometric, Uniform, Normal, Exponential, Gamma, Beta, Chi-squared, F-distribution)
 - **Key Algorithms**:
   - DFT, FFT (O(N log N))
@@ -835,12 +885,18 @@ done
   - Poisson integral formula
   - Galerkin finite element method
   - Rayleigh-Ritz energy minimization
+  - Weighted Residual Methods (Galerkin, collocation, subdomain, least squares)
+  - Collocation with Chebyshev nodes
   - Upwind, Lax-Friedrichs, Lax-Wendroff schemes
   - ADI (Alternating Direction Implicit)
   - Crank-Nicolson time stepping
   - SOR (Successive Over-Relaxation)
   - Picard iteration
   - Von Neumann stability analysis
+  - Multiple scales analysis
+  - Matched asymptotic expansions
+  - WKB approximation
+  - Poincare-Lindstedt method
 
 ## 🎓 Educational Value
 

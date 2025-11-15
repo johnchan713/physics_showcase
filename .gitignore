@@ -20,6 +20,7 @@ stochastic_methods_demo
 variational_calculus_demo
 pde_solution_methods_demo
 greens_functions_demo
+variational_wrm_demo
 
 # CMake
 build/
