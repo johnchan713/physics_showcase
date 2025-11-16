@@ -965,45 +965,45 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 
 ### Advanced Physics
 
-**Advanced Classical Mechanics** (`physics/advanced/classical/`):
-- **Hamiltonian Mechanics** (`hamiltonian.hpp`): Hamilton's equations, canonical transformations, generating functions
-- **Phase Space** (`phase_space.hpp`): Phase space analysis, Poincaré sections, symplectic structure
-- **Liouville Theorem** (`liouville.hpp`): Phase space volume conservation, statistical mechanics connection
+**Advanced Classical Mechanics:**
+- **Hamiltonian Mechanics** (`physics/classical_hamiltonian.hpp`): Hamilton's equations, canonical transformations, generating functions
+- **Phase Space** (`physics/classical_phase_space.hpp`): Phase space analysis, Poincaré sections, symplectic structure
+- **Liouville Theorem** (`physics/classical_liouville.hpp`): Phase space volume conservation, statistical mechanics connection
 
-**Cosmology** (`physics/advanced/cosmology/`):
-- **Friedmann Equations** (`friedmann_equations.hpp`): FLRW metric, expansion dynamics, critical density
-- **Expanding Universe** (`expanding_universe.hpp`): Hubble's law, scale factor evolution, redshift
-- **Early Universe** (`early_universe.hpp`): Radiation/matter domination, recombination, nucleosynthesis
-- **Energy Density** (`energy_density.hpp`): Matter, radiation, dark energy components
+**Cosmology:**
+- **Friedmann Equations** (`physics/cosmology_friedmann_equations.hpp`): FLRW metric, expansion dynamics, critical density
+- **Expanding Universe** (`physics/cosmology_expanding_universe.hpp`): Hubble's law, scale factor evolution, redshift
+- **Early Universe** (`physics/cosmology_early_universe.hpp`): Radiation/matter domination, recombination, nucleosynthesis
+- **Energy Density** (`physics/cosmology_energy_density.hpp`): Matter, radiation, dark energy components
 
-**Fluid Dynamics** (`physics/advanced/fluid_dynamics/`):
-- **Governing Equations** (`governing_equations.hpp`): Navier-Stokes, continuity, energy equations
-- **Flow Types** (`flow_types.hpp`): Laminar, turbulent, compressible, incompressible
-- **Compressible Flow** (`compressible_flow.hpp`): Mach number, shock waves, supersonic flow
-- **Boundary Layer** (`boundary_layer.hpp`): Boundary layer theory, separation, drag
-- **Vorticity** (`vorticity.hpp`): Vorticity dynamics, circulation, Kelvin's theorem
-- **Turbulence** (`turbulence.hpp`): Reynolds decomposition, energy cascade, turbulence models
-- **Dimensionless Numbers** (`dimensionless_numbers.hpp`): Reynolds, Prandtl, Mach, Froude numbers
+**Fluid Dynamics:**
+- **Governing Equations** (`physics/fluid_dynamics_governing_equations.hpp`): Navier-Stokes, continuity, energy equations
+- **Flow Types** (`physics/fluid_dynamics_flow_types.hpp`): Laminar, turbulent, compressible, incompressible
+- **Compressible Flow** (`physics/fluid_dynamics_compressible_flow.hpp`): Mach number, shock waves, supersonic flow
+- **Boundary Layer** (`physics/fluid_dynamics_boundary_layer.hpp`): Boundary layer theory, separation, drag
+- **Vorticity** (`physics/fluid_dynamics_vorticity.hpp`): Vorticity dynamics, circulation, Kelvin's theorem
+- **Turbulence** (`physics/fluid_dynamics_turbulence.hpp`): Reynolds decomposition, energy cascade, turbulence models
+- **Dimensionless Numbers** (`physics/fluid_dynamics_dimensionless_numbers.hpp`): Reynolds, Prandtl, Mach, Froude numbers
 
-**Gauge Theory** (`physics/advanced/gauge_theory/`):
-- **Gauge Invariance** (`gauge_invariance.hpp`): U(1), SU(2), SU(3) gauge symmetries
-- **Higgs Mechanism** (`higgs_mechanism.hpp`): Spontaneous symmetry breaking, mass generation
-- **Symmetries** (`symmetries.hpp`): Discrete and continuous symmetries, CPT theorem
-- **Running Couplings** (`running_couplings.hpp`): Renormalization group, beta functions
-- **Helicity** (`helicity.hpp`): Helicity conservation, polarization
-- **CP Violation** (`cp_violation_kaons.hpp`): CP violation in kaon systems
+**Gauge Theory:**
+- **Gauge Invariance** (`physics/gauge_theory_gauge_invariance.hpp`): U(1), SU(2), SU(3) gauge symmetries
+- **Higgs Mechanism** (`physics/gauge_theory_higgs_mechanism.hpp`): Spontaneous symmetry breaking, mass generation
+- **Symmetries** (`physics/gauge_theory_symmetries.hpp`): Discrete and continuous symmetries, CPT theorem
+- **Running Couplings** (`physics/gauge_theory_running_couplings.hpp`): Renormalization group, beta functions
+- **Helicity** (`physics/gauge_theory_helicity.hpp`): Helicity conservation, polarization
+- **CP Violation** (`physics/gauge_theory_cp_violation_kaons.hpp`): CP violation in kaon systems
 
-**Quantum Field Theory** (`physics/advanced/qft/`):
-- **Particle Physics** (`particle_physics.hpp`): Standard Model particles, interactions
-- **Antiparticles** (`antiparticles.hpp`): Particle-antiparticle creation/annihilation
-- **Interactions** (`interactions.hpp`): Electromagnetic, weak, strong interactions
-- **Cross Sections** (`cross_sections.hpp`): Scattering amplitudes, differential cross sections
-- **Decays** (`decays.hpp`): Decay rates, branching ratios, lifetime calculations
-- **Spin Statistics** (`spin_statistics.hpp`): Fermi-Dirac, Bose-Einstein statistics
-- **Supersymmetry** (`supersymmetry.hpp`): SUSY transformations, superpartners
-- **Quark-Gluon Plasma** (`quark_gluon_plasma.hpp`): QCD matter at extreme temperatures
+**Quantum Field Theory:**
+- **Particle Physics** (`physics/qft_particle_physics.hpp`): Standard Model particles, interactions
+- **Antiparticles** (`physics/qft_antiparticles.hpp`): Particle-antiparticle creation/annihilation
+- **Interactions** (`physics/qft_interactions.hpp`): Electromagnetic, weak, strong interactions
+- **Cross Sections** (`physics/qft_cross_sections.hpp`): Scattering amplitudes, differential cross sections
+- **Decays** (`physics/qft_decays.hpp`): Decay rates, branching ratios, lifetime calculations
+- **Spin Statistics** (`physics/qft_spin_statistics.hpp`): Fermi-Dirac, Bose-Einstein statistics
+- **Supersymmetry** (`physics/qft_supersymmetry.hpp`): SUSY transformations, superpartners
+- **Quark-Gluon Plasma** (`physics/qft_quark_gluon_plasma.hpp`): QCD matter at extreme temperatures
 
-**Operator Algebras and Quantum Mechanics** (`physics/advanced/operator_algebras.hpp`):
+**Operator Algebras and Quantum Mechanics** (`physics/operator_algebras.hpp`):
 Comprehensive functional analysis framework for quantum mechanics (~2,800 lines)
 
 - **Hilbert Spaces**
