@@ -2045,6 +2045,157 @@ using namespace maths;
 using namespace physics;
 ```
 
+**Nuclear Physics and Radioactivity** (`physics/nuclear_physics.hpp`):
+Comprehensive nuclear physics module covering radioactive decay, nuclear stability, and reactor theory (~1,550 lines with extensive computational functions)
+
+**Nuclear Stability and Binding Energy:**
+- **Semi-Empirical Mass Formula (SEMF)**: B(A,Z) = a_v A - a_s A^(2/3) - a_c Z²/A^(1/3) - a_a (A-2Z)²/A ± δ
+- **Binding Energy Calculations**: BE/A curve, separation energies (S_n, S_p), Q-values
+- **Valley of Stability**: N ≈ Z (light nuclei), N > Z (heavy nuclei)
+- **Mass Excess**: Δ = M - A (deviation from integer mass number)
+- **Computational Functions**:
+  - `binding_energy_semf(A, Z)` - Calculate total binding energy
+  - `binding_energy_per_nucleon(A, Z)` - BE/A calculation
+  - `neutron_separation_energy(A, Z)` - S_n = B(A,Z) - B(A-1,Z)
+  - `proton_separation_energy(A, Z)` - S_p = B(A,Z) - B(A-1,Z-1)
+  - `is_in_valley_of_stability(A, Z)` - Check stability criterion
+
+**Modes of Radioactive Decay:**
+
+*Alpha Decay (α):*
+- **Process**: ᴬ_Z X → ᴬ⁻⁴_{Z-2} Y + ⁴He (emission of helium nucleus)
+- **Q-value**: Q_α = [M(A,Z) - M(A-4,Z-2) - M(He-4)]c²
+- **Geiger-Nuttall Law**: log₁₀(λ) = a + b/√E_α (empirical decay constant relation)
+- **Gamow Factor**: G = 2π(Z-2)e²/(ℏv) (barrier penetration probability)
+- **Computational Functions**:
+  - `q_value_alpha(M_parent, M_daughter)` - Calculate Q-value
+  - `alpha_kinetic_energy(Q, A)` - T_α ≈ Q(A-4)/A
+  - `gamow_factor(Z, v)` - Barrier penetration factor
+  - `decay_constant_gamow(G)` - λ from Gamow theory
+
+*Beta Decay (β):*
+- **β⁻ Decay**: n → p + e⁻ + ν̄_e (neutron-rich nuclei)
+- **β⁺ Decay**: p → n + e⁺ + ν_e (proton-rich nuclei, requires Q > 1.022 MeV)
+- **Fermi Theory**: λ = (G_F²/2π³ℏ⁷c⁶) |M_fi|² f(Z,Q)
+- **Energy Distribution**: continuous spectrum, E_max = Q_β, ⟨E_β⟩ ≈ Q/3
+- **Computational Functions**:
+  - `q_value_beta_minus(M_parent, M_daughter)` - Q_β⁻ calculation
+  - `q_value_beta_plus(M_parent, M_daughter)` - Q_β⁺ with 2m_e correction
+  - `fermi_integral(Z, Q)` - Phase space factor
+  - `average_beta_energy(Q)` - Mean beta particle energy
+
+*Electron Capture (EC):*
+- **Process**: ᴬ_Z X + e⁻ → ᴬ_{Z-1} Y + ν_e (K-capture from inner shell)
+- **Q-value**: Q_EC = [M(A,Z) - M(A,Z-1)]c² - B_K
+- **Competition with β⁺**: EC possible for any Q > 0; β⁺ requires Q > 1.022 MeV
+- **Computational Functions**:
+  - `q_value_ec(M_parent, M_daughter, B_K)` - Q-value with binding correction
+  - `k_shell_binding(Z)` - B_K ≈ 13.6 Z² eV estimate
+  - `ec_branching_ratio(Z, Q)` - EC/(EC+β⁺) probability
+
+*Gamma Emission (γ):*
+- **Process**: ᴬ_Z X* → ᴬ_Z X + γ (electromagnetic transition)
+- **Multipole Transitions**: Electric (E1, E2, ...) and Magnetic (M1, M2, ...)
+- **Selection Rules**: E(L): ΔJ ≤ L, π_i π_f = (-1)^L; M(L): π_i π_f = (-1)^(L+1)
+- **Weisskopf Estimates**: T_1/2(E1) ≈ 6.8×10⁻¹⁵ A^(-2/3) E_γ^(-3) s
+- **Computational Functions**:
+  - `gamma_energy(E_initial, E_final, E_recoil)` - Transition energy
+  - `recoil_energy(E_gamma, A)` - E_R = E_γ²/(2Mc²)
+  - `weisskopf_e1_halflife(A, E_gamma)` - E1 transition estimate
+  - `weisskopf_m1_halflife(E_gamma)` - M1 transition estimate
+
+*Internal Conversion (IC):*
+- **Process**: ᴬ_Z X* + e⁻(bound) → ᴬ_Z X + e⁻(free) (competes with γ)
+- **Conversion Coefficient**: α = λ_IC / λ_γ (increases with Z, decreases with E_γ)
+- **IC Electron Energy**: E_e = E* - B_n (B_n = binding energy of shell n)
+- **Computational Functions**:
+  - `conversion_coefficient(λ_ic, λ_gamma)` - α calculation
+  - `ic_electron_energy(E_excitation, B_binding)` - Kinetic energy
+  - `alpha_k_estimate(Z, E_gamma, L)` - K-shell coefficient
+  - `gamma_branching_ratio(α_total)` - BR_γ = 1/(1 + α)
+
+*Isomers and Isomeric Transition:*
+- **Isomer Definition**: Metastable excited state with T_1/2 > 1 ns
+- **Spin Trap**: Large ΔJ → highly forbidden transition → long lifetime
+- **Examples**: Tc-99m (6 hr), Co-60m (10.5 min), Ta-180m (>10¹⁵ yr - longest known)
+
+**Radioactivity and Decay Rates:**
+
+*Fundamental Decay Law:*
+- **Exponential Decay**: N(t) = N₀ exp(-λt), A(t) = A₀ exp(-λt)
+- **Decay Constant**: λ = ln(2)/T_1/2 ≈ 0.693/T_1/2
+- **Mean Lifetime**: τ = 1/λ = T_1/2/ln(2) ≈ 1.443 T_1/2
+- **Activity**: A = λN (disintegrations per unit time)
+- **Computational Functions**:
+  - `number_of_nuclei(N_0, λ, t)` - N(t) calculation
+  - `activity(A_0, λ, t)` - A(t) calculation
+  - `lambda_from_halflife(T_half)` - λ = ln(2)/T_1/2
+  - `mean_lifetime(λ)` - τ = 1/λ
+  - `specific_activity(λ, M_molar)` - Activity per unit mass (Bq/g)
+
+*Units of Radioactivity:*
+- **Becquerel (SI)**: 1 Bq = 1 disintegration/second
+- **Curie (traditional)**: 1 Ci = 3.7×10¹⁰ Bq (activity of 1 g Ra-226)
+- **Common Units**: mCi = 37 MBq, μCi = 37 kBq
+- **Conversion Functions**:
+  - `curie_to_becquerel(Ci)` - 1 Ci = 3.7×10¹⁰ Bq
+  - `millicurie_to_becquerel(mCi)` - 1 mCi = 37 MBq
+  - `microcurie_to_becquerel(μCi)` - 1 μCi = 37 kBq
+
+*Half-Life:*
+- **Definition**: Time for N → N/2 (or A → A/2)
+- **Range in Nature**: 10⁻²³ s (Be-8) to >10¹⁸ yr (Te-128, Xe-136)
+- **Effective Half-Life**: T_eff = (T_phys × T_bio)/(T_phys + T_bio)
+- **Practical Rules**:
+  - 99% decay after ~6.64 half-lives
+  - 10 half-lives → 99.9% decay
+  - 7 half-lives → 99.2% decay
+- **Computational Functions**:
+  - `effective_halflife(T_phys, T_bio)` - Biological + physical
+  - `halflives_for_99_percent_decay()` - Returns ~6.64
+  - `halflives_to_fraction(fraction)` - Time to reach target fraction
+
+*Decay Chains and Equilibrium:*
+- **Bateman Equations**: dN_B/dt = λ_A N_A - λ_B N_B (sequential decay A → B → C)
+- **Secular Equilibrium**: T_A >> T_B (λ_A << λ_B) → A_B = A_A
+  - Example: Ra-226 (1600 yr) → Rn-222 (3.8 d)
+- **Transient Equilibrium**: T_A > T_B (λ_A < λ_B) → A_B/A_A = λ_B/(λ_B - λ_A) > 1
+  - Example: Mo-99 (66 hr) → Tc-99m (6 hr), ratio ≈ 1.1
+- **No Equilibrium**: T_A < T_B (λ_A > λ_B) → daughter accumulates
+- **Computational Functions**:
+  - `daughter_activity_bateman(λ_A, λ_B, A_A_0, t)` - Exact Bateman solution
+  - `is_secular_equilibrium(T_A, T_B)` - Check condition T_A >> T_B
+  - `is_transient_equilibrium(T_A, T_B)` - Check condition
+  - `transient_eq_ratio(T_A, T_B)` - A_B/A_A at equilibrium
+  - `time_to_equilibrium(λ_daughter)` - t_eq ≈ 5/λ_B
+  - `time_of_max_daughter(λ_A, λ_B)` - Time of peak daughter activity
+  - `max_daughter_activity(A_A_0, λ_A, λ_B)` - Maximum A_B value
+
+*Decay Systematics and Prediction:*
+- **N/Z Ratio**: Predicts β⁻ (neutron-rich) vs β⁺/EC (proton-rich)
+- **Alpha Decay**: Likely for Z > 82 (beyond lead)
+- **Spontaneous Fission**: Z²/A > 47 (competes with α decay)
+- **Drip Lines**: S_n < 0 (neutron drip), S_p < 0 (proton drip)
+- **Computational Functions**:
+  - `predict_beta_type(A, Z)` - Predict β⁻, β⁺, or stable
+  - `alpha_decay_likely(Z, A)` - Check Z > 82 criterion
+  - `fission_competes(Z, A)` - Z²/A > 47 check
+  - `beyond_proton_drip(A, Z)` - S_p < 0 check
+  - `beyond_neutron_drip(A, Z)` - S_n < 0 check
+
+*Data Analysis and Visualization:*
+- **Semi-Log Plots**: ln(A) vs t gives straight line with slope -λ
+- **Decay Curve Generation**: Generate data points for plotting
+- **Computational Functions**:
+  - `lambda_from_semilog(ln_A1, ln_A2, t1, t2)` - Extract λ from slope
+  - `generate_decay_curve(A_0, λ, t_max, n_points)` - Generate A(t) data
+  - `decay_chain_point(A_A_0, λ_A, λ_B, t)` - {A_parent, A_daughter} at time t
+
+**Natural Radioactivity:**
+- **Decay Series**: 4n (Th-232), 4n+2 (U-238), 4n+3 (U-235), 4n+1 (Np-237, extinct)
+- **Primordial Radionuclides**: U-238 (4.5 Gyr), U-235 (704 Myr), Th-232 (14 Gyr), K-40 (1.25 Gyr)
+- **Cosmogenic**: C-14 (5730 yr), Be-10 (1.39 Myr), Be-7 (53 d), H-3 (12.3 yr)
+
 ### Compilation
 All modules are header-only and require C++17:
 
