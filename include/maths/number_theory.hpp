@@ -2445,6 +2445,1073 @@ inline long long reconstructFromFactorization(const std::map<long long, int>& fa
     return n;
 }
 
+// =============================================================================
+// DISCRETE LOGARITHMS IN ℤ*_p
+// =============================================================================
+
+/**
+ * @brief Check if g is a generator (primitive root) modulo p
+ *
+ * g is a generator of ℤ*_p if ord(g) = φ(p) = p-1
+ *
+ * @param g Candidate generator
+ * @param p Prime modulus
+ * @return true if g is a generator
+ */
+inline bool isGeneratorModP(long long g, long long p) {
+    if (g <= 0 || g >= p) return false;
+    if (!isPrimeMillerRabin(p)) return false;
+
+    long long phi = p - 1;
+
+    // Find prime factorization of φ(p) = p-1
+    auto factors = trialDivisionFactorization(phi);
+
+    // g is a generator iff g^((p-1)/q) ≠ 1 (mod p) for all prime divisors q of p-1
+    for (const auto& [prime, exp] : factors) {
+        if (modPow(g, phi / prime, p) == 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * @brief Find a generator (primitive root) for ℤ*_p
+ *
+ * Uses brute force search starting from 2
+ *
+ * @param p Prime modulus
+ * @return A generator g of ℤ*_p, or -1 if not found
+ */
+inline long long findGeneratorModP(long long p) {
+    if (!isPrimeMillerRabin(p)) return -1;
+    if (p == 2) return 1;
+
+    // Try all candidates from 2 to p-1
+    for (long long g = 2; g < p; ++g) {
+        if (isGeneratorModP(g, p)) {
+            return g;
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @brief Compute discrete logarithm using baby-step giant-step algorithm
+ *
+ * Solves g^x ≡ h (mod p) for x
+ * Complexity: O(√p) time and space
+ *
+ * @param g Generator base
+ * @param h Target value
+ * @param p Prime modulus
+ * @return x such that g^x ≡ h (mod p), or -1 if no solution
+ */
+inline long long discreteLogBabyGiant(long long g, long long h, long long p) {
+    if (g <= 0 || h <= 0 || g >= p || h >= p) return -1;
+
+    // Baby-step giant-step algorithm
+    long long m = static_cast<long long>(std::sqrt(p)) + 1;
+
+    // Baby steps: compute g^j for j = 0, 1, ..., m-1
+    std::unordered_map<long long, long long> table;
+    long long gamma = 1;
+    for (long long j = 0; j < m; ++j) {
+        table[gamma] = j;
+        gamma = (gamma * g) % p;
+    }
+
+    // Giant steps: compute h * (g^(-m))^i for i = 0, 1, ..., m-1
+    long long g_inv_m = modPow(modInverse(g, p), m, p);
+    gamma = h;
+    for (long long i = 0; i < m; ++i) {
+        if (table.count(gamma)) {
+            long long x = i * m + table[gamma];
+            return x % (p - 1);
+        }
+        gamma = (gamma * g_inv_m) % p;
+    }
+
+    return -1;
+}
+
+/**
+ * @brief Compute discrete logarithm using Pollard's rho algorithm
+ *
+ * Probabilistic algorithm with O(√p) expected time, O(1) space
+ *
+ * @param g Generator base
+ * @param h Target value
+ * @param p Prime modulus
+ * @param maxIterations Maximum iterations
+ * @return x such that g^x ≡ h (mod p), or -1 if not found
+ */
+inline long long discreteLogPollardRho(long long g, long long h, long long p,
+                                       int maxIterations = 1000000) {
+    if (g <= 0 || h <= 0 || g >= p || h >= p) return -1;
+
+    long long order = p - 1;
+
+    // Define partition function for cycling
+    auto f = [&](long long x, long long a, long long b) -> std::tuple<long long, long long, long long> {
+        int partition = x % 3;
+        if (partition == 0) {
+            return {(x * h) % p, a, (b + 1) % order};
+        } else if (partition == 1) {
+            return {(x * x) % p, (2 * a) % order, (2 * b) % order};
+        } else {
+            return {(x * g) % p, (a + 1) % order, b};
+        }
+    };
+
+    // Floyd's cycle detection
+    long long x1 = 1, a1 = 0, b1 = 0;
+    long long x2 = 1, a2 = 0, b2 = 0;
+
+    for (int i = 0; i < maxIterations; ++i) {
+        // Tortoise: one step
+        std::tie(x1, a1, b1) = f(x1, a1, b1);
+
+        // Hare: two steps
+        std::tie(x2, a2, b2) = f(x2, a2, b2);
+        std::tie(x2, a2, b2) = f(x2, a2, b2);
+
+        if (x1 == x2) {
+            // Found collision: g^a1 * h^b1 ≡ g^a2 * h^b2 (mod p)
+            // => h^(b1-b2) ≡ g^(a2-a1) (mod p)
+            long long r = (b1 - b2 + order) % order;
+            long long s = (a2 - a1 + order) % order;
+
+            if (r == 0) continue; // Try again
+
+            long long d = gcd(r, order);
+            if (s % d != 0) return -1; // No solution
+
+            // Solve r*x ≡ s (mod order)
+            long long r_reduced = r / d;
+            long long s_reduced = s / d;
+            long long order_reduced = order / d;
+
+            if (gcd(r_reduced, order_reduced) == 1) {
+                long long x = (s_reduced * modInverse(r_reduced, order_reduced)) % order_reduced;
+                // Verify
+                if (modPow(g, x, p) == h) {
+                    return x;
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @brief Structure for Diffie-Hellman parameters
+ */
+struct DiffieHellmanParams {
+    long long p;  // Large prime
+    long long g;  // Generator of ℤ*_p
+};
+
+/**
+ * @brief Generate Diffie-Hellman public key from private key
+ *
+ * Public key = g^a mod p
+ *
+ * @param params DH parameters (p, g)
+ * @param privateKey Private key a
+ * @return Public key g^a mod p
+ */
+inline long long diffieHellmanPublicKey(const DiffieHellmanParams& params,
+                                        long long privateKey) {
+    return modPow(params.g, privateKey, params.p);
+}
+
+/**
+ * @brief Compute shared secret in Diffie-Hellman protocol
+ *
+ * Shared secret = (other's public key)^(my private key) mod p
+ *
+ * @param params DH parameters (p, g)
+ * @param otherPublicKey Other party's public key
+ * @param myPrivateKey My private key
+ * @return Shared secret
+ */
+inline long long diffieHellmanSharedSecret(const DiffieHellmanParams& params,
+                                           long long otherPublicKey,
+                                           long long myPrivateKey) {
+    return modPow(otherPublicKey, myPrivateKey, params.p);
+}
+
+/**
+ * @brief Complete Diffie-Hellman key exchange simulation
+ *
+ * @param p Prime modulus
+ * @param g Generator
+ * @param alicePrivate Alice's private key
+ * @param bobPrivate Bob's private key
+ * @return Tuple (Alice's shared secret, Bob's shared secret) - should be equal
+ */
+inline std::pair<long long, long long> diffieHellmanExchange(long long p, long long g,
+                                                             long long alicePrivate,
+                                                             long long bobPrivate) {
+    DiffieHellmanParams params{p, g};
+
+    // Alice computes her public key
+    long long alicePublic = diffieHellmanPublicKey(params, alicePrivate);
+
+    // Bob computes his public key
+    long long bobPublic = diffieHellmanPublicKey(params, bobPrivate);
+
+    // Alice computes shared secret using Bob's public key
+    long long aliceShared = diffieHellmanSharedSecret(params, bobPublic, alicePrivate);
+
+    // Bob computes shared secret using Alice's public key
+    long long bobShared = diffieHellmanSharedSecret(params, alicePublic, bobPrivate);
+
+    return {aliceShared, bobShared};
+}
+
+// =============================================================================
+// QUADRATIC RESIDUES AND QUADRATIC RECIPROCITY
+// =============================================================================
+
+/**
+ * @brief Compute the Legendre symbol (a/p)
+ *
+ * (a/p) = 0 if a ≡ 0 (mod p)
+ *       = 1 if a is a quadratic residue mod p
+ *       = -1 if a is not a quadratic residue mod p
+ *
+ * Uses Euler's criterion: (a/p) ≡ a^((p-1)/2) (mod p)
+ *
+ * @param a Integer
+ * @param p Odd prime
+ * @return Legendre symbol value {-1, 0, 1}
+ */
+inline int legendreSymbol(long long a, long long p) {
+    if (!isPrimeMillerRabin(p) || p == 2) return 0;
+
+    a = ((a % p) + p) % p; // Normalize to [0, p)
+
+    if (a == 0) return 0;
+
+    // Euler's criterion: (a/p) ≡ a^((p-1)/2) (mod p)
+    long long result = modPow(a, (p - 1) / 2, p);
+
+    // Convert to {-1, 0, 1}
+    if (result == p - 1) return -1;
+    if (result == 1) return 1;
+    return 0;
+}
+
+/**
+ * @brief Compute the Jacobi symbol (a/n)
+ *
+ * Generalization of Legendre symbol to composite moduli
+ * If n = p1^e1 * p2^e2 * ... * pk^ek, then (a/n) = ∏(a/pi)^ei
+ *
+ * Uses the quadratic reciprocity law for efficient computation
+ *
+ * @param a Integer
+ * @param n Odd positive integer
+ * @return Jacobi symbol value {-1, 0, 1}
+ */
+inline int jacobiSymbol(long long a, long long n) {
+    if (n <= 0 || n % 2 == 0) return 0;
+
+    a = ((a % n) + n) % n;
+
+    int result = 1;
+
+    while (a != 0) {
+        // Remove factors of 2
+        while (a % 2 == 0) {
+            a /= 2;
+            // (2/n) = (-1)^((n^2-1)/8)
+            long long r = n % 8;
+            if (r == 3 || r == 5) {
+                result = -result;
+            }
+        }
+
+        // Quadratic reciprocity: (a/n)(n/a) = (-1)^((a-1)(n-1)/4)
+        if (a % 4 == 3 && n % 4 == 3) {
+            result = -result;
+        }
+
+        // Swap a and n
+        std::swap(a, n);
+        a %= n;
+    }
+
+    return (n == 1) ? result : 0;
+}
+
+/**
+ * @brief Test if a is a quadratic residue modulo n
+ *
+ * For odd prime p: uses Legendre symbol
+ * For composite n: uses Jacobi symbol (necessary but not sufficient)
+ *
+ * @param a Integer
+ * @param n Modulus
+ * @return true if a is a quadratic residue mod n
+ */
+inline bool isQuadraticResidue(long long a, long long n) {
+    if (n == 2) {
+        return (a % 2 == 0) || (a % 2 == 1);
+    }
+
+    if (isPrimeMillerRabin(n)) {
+        return legendreSymbol(a, n) == 1;
+    }
+
+    // For composite n, Jacobi symbol is necessary but not sufficient
+    // We need to check if there exists x such that x^2 ≡ a (mod n)
+    a = ((a % n) + n) % n;
+
+    for (long long x = 0; x * x <= n && x < 1000000; ++x) {
+        if ((x * x) % n == a) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief Compute modular square root using Tonelli-Shanks algorithm
+ *
+ * Finds x such that x^2 ≡ a (mod p) for prime p
+ *
+ * @param a Quadratic residue
+ * @param p Odd prime
+ * @return Square root x, or -1 if a is not a quadratic residue
+ */
+inline long long modularSquareRoot(long long a, long long p) {
+    if (!isPrimeMillerRabin(p) || p == 2) return -1;
+
+    a = ((a % p) + p) % p;
+
+    // Check if a is a quadratic residue
+    if (legendreSymbol(a, p) != 1) return -1;
+
+    // Special case: p ≡ 3 (mod 4)
+    if (p % 4 == 3) {
+        return modPow(a, (p + 1) / 4, p);
+    }
+
+    // Tonelli-Shanks algorithm for p ≡ 1 (mod 4)
+    // Write p - 1 = 2^s * q with q odd
+    long long q = p - 1;
+    int s = 0;
+    while (q % 2 == 0) {
+        q /= 2;
+        s++;
+    }
+
+    // Find a quadratic non-residue n
+    long long n = 2;
+    while (legendreSymbol(n, p) != -1) {
+        n++;
+    }
+
+    // Initialize
+    long long z = modPow(n, q, p);
+    long long m = s;
+    long long c = z;
+    long long t = modPow(a, q, p);
+    long long r = modPow(a, (q + 1) / 2, p);
+
+    while (t != 1) {
+        // Find least i such that t^(2^i) = 1
+        long long temp = t;
+        int i = 0;
+        while (temp != 1 && i < m) {
+            temp = (temp * temp) % p;
+            i++;
+        }
+
+        if (i == m) return -1; // Should not happen
+
+        // Update values
+        long long b = modPow(c, 1LL << (m - i - 1), p);
+        m = i;
+        c = (b * b) % p;
+        t = (t * c) % p;
+        r = (r * b) % p;
+    }
+
+    return r;
+}
+
+/**
+ * @brief Verify quadratic residuosity assumption
+ *
+ * The quadratic residuosity assumption states that for Blum integers n = pq
+ * (where p, q ≡ 3 mod 4), it is computationally hard to distinguish
+ * quadratic residues from quadratic non-residues with Jacobi symbol 1
+ *
+ * @param n Blum integer (product of two primes ≡ 3 mod 4)
+ * @return true if n is a valid Blum integer
+ */
+inline bool isBlumInteger(long long n) {
+    auto factors = trialDivisionFactorization(n);
+
+    if (factors.size() != 2) return false;
+
+    for (const auto& [prime, exp] : factors) {
+        if (exp != 1) return false;
+        if (prime % 4 != 3) return false;
+    }
+
+    return true;
+}
+
+// =============================================================================
+// MODULES AND VECTOR SPACES
+// =============================================================================
+
+/**
+ * @brief Abstract module over a ring
+ *
+ * A module M over a ring R is an abelian group with scalar multiplication
+ * satisfying: r(m1+m2) = rm1+rm2, (r1+r2)m = r1m+r2m, (r1r2)m = r1(r2m)
+ */
+template<typename Scalar, typename Element>
+class Module {
+public:
+    virtual ~Module() = default;
+
+    // Module operations
+    virtual Element add(const Element& a, const Element& b) const = 0;
+    virtual Element scalarMultiply(const Scalar& r, const Element& m) const = 0;
+    virtual Element zero() const = 0;
+    virtual Element negate(const Element& m) const = 0;
+
+    /**
+     * @brief Check if elements form a submodule
+     */
+    bool isSubmodule(const std::vector<Element>& elements) const {
+        if (elements.empty()) return true;
+
+        // Must contain zero
+        bool hasZero = false;
+        Element zeroElem = zero();
+        for (const auto& elem : elements) {
+            if (elem == zeroElem) {
+                hasZero = true;
+                break;
+            }
+        }
+        if (!hasZero) return false;
+
+        // Closed under addition and scalar multiplication would need ring elements
+        // Simplified check: just verify closure under addition
+        for (size_t i = 0; i < elements.size() && i < 10; ++i) {
+            for (size_t j = 0; j < elements.size() && j < 10; ++j) {
+                Element sum = add(elements[i], elements[j]);
+                bool found = false;
+                for (const auto& elem : elements) {
+                    if (elem == sum) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Check linear independence (for vector spaces)
+     */
+    virtual bool areLinearlyIndependent(const std::vector<Element>& elements) const {
+        // Default implementation: stub
+        return false;
+    }
+
+    /**
+     * @brief Compute dimension (for vector spaces)
+     */
+    virtual int dimension() const {
+        return -1; // Unknown
+    }
+};
+
+/**
+ * @brief Vector space over a field
+ *
+ * Specialization of Module where scalars form a field
+ */
+template<typename Field, typename Vector>
+class VectorSpace : public Module<Field, Vector> {
+public:
+    /**
+     * @brief Check if vectors form a basis
+     */
+    virtual bool isBasis(const std::vector<Vector>& vectors) const {
+        // A basis must be linearly independent and span the space
+        if (!this->areLinearlyIndependent(vectors)) return false;
+
+        int dim = this->dimension();
+        if (dim >= 0 && static_cast<int>(vectors.size()) != dim) return false;
+
+        return true;
+    }
+
+    /**
+     * @brief Compute coordinates with respect to a basis
+     */
+    virtual std::vector<Field> coordinates(const Vector& v,
+                                          const std::vector<Vector>& basis) const {
+        // Abstract interface - implementation depends on concrete vector space
+        return std::vector<Field>();
+    }
+};
+
+/**
+ * @brief Concrete vector space: ℝⁿ
+ */
+class RealVectorSpace : public VectorSpace<double, std::vector<double>> {
+private:
+    int n; // Dimension
+
+public:
+    explicit RealVectorSpace(int dimension) : n(dimension) {}
+
+    std::vector<double> add(const std::vector<double>& a,
+                           const std::vector<double>& b) const override {
+        if (a.size() != b.size() || a.size() != static_cast<size_t>(n)) {
+            throw std::invalid_argument("Vector dimensions must match");
+        }
+
+        std::vector<double> result(n);
+        for (int i = 0; i < n; ++i) {
+            result[i] = a[i] + b[i];
+        }
+        return result;
+    }
+
+    std::vector<double> scalarMultiply(const double& r,
+                                      const std::vector<double>& m) const override {
+        if (m.size() != static_cast<size_t>(n)) {
+            throw std::invalid_argument("Vector dimension must match space dimension");
+        }
+
+        std::vector<double> result(n);
+        for (int i = 0; i < n; ++i) {
+            result[i] = r * m[i];
+        }
+        return result;
+    }
+
+    std::vector<double> zero() const override {
+        return std::vector<double>(n, 0.0);
+    }
+
+    std::vector<double> negate(const std::vector<double>& m) const override {
+        return scalarMultiply(-1.0, m);
+    }
+
+    int dimension() const override {
+        return n;
+    }
+
+    bool areLinearlyIndependent(const std::vector<std::vector<double>>& vectors) const override;
+};
+
+// =============================================================================
+// MATRICES
+// =============================================================================
+
+/**
+ * @brief Matrix class for linear algebra computations
+ */
+template<typename T = double>
+class Matrix {
+private:
+    std::vector<std::vector<T>> data;
+    int rows;
+    int cols;
+
+public:
+    /**
+     * @brief Construct zero matrix
+     */
+    Matrix(int m, int n) : rows(m), cols(n) {
+        data.resize(m, std::vector<T>(n, T(0)));
+    }
+
+    /**
+     * @brief Construct from 2D vector
+     */
+    Matrix(const std::vector<std::vector<T>>& mat) : data(mat) {
+        rows = mat.size();
+        cols = (rows > 0) ? mat[0].size() : 0;
+    }
+
+    /**
+     * @brief Get number of rows
+     */
+    int numRows() const { return rows; }
+
+    /**
+     * @brief Get number of columns
+     */
+    int numCols() const { return cols; }
+
+    /**
+     * @brief Access element
+     */
+    T& operator()(int i, int j) {
+        return data[i][j];
+    }
+
+    const T& operator()(int i, int j) const {
+        return data[i][j];
+    }
+
+    /**
+     * @brief Matrix addition
+     */
+    Matrix operator+(const Matrix& other) const {
+        if (rows != other.rows || cols != other.cols) {
+            throw std::invalid_argument("Matrix dimensions must match for addition");
+        }
+
+        Matrix result(rows, cols);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result(i, j) = data[i][j] + other(i, j);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @brief Matrix multiplication
+     */
+    Matrix operator*(const Matrix& other) const {
+        if (cols != other.rows) {
+            throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+        }
+
+        Matrix result(rows, other.cols);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < other.cols; ++j) {
+                T sum = T(0);
+                for (int k = 0; k < cols; ++k) {
+                    sum += data[i][k] * other(k, j);
+                }
+                result(i, j) = sum;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @brief Scalar multiplication
+     */
+    Matrix operator*(const T& scalar) const {
+        Matrix result(rows, cols);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result(i, j) = data[i][j] * scalar;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @brief Matrix transpose
+     */
+    Matrix transpose() const {
+        Matrix result(cols, rows);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result(j, i) = data[i][j];
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @brief Compute trace (sum of diagonal elements)
+     */
+    T trace() const {
+        if (rows != cols) {
+            throw std::invalid_argument("Trace only defined for square matrices");
+        }
+
+        T sum = T(0);
+        for (int i = 0; i < rows; ++i) {
+            sum += data[i][i];
+        }
+        return sum;
+    }
+
+    /**
+     * @brief Create identity matrix
+     */
+    static Matrix identity(int n) {
+        Matrix result(n, n);
+        for (int i = 0; i < n; ++i) {
+            result(i, i) = T(1);
+        }
+        return result;
+    }
+
+    /**
+     * @brief Get row as vector
+     */
+    std::vector<T> getRow(int i) const {
+        if (i < 0 || i >= rows) {
+            throw std::out_of_range("Row index out of range");
+        }
+        return data[i];
+    }
+
+    /**
+     * @brief Get column as vector
+     */
+    std::vector<T> getCol(int j) const {
+        if (j < 0 || j >= cols) {
+            throw std::out_of_range("Column index out of range");
+        }
+
+        std::vector<T> col(rows);
+        for (int i = 0; i < rows; ++i) {
+            col[i] = data[i][j];
+        }
+        return col;
+    }
+
+    /**
+     * @brief Swap two rows
+     */
+    void swapRows(int i, int j) {
+        if (i < 0 || i >= rows || j < 0 || j >= rows) {
+            throw std::out_of_range("Row index out of range");
+        }
+        std::swap(data[i], data[j]);
+    }
+
+    /**
+     * @brief Multiply row by scalar
+     */
+    void multiplyRow(int i, const T& scalar) {
+        if (i < 0 || i >= rows) {
+            throw std::out_of_range("Row index out of range");
+        }
+        for (int j = 0; j < cols; ++j) {
+            data[i][j] *= scalar;
+        }
+    }
+
+    /**
+     * @brief Add multiple of one row to another
+     */
+    void addRowMultiple(int target, int source, const T& scalar) {
+        if (target < 0 || target >= rows || source < 0 || source >= rows) {
+            throw std::out_of_range("Row index out of range");
+        }
+        for (int j = 0; j < cols; ++j) {
+            data[target][j] += scalar * data[source][j];
+        }
+    }
+
+    /**
+     * @brief Compute determinant using LU decomposition
+     */
+    T determinant() const;
+
+    /**
+     * @brief Compute inverse using Gauss-Jordan elimination
+     */
+    Matrix inverse() const;
+
+    /**
+     * @brief Solve Ax = b using Gaussian elimination
+     */
+    std::vector<T> solve(const std::vector<T>& b) const;
+
+    /**
+     * @brief Gaussian elimination to row echelon form
+     */
+    Matrix rowEchelonForm() const;
+
+    /**
+     * @brief Gaussian elimination to reduced row echelon form
+     */
+    Matrix reducedRowEchelonForm() const;
+
+    /**
+     * @brief Compute rank
+     */
+    int rank() const;
+
+    /**
+     * @brief Get underlying data
+     */
+    const std::vector<std::vector<T>>& getData() const { return data; }
+};
+
+// =============================================================================
+// GAUSSIAN ELIMINATION
+// =============================================================================
+
+/**
+ * @brief Gaussian elimination to row echelon form
+ *
+ * Transform matrix to upper triangular form
+ */
+template<typename T>
+Matrix<T> Matrix<T>::rowEchelonForm() const {
+    Matrix result = *this;
+
+    int pivot_row = 0;
+
+    for (int col = 0; col < cols && pivot_row < rows; ++col) {
+        // Find pivot
+        int max_row = pivot_row;
+        T max_val = std::abs(result(pivot_row, col));
+
+        for (int row = pivot_row + 1; row < rows; ++row) {
+            T val = std::abs(result(row, col));
+            if (val > max_val) {
+                max_val = val;
+                max_row = row;
+            }
+        }
+
+        // Check if pivot is zero
+        if (std::abs(result(max_row, col)) < 1e-10) {
+            continue; // Skip this column
+        }
+
+        // Swap rows
+        if (max_row != pivot_row) {
+            result.swapRows(pivot_row, max_row);
+        }
+
+        // Eliminate below pivot
+        for (int row = pivot_row + 1; row < rows; ++row) {
+            T factor = result(row, col) / result(pivot_row, col);
+            result.addRowMultiple(row, pivot_row, -factor);
+        }
+
+        pivot_row++;
+    }
+
+    return result;
+}
+
+/**
+ * @brief Gaussian elimination to reduced row echelon form
+ *
+ * Transform matrix to canonical form with leading 1s
+ */
+template<typename T>
+Matrix<T> Matrix<T>::reducedRowEchelonForm() const {
+    Matrix result = rowEchelonForm();
+
+    // Back substitution to get reduced form
+    for (int row = rows - 1; row >= 0; --row) {
+        // Find leading entry (pivot)
+        int pivot_col = -1;
+        for (int col = 0; col < cols; ++col) {
+            if (std::abs(result(row, col)) > 1e-10) {
+                pivot_col = col;
+                break;
+            }
+        }
+
+        if (pivot_col == -1) continue; // Zero row
+
+        // Scale to make pivot = 1
+        T pivot_val = result(row, pivot_col);
+        result.multiplyRow(row, T(1) / pivot_val);
+
+        // Eliminate above pivot
+        for (int above = 0; above < row; ++above) {
+            T factor = result(above, pivot_col);
+            result.addRowMultiple(above, row, -factor);
+        }
+    }
+
+    return result;
+}
+
+/**
+ * @brief Compute matrix rank
+ */
+template<typename T>
+int Matrix<T>::rank() const {
+    Matrix ref = rowEchelonForm();
+
+    int rank = 0;
+    for (int row = 0; row < rows; ++row) {
+        bool nonzero = false;
+        for (int col = 0; col < cols; ++col) {
+            if (std::abs(ref(row, col)) > 1e-10) {
+                nonzero = true;
+                break;
+            }
+        }
+        if (nonzero) rank++;
+    }
+
+    return rank;
+}
+
+/**
+ * @brief Solve linear system Ax = b using Gaussian elimination
+ */
+template<typename T>
+std::vector<T> Matrix<T>::solve(const std::vector<T>& b) const {
+    if (rows != cols) {
+        throw std::invalid_argument("Matrix must be square for solve()");
+    }
+    if (b.size() != static_cast<size_t>(rows)) {
+        throw std::invalid_argument("Right-hand side dimension must match matrix rows");
+    }
+
+    // Create augmented matrix [A|b]
+    Matrix augmented(rows, cols + 1);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            augmented(i, j) = data[i][j];
+        }
+        augmented(i, cols) = b[i];
+    }
+
+    // Row reduce
+    Matrix rref = augmented.reducedRowEchelonForm();
+
+    // Extract solution
+    std::vector<T> x(rows);
+    for (int i = 0; i < rows; ++i) {
+        x[i] = rref(i, cols);
+    }
+
+    return x;
+}
+
+/**
+ * @brief Compute determinant using row reduction
+ */
+template<typename T>
+T Matrix<T>::determinant() const {
+    if (rows != cols) {
+        throw std::invalid_argument("Determinant only defined for square matrices");
+    }
+
+    Matrix temp = *this;
+    T det = T(1);
+
+    for (int col = 0; col < cols; ++col) {
+        // Find pivot
+        int pivot_row = col;
+        for (int row = col + 1; row < rows; ++row) {
+            if (std::abs(temp(row, col)) > std::abs(temp(pivot_row, col))) {
+                pivot_row = row;
+            }
+        }
+
+        // Check for zero pivot
+        if (std::abs(temp(pivot_row, col)) < 1e-10) {
+            return T(0);
+        }
+
+        // Swap rows if needed
+        if (pivot_row != col) {
+            temp.swapRows(col, pivot_row);
+            det = -det;
+        }
+
+        // Update determinant
+        det *= temp(col, col);
+
+        // Eliminate below
+        for (int row = col + 1; row < rows; ++row) {
+            T factor = temp(row, col) / temp(col, col);
+            temp.addRowMultiple(row, col, -factor);
+        }
+    }
+
+    return det;
+}
+
+/**
+ * @brief Compute matrix inverse using Gauss-Jordan elimination
+ */
+template<typename T>
+Matrix<T> Matrix<T>::inverse() const {
+    if (rows != cols) {
+        throw std::invalid_argument("Inverse only defined for square matrices");
+    }
+
+    // Create augmented matrix [A|I]
+    Matrix augmented(rows, 2 * cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            augmented(i, j) = data[i][j];
+            augmented(i, j + cols) = (i == j) ? T(1) : T(0);
+        }
+    }
+
+    // Row reduce to [I|A^(-1)]
+    Matrix rref = augmented.reducedRowEchelonForm();
+
+    // Check if we got identity on the left
+    for (int i = 0; i < rows; ++i) {
+        if (std::abs(rref(i, i) - T(1)) > 1e-10) {
+            throw std::runtime_error("Matrix is singular and has no inverse");
+        }
+    }
+
+    // Extract inverse from right half
+    Matrix inv(rows, cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            inv(i, j) = rref(i, j + cols);
+        }
+    }
+
+    return inv;
+}
+
+/**
+ * @brief Check linear independence of vectors (implementation for RealVectorSpace)
+ */
+inline bool RealVectorSpace::areLinearlyIndependent(
+    const std::vector<std::vector<double>>& vectors) const {
+
+    if (vectors.empty()) return true;
+    if (vectors.size() > static_cast<size_t>(n)) return false;
+
+    // Create matrix with vectors as columns
+    Matrix<double> mat(n, vectors.size());
+    for (size_t j = 0; j < vectors.size(); ++j) {
+        if (vectors[j].size() != static_cast<size_t>(n)) {
+            throw std::invalid_argument("All vectors must have dimension n");
+        }
+        for (int i = 0; i < n; ++i) {
+            mat(i, j) = vectors[j][i];
+        }
+    }
+
+    // Vectors are linearly independent iff matrix has full column rank
+    return mat.rank() == static_cast<int>(vectors.size());
+}
+
 } // namespace number_theory
 } // namespace maths
 
