@@ -26,9 +26,11 @@ physics_showcase/
 │   │   ├── distributions.hpp
 │   │   ├── econometrics_regression.hpp
 │   │   ├── fourier_analysis.hpp
+│   │   ├── group_theory_lie_groups.hpp  # NEW: Abstract algebra, Lie groups
 │   │   ├── matrices.hpp
 │   │   ├── monte_carlo.hpp
 │   │   ├── nonsmooth_algorithms.hpp
+│   │   ├── number_theory.hpp      # NEW: 6000-line number theory & arithmetic geometry
 │   │   ├── ode_dynamical_systems.hpp
 │   │   ├── partial_differential_equations.hpp
 │   │   ├── pde_classification_solutions.hpp
@@ -722,6 +724,185 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
   - Applications to hydrogen atom radial functions
 
 **Applications:** Analytic number theory, complex dynamics, quantum mechanics, special functions
+
+### Number Theory & Arithmetic Geometry (`maths/number_theory.hpp`)
+**Comprehensive 6000-line computational number theory and arithmetic geometry library**
+
+#### Elementary Number Theory
+- **Euclidean Algorithm**: GCD, extended GCD, Bézout coefficients
+- **Modular Arithmetic**: Modular exponentiation, inverse, Chinese Remainder Theorem
+- **Euler's Totient**: φ(n) computation, Euler's theorem
+- **Rational Reconstruction**: Recover a/b from a mod m
+
+#### Primality Testing & Factoring
+- **Primality Tests**: Trial division, Miller-Rabin (probabilistic & deterministic)
+- **Prime Generation**: Sieve of Eratosthenes, segmented sieve, random primes
+- **Prime Theorems**: Chebyshev bounds, Bertrand's postulate, Mertens' theorems
+- **Factoring Algorithms**:
+  - Trial division with optimization
+  - Pollard's p-1 method
+  - Quadratic sieve (subexponential)
+  - Perfect power testing
+
+#### Cryptographic Algorithms
+- **Discrete Logarithms**:
+  - Baby-step giant-step (O(√p) time)
+  - Pollard's rho algorithm (O(√p) expected)
+  - Index calculus (subexponential)
+- **Diffie-Hellman**: Key establishment protocol
+- **Quadratic Residues**:
+  - Legendre symbol computation
+  - Jacobi symbol via quadratic reciprocity
+  - Tonelli-Shanks modular square roots
+  - Blum integers for cryptography
+
+#### Abstract Algebra
+- **Groups**: Abstract groups, abelian groups, cyclic groups, symmetric groups
+  - Subgroups, cosets, quotient groups
+  - Homomorphisms, isomorphisms, kernels
+  - Lagrange's theorem, group structure
+- **Rings**: Ring theory, polynomial rings, ideals
+  - Quotient rings, ring homomorphisms
+  - Principal ideals, ideal arithmetic
+- **Fields**: Field extensions, finite fields F_p^n
+  - Characteristic, extension degree
+  - Frobenius endomorphism
+  - Trace and norm maps
+- **Modules**: Module theory over rings
+  - Submodules, quotient modules
+  - Module homomorphisms
+  - Linear independence, bases
+
+#### Lie Groups & Lie Algebras
+- **Matrix Lie Groups**: GL(n), SL(n), O(n), SO(n)
+  - Group structure verification
+  - Compactness, connectedness
+  - Fundamental groups
+- **Lie Algebras**: sl(n), so(n), matrix brackets
+  - Lie bracket [X,Y] = XY - YX
+  - Jacobi identity verification
+  - Exponential mapping
+- **Matrix Exponential**: exp(A) = Σ A^n/n!
+  - Matrix logarithm
+  - Baker-Campbell-Hausdorff formula
+
+#### Linear Algebra & Matrices
+- **Matrix Operations**: Addition, multiplication, transpose, trace
+- **Gaussian Elimination**: Row echelon form, reduced row echelon form
+- **Matrix Invariants**: Determinant, rank, inverse
+- **Linear Systems**: Solve Ax = b via Gauss-Jordan
+- **Sparse Matrices**: Efficient storage, iterative solvers
+- **Linear Transformations**: Characteristic/minimal polynomials
+
+#### Polynomial Arithmetic
+- **Basic Operations**: Addition, multiplication, evaluation
+- **Division Algorithm**: Quotient and remainder
+- **Polynomial GCD**: Euclidean algorithm for polynomials
+- **Extended GCD**: Bézout identity for polynomials
+- **Chinese Remainder Theorem**: For polynomials
+- **Modular Arithmetic**: Polynomial inverses mod p
+- **Rational Functions**: Reconstruction algorithms
+- **Interpolation**: Lagrange interpolation
+- **Multipoint Evaluation**: Fast evaluation at n points
+
+#### Finite Fields
+- **Field Construction**: F_{p^n} via irreducible polynomials
+- **Irreducibility Testing**: Rabin's algorithm using gcd conditions
+- **Primitive Polynomials**: Generator testing
+- **Frobenius Map**: α → α^p automorphism
+- **Trace Map**: Tr(α) = α + α^p + ... + α^{p^{n-1}}
+- **Norm Map**: N(α) = α · α^p · ... · α^{p^{n-1}}
+- **Conjugates**: Galois conjugates over base field
+- **Subfield Structure**: F_{p^m} ⊆ F_{p^n} iff m | n
+
+#### Polynomial Factorization over Finite Fields
+- **Square-Free Decomposition**: f = ∏ f_i^i
+- **Equal-Degree Factorization**: Split into degree-d factors
+- **Cantor-Zassenhaus**: Probabilistic factoring algorithm
+- **Berlekamp's Algorithm**: Deterministic factoring
+  - Berlekamp matrix construction
+  - Nullspace computation
+  - Factor splitting
+- **Complete Factorization**: With multiplicities
+
+#### Linear Recurrence Sequences
+- **Linearly Generated Sequences**: a_n = Σ c_i a_{n-i}
+- **Berlekamp-Massey Algorithm**: Compute minimal polynomial
+  - Shortest linear recurrence
+  - O(n²) complexity
+- **Characteristic Polynomial**: x^d - c_1x^{d-1} - ... - c_d
+- **Matrix Method**: Hankel matrix approach
+
+#### Elliptic Curves
+- **Weierstrass Form**: y² = x³ + ax + b
+- **Point Addition**: Chord-and-tangent algorithm
+- **Scalar Multiplication**: [n]P using double-and-add
+- **Torsion Points**: E[n] = {P : [n]P = O}
+- **Point Counting**: #E(F_p) via naive enumeration
+- **j-Invariant**: j = 1728 · 4a³/(4a³ + 27b²)
+- **Isomorphism Testing**: Via j-invariant
+
+#### Iwasawa Theory of Elliptic Curves
+- **Selmer Groups**: Sel_p(E/K) measuring Hasse principle obstruction
+  - Dimension and p-rank computation
+  - Local-to-global principles
+- **Cohomology Groups**:
+  - Local cohomology H¹(K_v, E[p])
+  - Global cohomology H¹(K, E[p])
+  - Kummer map E(K)/pE(K) → H¹(K, E[p])
+- **Iwasawa Invariants**:
+  - Lambda invariant λ (polynomial growth rate)
+  - Mu invariant μ (Greenberg's conjecture: μ = 0)
+  - Growth formula: |Sel_p(E/K_n)| ≈ p^{λn + μp^n + ν}
+- **Control Theorems**: Relate Selmer groups in Z_p-towers
+- **Characteristic Ideals**: f(T) ∈ Z_p[[T]] encoding invariants
+- **Kummer Theory**:
+  - Kummer pairing computations
+  - Extension degrees [K(E[p]) : K]
+  - Galois group structure
+
+#### Galois Representations & Modularity
+- **ℓ-adic Representations**: ρ_E,ℓ: Gal(Q̄/Q) → GL₂(Z_ℓ)
+  - Tate module T_ℓ(E)
+  - Surjectivity (Serre's conjecture)
+  - Determinant = cyclotomic character
+- **Trace of Frobenius**: a_p = p + 1 - #E(F_p)
+  - Hasse bound: |a_p| ≤ 2√p
+  - Eichler-Shimura relation
+- **Modularity**: All elliptic curves over Q are modular
+  - Wiles, Taylor-Wiles, BCDT theorem
+  - Conductor computation
+- **Adelic Representations**: ρ: Gal(Q̄/Q) → GL₂(Ẑ)
+  - Compatibility across primes
+  - Image index [GL₂(Ẑ) : Im(ρ)]
+  - Complex multiplication detection
+
+#### Modular Curves & Hecke Theory
+- **Jacobian J₀(N)**: Jacobian of X₀(N)
+  - Genus/dimension formulas
+  - Mordell-Weil rank (BSD conjecture)
+  - Torsion subgroup structure
+- **Eisenstein Ideals**: I_E in Hecke algebra T
+  - Kernel J₀(N)[I_E] (Ribet's theorem)
+  - Maximal ideal properties
+  - Level-lowering applications
+- **Hecke Operators**: T_p on modular forms
+  - Eigenvalue a_p computation
+  - Ramanujan bound |a_p| ≤ 2√p
+  - Multiplicativity relations
+
+**Implementation Features:**
+- **6000 lines** of production-quality C++ code
+- Template-based for flexibility (works over Z, Q, F_p, etc.)
+- Comprehensive error checking and edge cases
+- Research-grade algorithms from:
+  - John Coates (Iwasawa theory)
+  - Ralph Greenberg (control theorems, invariants)
+  - Kenneth Ribet (level-lowering, Eisenstein ideals)
+  - Andrew Wiles (modularity theorem)
+  - Jean-Pierre Serre (Galois representations)
+
+**Applications:** Cryptography, algebraic number theory, arithmetic geometry, elliptic curve cryptography, post-quantum cryptography research, modular forms, BSD conjecture computations
 
 ### Basic Mathematics
 
