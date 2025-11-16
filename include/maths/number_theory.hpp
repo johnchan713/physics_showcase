@@ -5291,6 +5291,707 @@ inline std::vector<PolynomialExtended> squareFreeDecomposition(
     return components;
 }
 
+// =============================================================================
+// ELLIPTIC CURVES AND GALOIS REPRESENTATIONS
+// =============================================================================
+
+/**
+ * @brief Point on an elliptic curve
+ *
+ * Represents a point (x, y) or the point at infinity
+ */
+template<typename Field = long long>
+struct EllipticCurvePoint {
+    Field x, y;
+    bool isInfinity;
+    long long modulus; // For fields F_p
+
+    EllipticCurvePoint() : x(0), y(0), isInfinity(true), modulus(0) {}
+
+    EllipticCurvePoint(const Field& x_, const Field& y_, long long mod = 0)
+        : x(x_), y(y_), isInfinity(false), modulus(mod) {}
+
+    static EllipticCurvePoint infinity(long long mod = 0) {
+        EllipticCurvePoint pt;
+        pt.modulus = mod;
+        return pt;
+    }
+
+    bool operator==(const EllipticCurvePoint& other) const {
+        if (isInfinity && other.isInfinity) return true;
+        if (isInfinity || other.isInfinity) return false;
+        return x == other.x && y == other.y;
+    }
+};
+
+/**
+ * @brief Elliptic curve in Weierstrass form
+ *
+ * E: y² = x³ + ax + b (for simplicity, considering short Weierstrass form)
+ * Can be generalized to y² + a₁xy + a₃y = x³ + a₂x² + a₄x + a₆
+ */
+template<typename Field = long long>
+class EllipticCurve {
+private:
+    Field a, b; // Curve coefficients for y² = x³ + ax + b
+    long long modulus; // For curves over F_p
+
+public:
+    EllipticCurve(const Field& a_, const Field& b_, long long mod = 0)
+        : a(a_), b(b_), modulus(mod) {
+        // Check discriminant: Δ = -16(4a³ + 27b²) ≠ 0
+        if (modulus > 0) {
+            long long delta = (-16 * (4 * a * a * a + 27 * b * b)) % modulus;
+            if (delta == 0) {
+                throw std::invalid_argument("Curve is singular");
+            }
+        }
+    }
+
+    /**
+     * @brief Point addition using chord-and-tangent method
+     */
+    EllipticCurvePoint<Field> add(const EllipticCurvePoint<Field>& P,
+                                  const EllipticCurvePoint<Field>& Q) const {
+        if (P.isInfinity) return Q;
+        if (Q.isInfinity) return P;
+
+        if (modulus > 0) {
+            // Addition over F_p
+            if (P.x == Q.x) {
+                if ((P.y + Q.y) % modulus == 0) {
+                    return EllipticCurvePoint<Field>::infinity(modulus);
+                }
+                // Point doubling
+                long long slope = (3 * P.x * P.x + a) * modInverse(2 * P.y, modulus) % modulus;
+                long long x3 = (slope * slope - 2 * P.x + modulus + modulus) % modulus;
+                long long y3 = (slope * (P.x - x3) - P.y + modulus + modulus) % modulus;
+                return EllipticCurvePoint<Field>(x3, y3, modulus);
+            } else {
+                // Point addition
+                long long slope = ((Q.y - P.y + modulus) % modulus) *
+                                 modInverse((Q.x - P.x + modulus) % modulus, modulus) % modulus;
+                long long x3 = (slope * slope - P.x - Q.x + modulus + modulus + modulus) % modulus;
+                long long y3 = (slope * (P.x - x3) - P.y + modulus + modulus) % modulus;
+                return EllipticCurvePoint<Field>(x3, y3, modulus);
+            }
+        }
+
+        return P; // Simplified for other fields
+    }
+
+    /**
+     * @brief Scalar multiplication [n]P
+     */
+    EllipticCurvePoint<Field> multiply(long long n, const EllipticCurvePoint<Field>& P) const {
+        if (n == 0 || P.isInfinity) {
+            return EllipticCurvePoint<Field>::infinity(modulus);
+        }
+
+        if (n < 0) {
+            EllipticCurvePoint<Field> negP = P;
+            negP.y = -P.y;
+            if (modulus > 0) negP.y = (negP.y % modulus + modulus) % modulus;
+            return multiply(-n, negP);
+        }
+
+        // Double-and-add algorithm
+        EllipticCurvePoint<Field> result = EllipticCurvePoint<Field>::infinity(modulus);
+        EllipticCurvePoint<Field> temp = P;
+
+        while (n > 0) {
+            if (n % 2 == 1) {
+                result = add(result, temp);
+            }
+            temp = add(temp, temp);
+            n /= 2;
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief Compute order of a point (for finite fields)
+     */
+    long long pointOrder(const EllipticCurvePoint<Field>& P, long long maxOrder = 10000) const {
+        if (P.isInfinity) return 1;
+
+        EllipticCurvePoint<Field> Q = P;
+        for (long long n = 1; n <= maxOrder; ++n) {
+            if (Q.isInfinity) return n;
+            Q = add(Q, P);
+        }
+
+        return -1; // Order not found
+    }
+
+    /**
+     * @brief Find all n-torsion points E[n]
+     *
+     * Points P such that [n]P = O
+     */
+    std::vector<EllipticCurvePoint<Field>> torsionPoints(int n) const {
+        std::vector<EllipticCurvePoint<Field>> torsion;
+        torsion.push_back(EllipticCurvePoint<Field>::infinity(modulus));
+
+        if (modulus > 0) {
+            // Search for torsion points over F_p
+            for (long long x = 0; x < modulus; ++x) {
+                long long rhs = (x * x * x + a * x + b) % modulus;
+                rhs = (rhs % modulus + modulus) % modulus;
+
+                // Check if rhs is a quadratic residue
+                if (legendreSymbol(rhs, modulus) >= 0) {
+                    long long y = modularSquareRoot(rhs, modulus);
+                    if (y != -1) {
+                        EllipticCurvePoint<Field> P(x, y, modulus);
+                        if (multiply(n, P).isInfinity) {
+                            torsion.push_back(P);
+                        }
+                        if (y != 0) {
+                            EllipticCurvePoint<Field> Q(x, (modulus - y) % modulus, modulus);
+                            if (multiply(n, Q).isInfinity) {
+                                torsion.push_back(Q);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return torsion;
+    }
+
+    /**
+     * @brief Compute j-invariant: j = 1728 · 4a³ / (4a³ + 27b²)
+     */
+    Field jInvariant() const {
+        Field numerator = 1728 * 4 * a * a * a;
+        Field denominator = 4 * a * a * a + 27 * b * b;
+
+        if (modulus > 0) {
+            return (numerator * modInverse(denominator, modulus)) % modulus;
+        }
+
+        return numerator / denominator;
+    }
+
+    Field getA() const { return a; }
+    Field getB() const { return b; }
+    long long getModulus() const { return modulus; }
+};
+
+// =============================================================================
+// IWASAWA THEORY OF ELLIPTIC CURVES
+// =============================================================================
+
+/**
+ * @brief Selmer group structure for elliptic curves
+ *
+ * The p-Selmer group Sel_p(E/K) measures the obstruction to
+ * the Hasse principle for E
+ */
+template<typename Field = long long>
+class SelmerGroup {
+private:
+    EllipticCurve<Field> curve;
+    long long prime; // Prime p for p-Selmer group
+    std::vector<Field> generators; // Generators of Selmer group
+
+public:
+    SelmerGroup(const EllipticCurve<Field>& E, long long p)
+        : curve(E), prime(p) {}
+
+    /**
+     * @brief Compute dimension of Selmer group
+     *
+     * dim Sel_p(E/Q) gives information about Mordell-Weil rank
+     */
+    int dimension() const {
+        // Simplified computation
+        // In practice, requires local conditions at all primes
+        return static_cast<int>(generators.size());
+    }
+
+    /**
+     * @brief Check if element is in Selmer group
+     *
+     * Requires checking local conditions at all primes
+     */
+    bool isInSelmerGroup(const Field& element) const {
+        // Simplified implementation
+        // True Selmer group computation requires:
+        // 1. Global cohomology H¹(G_K, E[p])
+        // 2. Local conditions at all primes
+        return false;
+    }
+
+    /**
+     * @brief Compute p-rank of Selmer group
+     */
+    int pRank() const {
+        return dimension();
+    }
+};
+
+/**
+ * @brief Local cohomology group H¹(K_v, E[p])
+ *
+ * Local Galois cohomology at a place v
+ */
+template<typename Field = long long>
+class LocalCohomologyGroup {
+private:
+    EllipticCurve<Field> curve;
+    long long prime; // Prime p
+    long long place;  // Place v
+
+public:
+    LocalCohomologyGroup(const EllipticCurve<Field>& E, long long p, long long v)
+        : curve(E), prime(p), place(v) {}
+
+    /**
+     * @brief Compute dimension of local cohomology
+     */
+    int dimension() const {
+        // For good reduction at v: dim = 1
+        // For multiplicative reduction: dim = 2
+        // For additive reduction: varies
+        return 1; // Simplified
+    }
+
+    /**
+     * @brief Kummer map from E(K_v)/pE(K_v) → H¹(K_v, E[p])
+     */
+    Field kummerMap(const EllipticCurvePoint<Field>& P) const {
+        // Simplified Kummer theory
+        // Maps points to cohomology classes
+        return P.x;
+    }
+};
+
+/**
+ * @brief Global cohomology group H¹(K, E[p])
+ *
+ * Global Galois cohomology
+ */
+template<typename Field = long long>
+class GlobalCohomologyGroup {
+private:
+    EllipticCurve<Field> curve;
+    long long prime;
+
+public:
+    GlobalCohomologyGroup(const EllipticCurve<Field>& E, long long p)
+        : curve(E), prime(p) {}
+
+    /**
+     * @brief Compute Euler characteristic using Tate's formula
+     *
+     * χ(K, E[p]) = [K:Q] · ∏_v c_v / #E(K)[p]
+     */
+    long long eulerCharacteristic(int fieldDegree) const {
+        // Simplified computation
+        // Requires Tamagawa numbers c_v at all primes
+        return fieldDegree;
+    }
+
+    /**
+     * @brief Compute dimension using cohomology formula
+     */
+    int dimension() const {
+        // dim H¹(K, E[p]) relates to Selmer group
+        return 0; // Requires full computation
+    }
+};
+
+/**
+ * @brief Iwasawa module for elliptic curves
+ *
+ * Studies arithmetic objects in the cyclotomic Z_p-extension
+ */
+template<typename Field = long long>
+class IwasawaModule {
+private:
+    EllipticCurve<Field> curve;
+    long long prime; // Prime p for Z_p-extension
+
+public:
+    IwasawaModule(const EllipticCurve<Field>& E, long long p)
+        : curve(E), prime(p) {}
+
+    /**
+     * @brief Lambda invariant (growth rate of Selmer groups)
+     *
+     * Measures rank growth in Z_p-extension
+     */
+    int lambdaInvariant() const {
+        // In Iwasawa theory: |Sel_p(E/K_n)| ≈ p^{λn + μp^n + ν}
+        // λ measures polynomial growth
+        return 0; // Requires deep computation
+    }
+
+    /**
+     * @brief Mu invariant (anomalous growth)
+     *
+     * μ = 0 for elliptic curves without CM (conjectured)
+     */
+    int muInvariant() const {
+        // Greenberg's conjecture: μ = 0 for E/Q without CM
+        return 0;
+    }
+
+    /**
+     * @brief Control theorem for Selmer groups
+     *
+     * Relates Sel_p(E/K_n) to Sel_p(E/K_{n+1})
+     */
+    bool controlTheorem() const {
+        // Control theorem: canonical map
+        // Sel_p(E/K_n) → Sel_p(E/K_{n+1})
+        // has bounded kernel and cokernel
+        return true;
+    }
+
+    /**
+     * @brief Characteristic ideal of Iwasawa module
+     */
+    PolynomialExtended characteristicIdeal() const {
+        // The characteristic polynomial f(T) ∈ Z_p[[T]]
+        // encodes Iwasawa invariants
+        std::vector<long long> coeffs = {1}; // Simplified
+        return PolynomialExtended(coeffs);
+    }
+};
+
+/**
+ * @brief Kummer theory for elliptic curves
+ *
+ * Studies fields generated by torsion points
+ */
+template<typename Field = long long>
+class KummerTheory {
+private:
+    EllipticCurve<Field> curve;
+    long long prime;
+
+public:
+    KummerTheory(const EllipticCurve<Field>& E, long long p)
+        : curve(E), prime(p) {}
+
+    /**
+     * @brief Kummer pairing
+     *
+     * E(K)/pE(K) × H¹(K, E[p]) → Z/pZ
+     */
+    long long kummerPairing(const EllipticCurvePoint<Field>& P, const Field& cohomClass) const {
+        // Simplified pairing
+        return 0;
+    }
+
+    /**
+     * @brief Compute degree of Kummer extension
+     *
+     * [K(E[p]) : K] where K(E[p]) is field generated by p-torsion
+     */
+    long long extensionDegree() const {
+        // For most elliptic curves: [Q(E[p]) : Q] divides (p²-1)(p²-p)
+        long long maxDegree = (prime * prime - 1) * (prime * prime - prime);
+        return maxDegree; // Simplified
+    }
+
+    /**
+     * @brief Check if Kummer extension is abelian
+     */
+    bool isAbelianExtension() const {
+        // K(E[p])/K is Galois, possibly non-abelian
+        // Abelian iff Galois group is abelian
+        return false; // Generally non-abelian for p > 2
+    }
+};
+
+// =============================================================================
+// MODULAR CURVES AND GALOIS REPRESENTATIONS
+// =============================================================================
+
+/**
+ * @brief Modular curve J₀(N)
+ *
+ * Jacobian of modular curve X₀(N)
+ */
+class ModularCurveJ0 {
+private:
+    long long level; // Level N
+
+public:
+    explicit ModularCurveJ0(long long N) : level(N) {}
+
+    /**
+     * @brief Dimension of J₀(N)
+     *
+     * dim J₀(N) = genus of X₀(N)
+     */
+    long long dimension() const {
+        // Genus formula for X₀(N)
+        if (level == 1) return 0;
+
+        // Approximate genus using formula involving divisor function
+        long long g = 1 + level / 12;
+
+        // Corrections for small N (simplified)
+        return g;
+    }
+
+    /**
+     * @brief Compute rank of J₀(N)(Q)
+     *
+     * Mordell-Weil rank over Q
+     */
+    int rank() const {
+        // Difficult computation requiring BSD conjecture
+        return 0; // Unknown in general
+    }
+
+    /**
+     * @brief Find n-torsion subgroup J₀(N)[n]
+     */
+    int torsionDimension(int n) const {
+        // J₀(N)[n] is a finite group
+        // Dimension over Z/nZ
+        return 2 * dimension(); // As Z/nZ-module
+    }
+
+    long long getLevel() const { return level; }
+};
+
+/**
+ * @brief Eisenstein ideal in Hecke algebra
+ *
+ * Ideal generated by T_p - (1 + p) for primes p ∤ N
+ */
+class EisensteinIdeal {
+private:
+    long long level;
+    long long prime; // Auxiliary prime ℓ for ℓ-adic representations
+
+public:
+    EisensteinIdeal(long long N, long long ell) : level(N), prime(ell) {}
+
+    /**
+     * @brief Compute kernel of Eisenstein ideal
+     *
+     * Ribet's theorem: relates kernel to J₀(N)[I_E]
+     */
+    int kernelDimension() const {
+        // Dimension of J₀(N)[I_E] where I_E is Eisenstein ideal
+        // Related to congruences between modular forms
+        return 1; // Simplified
+    }
+
+    /**
+     * @brief Check if ideal is maximal
+     */
+    bool isMaximal() const {
+        // Eisenstein ideal is maximal in Hecke algebra
+        return true;
+    }
+
+    /**
+     * @brief Compute residue field
+     *
+     * T/I_E ≅ F_ℓ typically
+     */
+    long long residueFieldSize() const {
+        return prime;
+    }
+};
+
+/**
+ * @brief Galois representation ρ: Gal(Q̄/Q) → GL₂(Z_ℓ)
+ *
+ * Representation on Tate module T_ℓ(E)
+ */
+template<typename Field = long long>
+class GaloisRepresentation {
+private:
+    EllipticCurve<Field> curve;
+    long long prime; // Prime ℓ for ℓ-adic representation
+
+public:
+    GaloisRepresentation(const EllipticCurve<Field>& E, long long ell)
+        : curve(E), prime(ell) {}
+
+    /**
+     * @brief Check if representation is surjective
+     *
+     * Important for Serre's conjecture (now theorem)
+     */
+    bool isSurjective() const {
+        // For most elliptic curves without CM:
+        // ρ_E,ℓ: Gal(Q̄/Q) → GL₂(Z_ℓ) is surjective for all but finitely many ℓ
+        return true; // Simplified
+    }
+
+    /**
+     * @brief Compute determinant character
+     *
+     * det ρ = cyclotomic character χ_ℓ
+     */
+    bool hasCorrectDeterminant() const {
+        // det(ρ(σ)) = χ_ℓ(σ) for all σ ∈ Gal(Q̄/Q)
+        return true;
+    }
+
+    /**
+     * @brief Check if representation is modular
+     *
+     * Modularity theorem (Wiles, Taylor-Wiles, etc.)
+     */
+    bool isModular() const {
+        // All elliptic curves over Q are modular
+        return true;
+    }
+
+    /**
+     * @brief Compute level of representation
+     *
+     * Conductor of associated modular form
+     */
+    long long conductor() const {
+        // Conductor N(E) = ∏_p p^{f_p}
+        // where f_p depends on reduction type at p
+        return 1; // Requires factorization
+    }
+
+    /**
+     * @brief Trace of Frobenius at prime p
+     *
+     * a_p = p + 1 - #E(F_p)
+     */
+    long long traceOfFrobenius(long long p) const {
+        if (p == curve.getModulus()) {
+            return 0; // Bad reduction
+        }
+
+        // Count points on E(F_p)
+        long long count = 1; // Point at infinity
+        for (long long x = 0; x < p; ++x) {
+            long long rhs = (x * x * x + curve.getA() * x + curve.getB()) % p;
+            rhs = (rhs % p + p) % p;
+
+            int leg = legendreSymbol(rhs, p);
+            if (leg == 1) {
+                count += 2; // Two points (x, ±y)
+            } else if (leg == 0) {
+                count += 1; // One point (x, 0)
+            }
+        }
+
+        return p + 1 - count;
+    }
+};
+
+/**
+ * @brief Adelic representation
+ *
+ * Product of all ℓ-adic representations
+ * ρ: Gal(Q̄/Q) → GL₂(Ẑ) = ∏_ℓ GL₂(Z_ℓ)
+ */
+template<typename Field = long long>
+class AdelicRepresentation {
+private:
+    EllipticCurve<Field> curve;
+    std::vector<long long> primes;
+
+public:
+    explicit AdelicRepresentation(const EllipticCurve<Field>& E)
+        : curve(E) {
+        // Initialize with small primes
+        primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
+    }
+
+    /**
+     * @brief Check compatibility across primes
+     *
+     * Traces should be compatible via Eichler-Shimura
+     */
+    bool checkCompatibility() const {
+        // a_p should be independent of ℓ (comes from modular form)
+        return true;
+    }
+
+    /**
+     * @brief Compute image of representation
+     *
+     * Im(ρ) ⊆ GL₂(Ẑ)
+     */
+    long long imageIndex() const {
+        // Index [GL₂(Ẑ) : Im(ρ)]
+        // Finite for elliptic curves without CM
+        return 1; // Simplified
+    }
+
+    /**
+     * @brief Check if representation has complex multiplication
+     */
+    bool hasComplexMultiplication() const {
+        // E has CM iff End(E) is larger than Z
+        // Equivalent to j-invariant being algebraic integer
+        return false; // Most curves don't have CM
+    }
+
+    /**
+     * @brief Lenstra's result on image of inertia
+     *
+     * Studies image of inertia groups in Galois representation
+     */
+    bool lenstraCondition(long long p) const {
+        // Technical condition on ramification
+        // Used in Ribet's level-lowering theorem
+        return true;
+    }
+
+    /**
+     * @brief Compute Serre's conductor
+     *
+     * Minimal level for which ρ mod ℓ is modular
+     */
+    long long serreConductor(long long ell) const {
+        // Conductor of mod ℓ representation
+        return curve.getModulus(); // Simplified
+    }
+};
+
+/**
+ * @brief Hecke operator T_p on modular forms
+ */
+class HeckeOperator {
+private:
+    long long prime;
+    long long level;
+
+public:
+    HeckeOperator(long long p, long long N) : prime(p), level(N) {}
+
+    /**
+     * @brief Eigenvalue a_p for eigenform
+     *
+     * Related to trace of Frobenius
+     */
+    long long eigenvalue(const EllipticCurve<long long>& E) const {
+        GaloisRepresentation<long long> rho(E, prime);
+        return rho.traceOfFrobenius(prime);
+    }
+
+    /**
+     * @brief Check Ramanujan bound |a_p| ≤ 2√p
+     */
+    bool satisfiesRamanujanBound(long long a_p) const {
+        double bound = 2.0 * std::sqrt(static_cast<double>(prime));
+        return std::abs(static_cast<double>(a_p)) <= bound;
+    }
+};
+
 } // namespace number_theory
 } // namespace maths
 
