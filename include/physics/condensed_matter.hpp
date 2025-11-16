@@ -187,7 +187,7 @@ public:
         if (T >= T_c_) return 0.0;
 
         double Delta = energyGap(T);
-        double v_F = std::sqrt(2.0 * E_F / m_e);
+        double v_F = std::sqrt(2.0 * E_F_ / m_e);
         return hbar * v_F / (M_PI * Delta);
     }
 
@@ -254,7 +254,7 @@ public:
         auto v_s = superfluidVelocity(A);
         std::vector<double> j_s(v_s.size());
         for (size_t i = 0; i < v_s.size(); ++i) {
-            j_s[i] = -n_s * e * v_s[i];
+            j_s[i] = -n_s_ * e * v_s[i];
         }
         return j_s;
     }

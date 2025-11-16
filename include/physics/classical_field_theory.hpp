@@ -145,9 +145,9 @@ public:
         double eps = 1e-6) {
 
         auto dphi = phi.gradient(x, eps);
-        double dL_dphi = (L(x, phi, dphi) - L(x, ScalarField([&phi, &x](const Vector4&) {
+        double dL_dphi = (L(x, phi, dphi) - L(x, ScalarField(std::function<double(const Vector4&)>([&phi, &x, eps](const Vector4&) {
             return phi(x) - eps;
-        }), dphi)) / eps;
+        })), dphi)) / eps;
 
         double dL_ddphi_sum = 0.0;
         for (int mu = 0; mu < 4; ++mu) {

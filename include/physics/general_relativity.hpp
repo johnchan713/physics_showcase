@@ -400,12 +400,12 @@ public:
     bool verifyFieldEquations(const Tensor2& stress_energy,
                               const Vector4& x,
                               double tol = 1e-6) const {
-        auto G = components(x);
+        auto G_tensor = components(x);
         double factor = 8.0 * M_PI * G / (c * c * c * c);
 
         for (int mu = 0; mu < 4; ++mu) {
             for (int nu = 0; nu < 4; ++nu) {
-                double diff = std::abs(G[mu][nu] - factor * stress_energy[mu][nu]);
+                double diff = std::abs(G_tensor[mu][nu] - factor * stress_energy[mu][nu]);
                 if (diff > tol) {
                     return false;
                 }

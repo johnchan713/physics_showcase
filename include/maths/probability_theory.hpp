@@ -157,6 +157,10 @@ public:
         return std::sqrt(variance(outcomes, probabilities));
     }
 
+    ProbabilitySpace* space() const {
+        return space_;
+    }
+
     std::vector<double> cumulativeDistribution(const std::vector<Outcome>& outcomes,
                                               const std::vector<double>& probabilities,
                                               const std::vector<double>& x_values) const {
@@ -283,7 +287,7 @@ public:
         };
 
         int n = iid_sequence.size();
-        RandomVariable X_bar(iid_sequence[0].space_, sample_mean(n));
+        RandomVariable X_bar(iid_sequence[0].space(), sample_mean(n));
 
         double prob_deviation = 0.0;
         for (size_t i = 0; i < outcomes.size(); ++i) {
