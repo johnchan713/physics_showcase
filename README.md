@@ -2196,6 +2196,153 @@ Comprehensive nuclear physics module covering radioactive decay, nuclear stabili
 - **Primordial Radionuclides**: U-238 (4.5 Gyr), U-235 (704 Myr), Th-232 (14 Gyr), K-40 (1.25 Gyr)
 - **Cosmogenic**: C-14 (5730 yr), Be-10 (1.39 Myr), Be-7 (53 d), H-3 (12.3 yr)
 
+**Neutron Interactions:**
+
+*Neutron Scattering - Elastic and Inelastic:*
+- **Elastic Scattering**: (n,n) - Neutron bounces off nucleus, KE conserved in CM frame
+- **Inelastic Scattering**: (n,n') - Neutron loses energy, nucleus left in excited state
+- **Average Log Energy Decrement**: ξ = 1 - [(A-1)²/(2A)] ln[(A+1)/(A-1)]
+- **Slowing-Down Power**: ξΣ_s (moderating power)
+- **Moderating Ratio**: ξΣ_s / Σ_a (figure of merit for moderators)
+- **Computational Functions**:
+  - `average_log_energy_decrement(A)` - ξ calculation for neutron moderation
+  - `energy_after_elastic(E_initial, A, θ_cm)` - E' = E[(A² + 1 + 2A cos θ)/(A+1)²]
+  - `minimum_energy_elastic(E, A)` - E_min = E[(A-1)/(A+1)]² (backscatter)
+  - `collisions_to_slow(E_i, E_f, A)` - n ≈ ln(E_i/E_f)/ξ
+  - `inelastic_threshold(Q, A)` - E_thresh = Q[(A+1)/A]
+  - `energy_after_inelastic(E, Q, A)` - Neutron energy after excitation
+  - `slowing_down_power(ξ, Σ_s)` - Moderating power
+  - `moderating_ratio(ξ, Σ_s, Σ_a)` - Quality factor for moderators
+
+*Neutron Absorption - Radiative Capture:*
+- **Radiative Capture**: (n,γ) - n + A → (A+1) + γ (neutron absorbed, gamma emitted)
+- **1/v Law**: σ(E) = σ_0 √(E_0/E) for thermal neutrons (σ ∝ 1/v)
+- **Breit-Wigner Resonance**: σ(E) = σ_max [Γ²/4] / [(E - E_R)² + Γ²/4]
+- **Resonance Integral**: I = ∫ σ(E) dE/E over epithermal range
+- **Activation**: R = φ N σ_a (reactions/cm³/s)
+- **Computational Functions**:
+  - `capture_cross_section_thermal(σ_0, E_0, E)` - 1/v law σ(E)
+  - `breit_wigner_resonance(σ_max, E_R, Γ, E)` - Resonance shape
+  - `resonance_integral_single(σ_0, E_R, Γ)` - Epithermal contribution
+  - `activation_rate(φ, N, σ_a)` - Reaction rate R = φNσ
+  - `activity_from_irradiation(R, λ, t)` - A = R(1 - e^(-λt))
+  - `saturation_activity(R)` - A_sat = R (infinite irradiation)
+  - `effective_cross_section(σ_th, I, f_th)` - Spectrum-averaged σ_eff
+  - `self_shielding_factor(τ)` - f ≈ 1/(1 + τ) (flux depression)
+
+*Particle Ejection Reactions:*
+- **(n,p) Reaction**: n + A(Z) → p + A(Z-1) (neutron in, proton out, Z → Z-1)
+  - Threshold typically 1-5 MeV (endothermic for most nuclei)
+  - Q-value usually negative: Q ≈ (m_n - m_p)c² + ΔBE ≈ -0.8 MeV
+- **(n,α) Reaction**: n + A(Z) → α + (A-3)(Z-2) (alpha particle ejection)
+  - Exothermic for light nuclei (⁶Li, ¹⁰B), endothermic for heavy
+  - Important for neutron detection: ⁶Li(n,α)³H, ¹⁰B(n,α)⁷Li
+- **(n,2n) Reaction**: n + A → 2n + (A-1) (neutron multiplication)
+  - High threshold: typically 8-10 MeV (Q ≈ -S_n ≈ -8 MeV)
+  - Peaks around 14 MeV (fusion neutron energy)
+  - Important for beryllium neutron multipliers in reactors
+- **Computational Functions**:
+  - `q_value_np(A, Z)` - (n,p) Q-value (typically negative)
+  - `q_value_n2n(A, Z)` - (n,2n) Q-value (Q ≈ -8 MeV)
+  - `threshold_energy(Q, A_target, A_product)` - Kinematic threshold
+  - `np_threshold(A)` - (n,p) threshold energy
+  - `n2n_threshold(A)` - (n,2n) threshold (typically 8-10 MeV)
+  - `np_cross_section(E, σ_max, E_peak)` - (n,p) energy dependence
+  - `n2n_cross_section(E, σ_max)` - (n,2n) σ(E), peaks at 14 MeV
+  - `neutron_multiplication(σ_n2n, σ_total)` - ν = 1 + σ(n,2n)/σ_total
+
+*Neutron-Induced Fission:*
+- **Fission Process**: n + A → fission fragments + neutrons + ~200 MeV
+  - Light fragment: A ≈ 95, heavy fragment: A ≈ 135 (bimodal distribution)
+  - Average neutrons: ν̄ = 2.42 (U-235), 2.87 (Pu-239)
+  - Energy release: ~200 MeV total, 190 MeV recoverable (10 MeV to neutrinos)
+- **Fission Cross-Sections**:
+  - U-235 (thermal): σ_f = 585 barns at 0.0253 eV (fissile)
+  - Pu-239 (thermal): σ_f = 747 barns (fissile)
+  - U-238 (fast): threshold at 1 MeV, σ_f ≈ 0.5 b at 14 MeV (fissionable)
+- **Delayed Neutrons**: Critical for reactor control
+  - β = 0.0065 (0.65%) for U-235
+  - β = 0.0021 (0.21%) for Pu-239
+  - β = 0.0148 (1.48%) for U-238
+- **Energy Distribution per Fission**:
+  - Fission fragments: 168 MeV (kinetic energy)
+  - Prompt neutrons: 5 MeV
+  - Prompt gammas: 7 MeV
+  - Beta decay: 7 MeV
+  - Gamma decay: 6 MeV
+  - Neutrinos: 10 MeV (lost, not recoverable)
+- **Computational Functions**:
+  - `fission_q_value(A)` - Q ≈ 0.85A MeV (≈ 200 MeV for U-235)
+  - `u235_fission_cross_section_thermal()` - σ_f = 585 barns
+  - `pu239_fission_cross_section_thermal()` - σ_f = 747 barns
+  - `u238_fission_cross_section(E)` - Fast fission σ_f(E) for U-238
+  - `average_neutrons_per_fission(isotope, E)` - ν̄(E) = ν̄_0 + slope × E
+  - `delayed_neutron_fraction(isotope)` - β for reactor kinetics
+  - `fission_energy_component(component)` - Energy breakdown by component
+  - `recoverable_energy_per_fission()` - 190 MeV (excludes neutrinos)
+  - `fission_yield_mass(A_fragment)` - Mass distribution (bimodal)
+  - `k_infinity(ν, σ_f, σ_c)` - k∞ = νσ_f/(σ_f + σ_c)
+  - `eta_factor(ν, σ_f, σ_a)` - η = νσ_f/σ_a (reproduction factor)
+  - `alpha_ratio(σ_c, σ_f)` - α = σ_c/σ_f (capture-to-fission ratio)
+
+**Nuclear Fission Physics:**
+
+*Liquid Drop Model:*
+- **Surface Energy**: E_surface = a_s A^(2/3) ≈ 17.8 A^(2/3) MeV
+- **Coulomb Energy**: E_Coulomb = a_c Z²/A^(1/3) ≈ 0.711 Z²/A^(1/3) MeV
+- **Fissility Parameter**: x = E_Coulomb / (2 × E_surface) = Z²/(50A)
+- **Critical Energy**: E_crit = 2 E_surface (1 - x), typically 5-6 MeV for actinides
+
+*Material Classification:*
+- **Fissile**: U-233, U-235, Pu-239, Pu-241 (fission with thermal neutrons)
+- **Fissionable**: U-238, Th-232 (fission with fast neutrons only)
+- **Fertile**: U-238 → Pu-239, Th-232 → U-233 (breeding potential)
+
+**Computational Functions**:
+  - `surface_energy(A)`, `coulomb_energy(Z, A)` - Liquid drop terms
+  - `fissility_parameter(Z, A)` - x = Z²/(50A)
+  - `critical_energy(Z, A)` - Fission barrier height
+  - `is_fissile/fissionable/fertile(Z, A)` - Material classification
+  - `binding_energy_per_nucleon(A, Z)` - BE/A from SEMF
+  - `spontaneous_fission_parameter(Z, A)` - Z²/A > 47 criterion
+
+**Fission Energy Release:**
+- **Total**: ~200 MeV (fragments: 168, neutrons: 5, gammas: 13, betas: 14, neutrinos: 10 lost)
+- **Recoverable**: 193 MeV (excluding neutrinos)
+
+**Computational Functions**:
+  - `fission_q_value_from_fragments(...)` - Calculate Q from SEMF
+  - `fragment_kinetic_energy_light/heavy(...)` - Fragment KE split by momentum
+  - `prompt/delayed_energy()` - Energy release timing
+  - `power_from_fission_rate(...)` - Convert fissions/s to watts
+  - `burnup_energy(...)` - Fuel burnup (MWd/kg)
+
+**Radiation Interactions:**
+
+*Alpha (α):*
+- Range: R ≈ 0.31 E^(3/2) cm in air, ~1/1000 in tissue
+- Very high ionization, Bragg peak at ~95% of range
+- Functions: `alpha_range_air/tissue(E)`, `alpha_specific_ionization(E)`
+
+*Beta (β⁻):*
+- Range: Katz-Penfold formula, ~0.1-1 cm in tissue
+- Bremsstrahlung: Y ≈ 3.5×10⁻⁴ Z E
+- Functions: `beta_range_aluminum/tissue(E)`, `bremsstrahlung_yield(Z, E)`
+
+*Positron (β⁺):*
+- Annihilation: e⁺ + e⁻ → 2γ (0.511 MeV each)
+- Functions: `positron_range_tissue(E)`, `annihilation_photon_energy()`
+
+*Neutron (n):*
+- Mean free path: λ = 1/(Nσ), diffusion length: L = √(D/Σ_a)
+- Quality factor: Q = 5-20 (energy dependent)
+- Functions: `neutron_mean_free_path(...)`, `neutron_quality_factor(E)`
+
+*Gamma (γ):*
+- Three processes: photoelectric (τ ∝ Z⁴/E³), Compton, pair production (E > 1.022 MeV)
+- Attenuation: I = I₀ e^(-μx), HVL = 0.693/μ
+- Functions: `gamma_attenuation_coefficient(...)`, `half_value_layer(μ)`, `gamma_transmission(...)`
+
 ### Compilation
 All modules are header-only and require C++17:
 
