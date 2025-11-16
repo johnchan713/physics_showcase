@@ -43,19 +43,19 @@ physics_showcase/
 │   │   ├── trigonometry_identities.hpp
 │   │   ├── variational_calculus.hpp
 │   │   └── vectors.hpp
-│   └── physics/
+│   └── physics/                   # All physics modules (flattened)
 │       ├── (basic modules)        # Classical mechanics, waves, etc.
-│       ├── advanced_quantum_mechanics.hpp      # NEW: Advanced QM topics
-│       ├── quantum_chemistry.hpp               # NEW: Atomic/molecular structure
-│       ├── quantum_foundations.hpp             # NEW: Historical QM development
-│       ├── relativistic_quantum_mechanics.hpp  # NEW: Spin and Dirac theory
-│       └── advanced/              # Advanced physics topics
-│           ├── classical/         # Hamiltonian, Liouville, phase space
-│           ├── cosmology/         # Friedmann equations, early universe
-│           ├── fluid_dynamics/    # Turbulence, compressible flow
-│           ├── gauge_theory/      # Gauge invariance, Higgs mechanism
-│           ├── operator_algebras.hpp  # NEW: Von Neumann, C*-algebras
-│           └── qft/              # Quantum field theory
+│       ├── advanced_quantum_mechanics.hpp      # Advanced QM topics
+│       ├── quantum_chemistry.hpp               # Atomic/molecular structure
+│       ├── quantum_foundations.hpp             # Historical QM development
+│       ├── relativistic_quantum_mechanics.hpp  # Spin and Dirac theory
+│       ├── operator_algebras.hpp               # Von Neumann, C*-algebras
+│       ├── classical_*.hpp        # Hamiltonian, Liouville, phase space (3 files)
+│       ├── cosmology_*.hpp        # Friedmann equations, early universe (4 files)
+│       ├── fluid_dynamics_*.hpp   # Turbulence, compressible flow (7 files)
+│       ├── gauge_theory_*.hpp     # Gauge invariance, Higgs mechanism (6 files)
+│       ├── qft_*.hpp              # Quantum field theory (8 files)
+│       └── physics_advanced.hpp   # Central header for all advanced modules
 ├── examples/                      # Physics demonstration programs
 └── README.md
 ```
