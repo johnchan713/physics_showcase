@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <string>
+#include <functional>
 
 /**
  * @file cross_sections.hpp
