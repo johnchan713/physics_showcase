@@ -1,7 +1,7 @@
 #ifndef PHYSICS_ADVANCED_FLUID_DYNAMICS_FLOW_TYPES_HPP
 #define PHYSICS_ADVANCED_FLUID_DYNAMICS_FLOW_TYPES_HPP
 
-#include <Eigen/Dense>
+#include "maths/vectors.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <vector>
@@ -415,8 +415,8 @@ public:
      * @param velocity Uniform velocity
      * @return Velocity at position
      */
-    static Eigen::Vector2d uniformFlow(const Eigen::Vector2d& position,
-                                       const Eigen::Vector2d& velocity) {
+    static maths::linear_algebra::Vector uniformFlow(const maths::linear_algebra::Vector& position,
+                                       const maths::linear_algebra::Vector& velocity) {
         return velocity;
     }
 
@@ -430,7 +430,7 @@ public:
      * @param source_strength m (positive = source, negative = sink)
      * @return Velocity
      */
-    static Eigen::Vector2d pointSource(const Eigen::Vector2d& position,
+    static maths::linear_algebra::Vector pointSource(const maths::linear_algebra::Vector& position,
                                        double source_strength) {
         double r = position.norm();
         if (r < 1e-10) {
@@ -438,7 +438,7 @@ public:
         }
 
         double u_r = source_strength / (2.0 * M_PI * r);
-        return u_r * position.normalized();
+        return position * (u_r / r);
     }
 
     /**
@@ -451,7 +451,7 @@ public:
      * @param circulation Γ
      * @return Velocity
      */
-    static Eigen::Vector2d pointVortex(const Eigen::Vector2d& position,
+    static maths::linear_algebra::Vector pointVortex(const maths::linear_algebra::Vector& position,
                                        double circulation) {
         double r = position.norm();
         if (r < 1e-10) {
@@ -461,8 +461,8 @@ public:
         double u_theta = circulation / (2.0 * M_PI * r);
 
         // Velocity is tangent to circles: perpendicular to radius
-        Eigen::Vector2d tangent(-position.y(), position.x());
-        return (u_theta / r) * tangent;
+        maths::linear_algebra::Vector tangent({-position[1], position[0]});
+        return tangent * (u_theta / r);
     }
 
     /**
@@ -474,10 +474,10 @@ public:
      * @param dipole_strength K
      * @return Velocity
      */
-    static Eigen::Vector2d doublet(const Eigen::Vector2d& position,
+    static maths::linear_algebra::Vector doublet(const maths::linear_algebra::Vector& position,
                                    double dipole_strength) {
-        double x = position.x();
-        double y = position.y();
+        double x = position[0];
+        double y = position[1];
         double r2 = x * x + y * y;
 
         if (r2 < 1e-10) {
@@ -489,7 +489,7 @@ public:
         double u = factor * (x * x - y * y) / r2;
         double v = factor * (2.0 * x * y) / r2;
 
-        return Eigen::Vector2d(u, v);
+        return maths::linear_algebra::Vector({u, v});
     }
 
     /**
@@ -502,21 +502,21 @@ public:
      * @param cylinder_radius R
      * @return Velocity
      */
-    static Eigen::Vector2d cylinderFlow(const Eigen::Vector2d& position,
+    static maths::linear_algebra::Vector cylinderFlow(const maths::linear_algebra::Vector& position,
                                         double uniform_velocity,
                                         double cylinder_radius) {
         double r = position.norm();
 
         if (r < cylinder_radius) {
             // Inside cylinder
-            return Eigen::Vector2d::Zero();
+            return maths::linear_algebra::Vector(2);
         }
 
         // Doublet strength K = -U R²
         double K = -uniform_velocity * cylinder_radius * cylinder_radius;
 
-        Eigen::Vector2d uniform(uniform_velocity, 0.0);
-        Eigen::Vector2d doublet_vel = doublet(position, K);
+        maths::linear_algebra::Vector uniform({uniform_velocity, 0.0});
+        maths::linear_algebra::Vector doublet_vel = doublet(position, K);
 
         return uniform + doublet_vel;
     }
@@ -545,11 +545,11 @@ public:
      *
      * Streamlines: ψ = constant
      */
-    static double streamFunction(const Eigen::Vector2d& position,
+    static double streamFunction(const maths::linear_algebra::Vector& position,
                                  double source_strength,
                                  double circulation) {
-        double x = position.x();
-        double y = position.y();
+        double x = position[0];
+        double y = position[1];
         double r = position.norm();
         double theta = std::atan2(y, x);
 
