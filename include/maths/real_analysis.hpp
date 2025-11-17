@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <limits>
 #include <stdexcept>
+#include <numeric>
 
 namespace maths {
 namespace real_analysis {

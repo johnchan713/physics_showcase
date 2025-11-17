@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <complex>
+#include <array>
 
 /**
  * @file oscillations.hpp

@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
+#include <functional>
 
 /**
  * @file life_tables.hpp
