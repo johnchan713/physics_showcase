@@ -14,6 +14,7 @@
 #include <functional>
 #include <unordered_map>
 #include <ctime>
+#include <complex>
 
 /**
  * @file number_theory.hpp
@@ -1942,6 +1943,11 @@ public:
     // Equality
     bool operator==(const Polynomial& other) const {
         return coeffs == other.coeffs;
+    }
+
+    // Less than (for std::map)
+    bool operator<(const Polynomial& other) const {
+        return coeffs < other.coeffs;
     }
 
     // Evaluate at x
@@ -3943,7 +3949,8 @@ public:
             if (quotient.coeffs.empty()) {
                 quotient = term;
             } else {
-                quotient = quotient + term;
+                Polynomial temp = quotient + term;
+                quotient = PolynomialExtended(temp.getCoeffs());
             }
 
             PolynomialExtended subtrahend(divisor.coeffs);
@@ -4086,7 +4093,8 @@ public:
         if (!(modulus == other.modulus)) {
             throw std::invalid_argument("Moduli must match");
         }
-        return PolynomialModulo(poly + other.poly, modulus);
+        Polynomial temp = poly + other.poly;
+        return PolynomialModulo(PolynomialExtended(temp.getCoeffs()), modulus);
     }
 
     /**
@@ -4096,7 +4104,8 @@ public:
         if (!(modulus == other.modulus)) {
             throw std::invalid_argument("Moduli must match");
         }
-        return PolynomialModulo(poly * other.poly, modulus);
+        Polynomial temp = poly * other.poly;
+        return PolynomialModulo(PolynomialExtended(temp.getCoeffs()), modulus);
     }
 };
 
@@ -4317,7 +4326,7 @@ inline PolynomialExtended polynomialModularInverse(const PolynomialExtended& f,
                                                    const PolynomialExtended& h) {
     auto [g, s, t] = PolynomialExtended::extendedGCD(f, h);
 
-    if (g.degree() != 0 || g.coeffs[0] != 1) {
+    if (g.degree() != 0 || g.getCoeffs()[0] != 1) {
         throw std::invalid_argument("Polynomials are not coprime");
     }
 
@@ -4345,7 +4354,8 @@ inline PolynomialExtended polynomialChineseRemainder(
     // Compute M = ∏ m_i
     PolynomialExtended M = moduli[0];
     for (size_t i = 1; i < moduli.size(); ++i) {
-        M = M * moduli[i];
+        Polynomial temp = M * moduli[i];
+        M = PolynomialExtended(temp.getCoeffs());
     }
 
     PolynomialExtended result({0});
@@ -4358,8 +4368,11 @@ inline PolynomialExtended polynomialChineseRemainder(
         PolynomialExtended yi = polynomialModularInverse(Mi, moduli[i]);
 
         // result += a_i * M_i * y_i
-        PolynomialExtended term = remainders[i] * Mi * yi;
-        result = result + term;
+        Polynomial temp1 = remainders[i] * Mi;
+        Polynomial temp2 = temp1 * yi;
+        PolynomialExtended term = PolynomialExtended(temp2.getCoeffs());
+        Polynomial temp3 = result + term;
+        result = PolynomialExtended(temp3.getCoeffs());
     }
 
     // Reduce modulo M
@@ -4411,7 +4424,7 @@ inline PolynomialExtended minimalPolynomial(const PolynomialModulo& alpha,
                                            long long p, int maxDeg = 10) {
     // Build matrix of powers of alpha
     std::vector<PolynomialExtended> powers;
-    PolynomialModulo current({1}, alpha.modulus);
+    PolynomialModulo current(PolynomialExtended(std::vector<long long>{1}), alpha.modulus);
 
     for (int i = 0; i <= maxDeg; ++i) {
         powers.push_back(current.poly);
@@ -4434,7 +4447,8 @@ inline PolynomialExtended fastPolynomialMultiply(const PolynomialExtended& a,
                                                 const PolynomialExtended& b) {
     // Full FFT implementation would go here
     // For now, fall back to standard multiplication
-    return a * b;
+    Polynomial temp = a * b;
+    return PolynomialExtended(temp.getCoeffs());
 }
 
 /**
@@ -4952,8 +4966,8 @@ inline long long trace(const PolynomialModulo& alpha, long long p, int n) {
     }
 
     // Extract constant term (element of F_p)
-    if (sum.poly.coeffs.empty()) return 0;
-    return ((sum.poly.coeffs[0] % p) + p) % p;
+    if (sum.poly.getCoeffs().empty()) return 0;
+    return ((sum.poly.getCoeffs()[0] % p) + p) % p;
 }
 
 /**
@@ -4971,8 +4985,8 @@ inline long long norm(const PolynomialModulo& alpha, long long p, int n) {
     }
 
     // Extract constant term
-    if (product.poly.coeffs.empty()) return 0;
-    return ((product.poly.coeffs[0] % p) + p) % p;
+    if (product.poly.getCoeffs().empty()) return 0;
+    return ((product.poly.getCoeffs()[0] % p) + p) % p;
 }
 
 /**
@@ -5015,13 +5029,19 @@ inline bool isIrreducibleRabin(const PolynomialExtended& f, long long p) {
     for (int i = 1; i < n; ++i) {
         // Compute x^{p^i} mod f
         for (long long j = 1; j < p; ++j) {
-            auto [q, r] = (xPower * xPower).divideWithRemainder(f);
+            Polynomial tempPoly = xPower * xPower;
+            PolynomialExtended tempExt(tempPoly.getCoeffs());
+            auto [q, r] = tempExt.divideWithRemainder(f);
             xPower = r;
         }
 
         // Compute gcd(f, x^{p^i} - x)
         PolynomialExtended diff = xPower;
-        diff.coeffs[1] -= 1; // x^{p^i} - x
+        std::vector<long long> diff_coeffs = diff.getCoeffs();
+        if (diff_coeffs.size() > 1) {
+            diff_coeffs[1] -= 1; // x^{p^i} - x
+            diff = PolynomialExtended(diff_coeffs);
+        }
 
         PolynomialExtended g = PolynomialExtended::gcd(f, diff);
 
@@ -5032,16 +5052,22 @@ inline bool isIrreducibleRabin(const PolynomialExtended& f, long long p) {
 
     // Check that f divides x^{p^n} - x
     for (long long j = 1; j < p; ++j) {
-        auto [q, r] = (xPower * xPower).divideWithRemainder(f);
+        Polynomial tempPoly = xPower * xPower;
+        PolynomialExtended tempExt(tempPoly.getCoeffs());
+        auto [q, r] = tempExt.divideWithRemainder(f);
         xPower = r;
     }
 
     PolynomialExtended diff = xPower;
-    diff.coeffs[1] -= 1;
+    std::vector<long long> diff_coeffs = diff.getCoeffs();
+    if (diff_coeffs.size() > 1) {
+        diff_coeffs[1] -= 1;
+        diff = PolynomialExtended(diff_coeffs);
+    }
 
     auto [q, r] = diff.divideWithRemainder(f);
 
-    return r.degree() < 0 || (r.degree() == 0 && r.coeffs[0] == 0);
+    return r.degree() < 0 || (r.degree() == 0 && r.getCoeffs()[0] == 0);
 }
 
 /**
@@ -5175,8 +5201,9 @@ inline std::vector<PolynomialExtended> berlekampFactorization(const PolynomialEx
         auto [q, r] = xPower.divideWithRemainder(f);
 
         // Fill column j of Q
-        for (int i = 0; i < n && i < static_cast<int>(r.coeffs.size()); ++i) {
-            Q(i, j) = ((r.coeffs[i] % p) + p) % p;
+        const auto& r_coeffs = r.getCoeffs();
+        for (int i = 0; i < n && i < static_cast<int>(r_coeffs.size()); ++i) {
+            Q(i, j) = ((r_coeffs[i] % p) + p) % p;
         }
     }
 
@@ -5259,8 +5286,9 @@ inline std::vector<PolynomialExtended> squareFreeDecomposition(
 
     // Compute derivative
     std::vector<long long> derivCoeffs;
-    for (size_t i = 1; i < current.coeffs.size(); ++i) {
-        long long coef = (i * current.coeffs[i]) % p;
+    const auto& current_coeffs = current.getCoeffs();
+    for (size_t i = 1; i < current_coeffs.size(); ++i) {
+        long long coef = (i * current_coeffs[i]) % p;
         derivCoeffs.push_back(coef);
     }
     PolynomialExtended derivative(derivCoeffs);
@@ -5284,8 +5312,9 @@ inline std::vector<PolynomialExtended> squareFreeDecomposition(
         if (current.degree() == 0) break;
 
         std::vector<long long> derivCoeffs2;
-        for (size_t j = 1; j < current.coeffs.size(); ++j) {
-            derivCoeffs2.push_back((j * current.coeffs[j]) % p);
+        const auto& current_coeffs2 = current.getCoeffs();
+        for (size_t j = 1; j < current_coeffs2.size(); ++j) {
+            derivCoeffs2.push_back((j * current_coeffs2[j]) % p);
         }
         derivative = PolynomialExtended(derivCoeffs2);
 
@@ -7214,12 +7243,12 @@ public:
     /**
      * @brief Dimension formula for Siegel modular forms
      */
-    static int dimensionFormula(int g, int k) {
-        if (g == 1) {
+    static int dimensionFormula(int genus, int weight) {
+        if (genus == 1) {
             // Classical case
-            return std::max(0, k / 12);  // Simplified
+            return std::max(0, weight / 12);  // Simplified
         }
-        // Use Tsushima formula for g ≥ 2
+        // Use Tsushima formula for genus ≥ 2
         return 0;  // Placeholder
     }
 
@@ -7336,7 +7365,7 @@ public:
     /**
      * @brief Correspondence theorem (Vasudevan)
      */
-    static bool vasudeva Correspondence() {
+    static bool vasudevaCorrespondence() {
         // Bijection between certain spaces of Siegel and Jacobi forms
         return true;
     }

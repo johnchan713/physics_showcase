@@ -3,12 +3,13 @@
 // This comprehensive test verifies that all modules compile successfully
 // Functional testing for specific modules is in test_new_modules.cpp
 
-// Mathematics modules (excluding number_theory which has existing bugs)
+// Mathematics modules
 #include "maths/matrices.hpp"
 #include "maths/vectors.hpp"
 #include "maths/complex_analysis.hpp"
 #include "maths/fourier_analysis.hpp"
 #include "maths/topology.hpp"
+#include "maths/number_theory.hpp"
 #include "maths/group_theory_lie_groups.hpp"
 #include "maths/differential_algebra.hpp"
 #include "maths/calculus_theorems.hpp"
@@ -118,17 +119,16 @@ int main() {
 
     cout << "\nTesting module inclusions...\n\n";
 
-    int math_count = 31;  // 32 total, excluded: number_theory
-    int physics_count = 68;  // 69 total, excluded: none
+    int math_count = 32;  // All 32 math modules now compile!
+    int physics_count = 68;  // All 68 physics modules compile!
     int total_count = math_count + physics_count;
 
     cout << "Mathematics modules:      " << math_count << " ✓\n";
     cout << "Physics modules:          " << physics_count << " ✓\n";
     cout << "Total modules compiled:   " << total_count << "\n\n";
 
-    cout << "Excluded modules (with existing bugs):\n";
-    cout << "  Math: number_theory (PolynomialExtended class design issues)\n";
-    cout << "  Physics: none - all bugs fixed!\n\n";
+    cout << "Excluded modules (with bugs):\n";
+    cout << "  None - ALL BUGS FIXED!\n\n";
 
     cout << "Excluded modules (require external libraries):\n";
     cout << "  - fluid_dynamics_*.hpp (7 modules - require Eigen)\n";
