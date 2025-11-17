@@ -23,18 +23,18 @@ namespace physics::advanced::fluid_dynamics {
  * @class IsentropicFlow
  * @brief Isentropic (reversible adiabatic) flow relations
  *
- * For ideal gas: pρ^(-γ) = constant
+ * For ideal gas: prho^(-gamma) = constant
  */
 class IsentropicFlow {
 public:
     /**
      * @brief Temperature ratio from pressure ratio
      *
-     * T₂/T₁ = (p₂/p₁)^((γ-1)/γ)
+     * T2/T1 = (p2/p1)^((gamma-1)/gamma)
      *
-     * @param pressure_ratio p₂/p₁
-     * @param gamma Specific heat ratio γ = cp/cv
-     * @return Temperature ratio T₂/T₁
+     * @param pressure_ratio p2/p1
+     * @param gamma Specific heat ratio gamma = cp/cv
+     * @return Temperature ratio T2/T1
      */
     static double temperatureRatio(double pressure_ratio, double gamma) {
         double exponent = (gamma - 1.0) / gamma;
@@ -44,11 +44,11 @@ public:
     /**
      * @brief Density ratio from pressure ratio
      *
-     * ρ₂/ρ₁ = (p₂/p₁)^(1/γ)
+     * rho2/rho1 = (p2/p1)^(1/gamma)
      *
-     * @param pressure_ratio p₂/p₁
+     * @param pressure_ratio p2/p1
      * @param gamma Specific heat ratio
-     * @return Density ratio ρ₂/ρ₁
+     * @return Density ratio rho2/rho1
      */
     static double densityRatio(double pressure_ratio, double gamma) {
         return std::pow(pressure_ratio, 1.0 / gamma);
@@ -57,13 +57,13 @@ public:
     /**
      * @brief Isentropic process equation
      *
-     * p₁/ρ₁^γ = p₂/ρ₂^γ
+     * p1/rho1^gamma = p2/rho2^gamma
      *
      * @param p1 Initial pressure (Pa)
      * @param rho1 Initial density (kg/m³)
      * @param rho2 Final density (kg/m³)
      * @param gamma Specific heat ratio
-     * @return Final pressure p₂ (Pa)
+     * @return Final pressure p2 (Pa)
      */
     static double pressure(double p1, double rho1, double rho2, double gamma) {
         return p1 * std::pow(rho2 / rho1, gamma);
@@ -72,11 +72,11 @@ public:
     /**
      * @brief Speed of sound
      *
-     * c = √(γRT) = √(γp/ρ)
+     * c = sqrt(gammaRT) = sqrt(gammap/rho)
      *
      * @param gamma Specific heat ratio
      * @param pressure p (Pa)
-     * @param density ρ (kg/m³)
+     * @param density rho (kg/m³)
      * @return Speed of sound (m/s)
      */
     static double soundSpeed(double gamma, double pressure, double density) {
@@ -89,7 +89,7 @@ public:
     /**
      * @brief Speed of sound from temperature
      *
-     * c = √(γRT)
+     * c = sqrt(gammaRT)
      *
      * @param gamma Specific heat ratio
      * @param gas_constant R (J/(kg·K))
@@ -113,12 +113,12 @@ public:
     /**
      * @brief Stagnation temperature
      *
-     * T₀ = T(1 + (γ-1)/2 × M²)
+     * T0 = T(1 + (gamma-1)/2 × M^2)
      *
      * @param static_temperature T (K)
      * @param mach_number M
      * @param gamma Specific heat ratio
-     * @return Stagnation temperature T₀ (K)
+     * @return Stagnation temperature T0 (K)
      */
     static double temperature(double static_temperature,
                              double mach_number,
@@ -130,12 +130,12 @@ public:
     /**
      * @brief Stagnation pressure
      *
-     * p₀ = p(1 + (γ-1)/2 × M²)^(γ/(γ-1))
+     * p0 = p(1 + (gamma-1)/2 × M^2)^(gamma/(gamma-1))
      *
      * @param static_pressure p (Pa)
      * @param mach_number M
      * @param gamma Specific heat ratio
-     * @return Stagnation pressure p₀ (Pa)
+     * @return Stagnation pressure p0 (Pa)
      */
     static double pressure(double static_pressure,
                           double mach_number,
@@ -148,12 +148,12 @@ public:
     /**
      * @brief Stagnation density
      *
-     * ρ₀ = ρ(1 + (γ-1)/2 × M²)^(1/(γ-1))
+     * rho0 = rho(1 + (gamma-1)/2 × M^2)^(1/(gamma-1))
      *
-     * @param static_density ρ (kg/m³)
+     * @param static_density rho (kg/m³)
      * @param mach_number M
      * @param gamma Specific heat ratio
-     * @return Stagnation density ρ₀ (kg/m³)
+     * @return Stagnation density rho0 (kg/m³)
      */
     static double density(double static_density,
                          double mach_number,
@@ -166,9 +166,9 @@ public:
     /**
      * @brief Static temperature from stagnation
      *
-     * T = T₀ / (1 + (γ-1)/2 × M²)
+     * T = T0 / (1 + (gamma-1)/2 × M^2)
      *
-     * @param stagnation_temperature T₀ (K)
+     * @param stagnation_temperature T0 (K)
      * @param mach_number M
      * @param gamma Specific heat ratio
      * @return Static temperature T (K)
@@ -183,9 +183,9 @@ public:
     /**
      * @brief Static pressure from stagnation
      *
-     * p = p₀ / (1 + (γ-1)/2 × M²)^(γ/(γ-1))
+     * p = p0 / (1 + (gamma-1)/2 × M^2)^(gamma/(gamma-1))
      *
-     * @param stagnation_pressure p₀ (Pa)
+     * @param stagnation_pressure p0 (Pa)
      * @param mach_number M
      * @param gamma Specific heat ratio
      * @return Static pressure p (Pa)
@@ -208,7 +208,7 @@ public:
     /**
      * @brief Critical pressure ratio
      *
-     * p*/p₀ = (2/(γ+1))^(γ/(γ-1))
+     * p* / p0 = (2/(gamma+1))^(gamma/(gamma-1))
      *
      * @param gamma Specific heat ratio
      * @return Critical pressure ratio
@@ -222,7 +222,7 @@ public:
     /**
      * @brief Critical temperature ratio
      *
-     * T*/T₀ = 2/(γ+1)
+     * T* / T0 = 2/(gamma+1)
      *
      * @param gamma Specific heat ratio
      * @return Critical temperature ratio
@@ -234,7 +234,7 @@ public:
     /**
      * @brief Critical density ratio
      *
-     * ρ*/ρ₀ = (2/(γ+1))^(1/(γ-1))
+     * rho* / rho0 = (2/(gamma+1))^(1/(gamma-1))
      *
      * @param gamma Specific heat ratio
      * @return Critical density ratio
@@ -248,11 +248,11 @@ public:
     /**
      * @brief Critical velocity (sonic)
      *
-     * c* = √(2γRT₀/(γ+1))
+     * c* = sqrt(2gammaRT0/(gamma+1))
      *
      * @param gamma Specific heat ratio
      * @param gas_constant R (J/(kg·K))
-     * @param stagnation_temperature T₀ (K)
+     * @param stagnation_temperature T0 (K)
      * @return Critical velocity (m/s)
      */
     static double criticalVelocity(double gamma, double gas_constant,
@@ -273,11 +273,11 @@ public:
     /**
      * @brief Downstream Mach number
      *
-     * M₂² = [M₁² + 2/(γ-1)] / [2γM₁²/(γ-1) - 1]
+     * M2^2 = [M1^2 + 2/(gamma-1)] / [2gammaM1^2/(gamma-1) - 1]
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
-     * @return Downstream Mach number M₂
+     * @return Downstream Mach number M2
      */
     static double downstreamMach(double mach_upstream, double gamma) {
         if (mach_upstream < 1.0) {
@@ -296,11 +296,11 @@ public:
     /**
      * @brief Pressure ratio across shock
      *
-     * p₂/p₁ = 1 + 2γ/(γ+1) × (M₁² - 1)
+     * p2/p1 = 1 + 2gamma/(gamma+1) × (M1^2 - 1)
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
-     * @return Pressure ratio p₂/p₁
+     * @return Pressure ratio p2/p1
      */
     static double pressureRatio(double mach_upstream, double gamma) {
         double M1_sq = mach_upstream * mach_upstream;
@@ -310,11 +310,11 @@ public:
     /**
      * @brief Density ratio across shock
      *
-     * ρ₂/ρ₁ = [(γ+1)M₁²] / [2 + (γ-1)M₁²]
+     * rho2/rho1 = [(gamma+1)M1^2] / [2 + (gamma-1)M1^2]
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
-     * @return Density ratio ρ₂/ρ₁
+     * @return Density ratio rho2/rho1
      */
     static double densityRatio(double mach_upstream, double gamma) {
         double M1_sq = mach_upstream * mach_upstream;
@@ -326,11 +326,11 @@ public:
     /**
      * @brief Temperature ratio across shock
      *
-     * T₂/T₁ = (p₂/p₁) × (ρ₁/ρ₂)
+     * T2/T1 = (p2/p1) × (rho1/rho2)
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
-     * @return Temperature ratio T₂/T₁
+     * @return Temperature ratio T2/T1
      */
     static double temperatureRatio(double mach_upstream, double gamma) {
         double p_ratio = pressureRatio(mach_upstream, gamma);
@@ -341,14 +341,14 @@ public:
     /**
      * @brief Stagnation pressure ratio across shock
      *
-     * p₀₂/p₀₁ < 1 (entropy increase)
+     * p02/p01 < 1 (entropy increase)
      *
-     * p₀₂/p₀₁ = [(γ+1)M₁²/(2+(γ-1)M₁²)]^(γ/(γ-1)) ×
-     *           [(γ+1)/(2γM₁²-(γ-1))]^(1/(γ-1))
+     * p02/p01 = [(gamma+1)M1^2/(2+(gamma-1)M1^2)]^(gamma/(gamma-1)) ×
+     *           [(gamma+1)/(2gammaM1^2-(gamma-1))]^(1/(gamma-1))
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
-     * @return Stagnation pressure ratio p₀₂/p₀₁
+     * @return Stagnation pressure ratio p02/p01
      */
     static double stagnationPressureRatio(double mach_upstream, double gamma) {
         double M1_sq = mach_upstream * mach_upstream;
@@ -367,9 +367,9 @@ public:
     /**
      * @brief Entropy increase across shock
      *
-     * Δs = cp ln[(T₂/T₁)(p₁/p₂)^((γ-1)/γ)]
+     * Δs = cp ln[(T2/T1)(p1/p2)^((gamma-1)/gamma)]
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
      * @param specific_heat_p cp (J/(kg·K))
      * @return Entropy increase Δs (J/(kg·K))
@@ -386,9 +386,9 @@ public:
     /**
      * @brief Shock strength parameter
      *
-     * β = (p₂ - p₁) / p₁
+     * β = (p2 - p1) / p1
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
      * @return Shock strength
      */
@@ -399,13 +399,13 @@ public:
     /**
      * @brief Check if shock is strong
      *
-     * Strong shock: M₁ >> 1
+     * Strong shock: M1 >> 1
      * Limiting ratios:
-     * - ρ₂/ρ₁ → (γ+1)/(γ-1)
-     * - p₂/p₁ → ∞
+     * - rho2/rho1 → (gamma+1)/(gamma-1)
+     * - p2/p1 → inf
      *
-     * @param mach_upstream M₁
-     * @return true if strong shock (M₁ > 3)
+     * @param mach_upstream M1
+     * @return true if strong shock (M1 > 3)
      */
     static bool isStrongShock(double mach_upstream) {
         return mach_upstream > 3.0;
@@ -423,13 +423,13 @@ public:
     /**
      * @brief Normal component of Mach number
      *
-     * M₁ₙ = M₁ sin(β)
+     * M1ₙ = M1 sin(β)
      *
      * where β is shock angle
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param shock_angle β (radians)
-     * @return Normal Mach number M₁ₙ
+     * @return Normal Mach number M1ₙ
      */
     static double normalMach(double mach_upstream, double shock_angle) {
         return mach_upstream * std::sin(shock_angle);
@@ -438,11 +438,11 @@ public:
     /**
      * @brief Shock angle from deflection angle (θ-β-M relation)
      *
-     * tan(θ) = 2cot(β) × (M₁²sin²β - 1) / (M₁²(γ+cos2β) + 2)
+     * tan(θ) = 2cot(β) × (M1^2sin^2β - 1) / (M1^2(gamma+cos2β) + 2)
      *
      * Requires iterative solution
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param deflection_angle θ (radians)
      * @param gamma Specific heat ratio
      * @return Shock angle β (radians)
@@ -487,11 +487,11 @@ public:
      * Apply normal shock relations to normal component,
      * tangential component unchanged
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param shock_angle β (radians)
      * @param deflection_angle θ (radians)
      * @param gamma Specific heat ratio
-     * @return Downstream Mach number M₂
+     * @return Downstream Mach number M2
      */
     static double downstreamMach(double mach_upstream,
                                 double shock_angle,
@@ -500,7 +500,7 @@ public:
         double M1n = normalMach(mach_upstream, shock_angle);
         double M2n = NormalShock::downstreamMach(M1n, gamma);
 
-        // M₂ = M₂ₙ / sin(β - θ)
+        // M2 = M2ₙ / sin(β - θ)
         return M2n / std::sin(shock_angle - deflection_angle);
     }
 
@@ -509,7 +509,7 @@ public:
      *
      * Beyond this, shock detaches
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param gamma Specific heat ratio
      * @return Maximum deflection angle θmax (radians)
      */
@@ -533,8 +533,8 @@ public:
     /**
      * @brief Prandtl-Meyer function
      *
-     * ν(M) = √[(γ+1)/(γ-1)] × arctan[√((γ-1)/(γ+1) × (M²-1))]
-     *        - arctan[√(M²-1)]
+     * ν(M) = sqrt[(gamma+1)/(gamma-1)] × arctan[sqrt((gamma-1)/(gamma+1) × (M^2-1))]
+     *        - arctan[sqrt(M^2-1)]
      *
      * @param mach_number M
      * @param gamma Specific heat ratio
@@ -560,14 +560,14 @@ public:
     /**
      * @brief Downstream Mach from deflection
      *
-     * ν₂ = ν₁ + θ
+     * ν2 = ν1 + θ
      *
-     * Then solve for M₂ from ν₂
+     * Then solve for M2 from ν2
      *
-     * @param mach_upstream M₁
+     * @param mach_upstream M1
      * @param deflection_angle θ (radians, positive for expansion)
      * @param gamma Specific heat ratio
-     * @return Downstream Mach number M₂
+     * @return Downstream Mach number M2
      */
     static double downstreamMach(double mach_upstream,
                                 double deflection_angle,
@@ -598,9 +598,9 @@ public:
     /**
      * @brief Maximum Prandtl-Meyer angle
      *
-     * ν_max as M → ∞
+     * ν_max as M → inf
      *
-     * ν_max = (π/2) × (√[(γ+1)/(γ-1)] - 1)
+     * ν_max = (π/2) × (sqrt[(gamma+1)/(gamma-1)] - 1)
      *
      * @param gamma Specific heat ratio
      * @return Maximum angle (radians)

@@ -23,20 +23,20 @@ namespace physics::advanced::fluid_dynamics {
  *
  * Self-similar solution reduces PDE to ODE:
  * f''' + (1/2)ff'' = 0
- * where η = y√(U/(νx))
+ * where eta = ysqrt(U/(nux))
  */
 class BlasiusSolution {
 public:
     /**
-     * @brief Similarity variable η
+     * @brief Similarity variable eta
      *
-     * η = y√(U∞/(νx))
+     * eta = ysqrt(Uinf/(nux))
      *
      * @param y Distance from wall (m)
      * @param x Distance from leading edge (m)
-     * @param velocity U∞ (m/s)
-     * @param kinematic_viscosity ν (m²/s)
-     * @return Similarity variable η
+     * @param velocity Uinf (m/s)
+     * @param kinematic_viscosity nu (m^2/s)
+     * @return Similarity variable eta
      */
     static double similarityVariable(double y, double x,
                                      double velocity,
@@ -50,14 +50,14 @@ public:
     /**
      * @brief Approximate velocity profile from Blasius solution
      *
-     * u/U∞ = f'(η)
+     * u/Uinf = f'(eta)
      *
-     * Using polynomial approximation for f'(η):
-     * f' ≈ 2η - 2η³/3 + η⁴/6  for η ≤ 3
-     * f' ≈ 1                   for η > 3
+     * Using polynomial approximation for f'(eta):
+     * f' ≈ 2eta - 2eta³/3 + eta⁴/6  for eta ≤ 3
+     * f' ≈ 1                   for eta > 3
      *
-     * @param eta Similarity variable η
-     * @return Dimensionless velocity u/U∞
+     * @param eta Similarity variable eta
+     * @return Dimensionless velocity u/Uinf
      */
     static double velocityProfile(double eta) {
         if (eta < 0.0) {
@@ -67,7 +67,7 @@ public:
             return 1.0;  // Edge of boundary layer
         }
 
-        // Polynomial approximation (valid for small η)
+        // Polynomial approximation (valid for small eta)
         if (eta <= 3.0) {
             return 2.0 * eta - (2.0/3.0) * std::pow(eta, 3) +
                    (1.0/6.0) * std::pow(eta, 4);
@@ -78,15 +78,15 @@ public:
     }
 
     /**
-     * @brief Boundary layer thickness δ₉₉
+     * @brief Boundary layer thickness delta99
      *
-     * δ₉₉ = 5.0√(νx/U∞)
+     * delta99 = 5.0sqrt(nux/Uinf)
      *
-     * Distance where u = 0.99U∞
+     * Distance where u = 0.99Uinf
      *
      * @param x Distance from leading edge
-     * @param velocity U∞
-     * @param kinematic_viscosity ν
+     * @param velocity Uinf
+     * @param kinematic_viscosity nu
      * @return Boundary layer thickness (m)
      */
     static double thickness(double x, double velocity,
@@ -95,15 +95,15 @@ public:
     }
 
     /**
-     * @brief Displacement thickness δ*
+     * @brief Displacement thickness delta*
      *
-     * δ* = ∫₀^∞ (1 - u/U∞) dy = 1.721√(νx/U∞)
+     * delta* = integral0^inf (1 - u/Uinf) dy = 1.721sqrt(nux/Uinf)
      *
      * Represents mass flux deficit
      *
      * @param x Distance from leading edge
-     * @param velocity U∞
-     * @param kinematic_viscosity ν
+     * @param velocity Uinf
+     * @param kinematic_viscosity nu
      * @return Displacement thickness (m)
      */
     static double displacementThickness(double x, double velocity,
@@ -112,15 +112,15 @@ public:
     }
 
     /**
-     * @brief Momentum thickness θ
+     * @brief Momentum thickness theta
      *
-     * θ = ∫₀^∞ (u/U∞)(1 - u/U∞) dy = 0.664√(νx/U∞)
+     * theta = integral0^inf (u/Uinf)(1 - u/Uinf) dy = 0.664sqrt(nux/Uinf)
      *
      * Represents momentum flux deficit
      *
      * @param x Distance from leading edge
-     * @param velocity U∞
-     * @param kinematic_viscosity ν
+     * @param velocity Uinf
+     * @param kinematic_viscosity nu
      * @return Momentum thickness (m)
      */
     static double momentumThickness(double x, double velocity,
@@ -131,13 +131,13 @@ public:
     /**
      * @brief Shape factor H
      *
-     * H = δ*/θ
+     * H = delta* / theta
      *
      * For Blasius: H = 2.59
      * Increases with adverse pressure gradient
      *
-     * @param displacement_thickness δ*
-     * @param momentum_thickness θ
+     * @param displacement_thickness delta*
+     * @param momentum_thickness theta
      * @return Shape factor H
      */
     static double shapeFactor(double displacement_thickness,
@@ -151,9 +151,9 @@ public:
     /**
      * @brief Local skin friction coefficient
      *
-     * Cf = τw/(½ρU∞²) = 0.664/√Rex
+     * Cf = τw/(½ρUinf^2) = 0.664/sqrtRex
      *
-     * where Rex = U∞x/ν
+     * where Rex = Uinfx/nu
      *
      * @param reynolds_x Local Reynolds number Rex
      * @return Skin friction coefficient
@@ -168,12 +168,12 @@ public:
     /**
      * @brief Wall shear stress
      *
-     * τw = 0.332ρU∞²√(ν/(U∞x))
+     * τw = 0.332ρUinf^2sqrt(nu/(Uinfx))
      *
      * @param density ρ
-     * @param velocity U∞
+     * @param velocity Uinf
      * @param x Distance from leading edge
-     * @param kinematic_viscosity ν
+     * @param kinematic_viscosity nu
      * @return Wall shear stress (Pa)
      */
     static double wallShearStress(double density, double velocity,
@@ -185,13 +185,13 @@ public:
     /**
      * @brief Total drag force on flat plate (both sides)
      *
-     * FD = 1.328ρU∞²L√(ν/(U∞L)) × width
+     * FD = 1.328ρUinf^2Lsqrt(nu/(UinfL)) × width
      *
      * @param density ρ
-     * @param velocity U∞
+     * @param velocity Uinf
      * @param length L
      * @param width W
-     * @param kinematic_viscosity ν
+     * @param kinematic_viscosity nu
      * @return Total drag force (N)
      */
     static double totalDrag(double density, double velocity,
@@ -209,21 +209,21 @@ public:
  * @brief Von Kármán momentum integral equation
  *
  * Integral form of boundary layer equations:
- * τw = ρU²(dθ/dx + θ(2+H)/U × dU/dx)
+ * τw = ρU^2(dtheta/dx + theta(2+H)/U × dU/dx)
  */
 class VonKarmanIntegral {
 public:
     /**
      * @brief Von Kármán momentum integral equation
      *
-     * dθ/dx = Cf/2 - θ(2+H)/U × dU/dx
+     * dtheta/dx = Cf/2 - theta(2+H)/U × dU/dx
      *
-     * @param theta_current Current momentum thickness θ
+     * @param theta_current Current momentum thickness theta
      * @param cf_local Local skin friction coefficient
-     * @param shape_factor H = δ*/θ
+     * @param shape_factor H = delta* / theta
      * @param velocity U
      * @param velocity_gradient dU/dx
-     * @return dθ/dx
+     * @return dtheta/dx
      */
     static double momentumThicknessGradient(
         double theta_current,
@@ -242,9 +242,9 @@ public:
     /**
      * @brief Approximate Cf for laminar flow
      *
-     * Cf ≈ 2(dθ/dx)  (for zero pressure gradient)
+     * Cf ≈ 2(dtheta/dx)  (for zero pressure gradient)
      *
-     * @param theta_gradient dθ/dx
+     * @param theta_gradient dtheta/dx
      * @return Skin friction coefficient
      */
     static double skinFrictionFromGradient(double theta_gradient) {
@@ -255,11 +255,11 @@ public:
      * @brief Separation criterion
      *
      * Separation occurs when τw → 0, which corresponds to
-     * (dθ/dx)(U²/ν) → 0.0082 (laminar)
+     * (dtheta/dx)(U^2/nu) → 0.0082 (laminar)
      *
-     * @param theta_gradient dθ/dx
+     * @param theta_gradient dtheta/dx
      * @param velocity U
-     * @param kinematic_viscosity ν
+     * @param kinematic_viscosity nu
      * @return true if separation is imminent
      */
     static bool isSeparationImminent(double theta_gradient,
@@ -280,7 +280,7 @@ public:
     /**
      * @brief Turbulent boundary layer thickness
      *
-     * δ ≈ 0.37x/Re_x^(1/5)
+     * delta ≈ 0.37x/Re_x^(1/5)
      *
      * @param x Distance from leading edge
      * @param reynolds_x Local Reynolds number
@@ -322,14 +322,14 @@ public:
     /**
      * @brief Power law velocity profile for turbulent flow
      *
-     * u/U∞ = (y/δ)^(1/n)
+     * u/Uinf = (y/delta)^(1/n)
      *
      * Typically n = 7 for moderate Reynolds numbers
      *
      * @param y Distance from wall
      * @param delta Boundary layer thickness
      * @param n Power law exponent
-     * @return Dimensionless velocity u/U∞
+     * @return Dimensionless velocity u/Uinf
      */
     static double powerLawProfile(double y, double delta, int n = 7) {
         if (y > delta) {
@@ -345,7 +345,7 @@ public:
      *
      * where κ ≈ 0.41 (von Kármán constant), B ≈ 5.0
      *
-     * @param y_plus Dimensionless wall distance y⁺ = yuτ/ν
+     * @param y_plus Dimensionless wall distance y⁺ = yuτ/nu
      * @param kappa von Kármán constant (default 0.41)
      * @param B Constant (default 5.0)
      * @return Dimensionless velocity u⁺ = u/uτ
@@ -368,7 +368,7 @@ public:
     /**
      * @brief Friction velocity uτ
      *
-     * uτ = √(τw/ρ)
+     * uτ = sqrt(τw/ρ)
      *
      * Velocity scale in wall coordinates
      *
@@ -402,9 +402,9 @@ public:
      * @brief Calculate all boundary layer thicknesses
      */
     struct Thicknesses {
-        double delta;           // δ (99% thickness)
-        double delta_star;      // δ* (displacement)
-        double theta;           // θ (momentum)
+        double delta;           // delta (99% thickness)
+        double delta_star;      // delta* (displacement)
+        double theta;           // theta (momentum)
         double H;               // Shape factor
     };
 
