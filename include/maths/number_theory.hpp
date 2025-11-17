@@ -10,6 +10,10 @@
 #include <set>
 #include <cstdint>
 #include <random>
+#include <array>
+#include <functional>
+#include <unordered_map>
+#include <ctime>
 
 /**
  * @file number_theory.hpp

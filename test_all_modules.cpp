@@ -3,12 +3,12 @@
 // This comprehensive test verifies that all modules compile successfully
 // Functional testing for specific modules is in test_new_modules.cpp
 
-// Mathematics modules (excluding number_theory and topology which have existing bugs)
+// Mathematics modules (excluding number_theory which has existing bugs)
 #include "maths/matrices.hpp"
 #include "maths/vectors.hpp"
 #include "maths/complex_analysis.hpp"
 #include "maths/fourier_analysis.hpp"
-// #include "maths/topology.hpp"  // Has parameter shadowing bugs
+#include "maths/topology.hpp"
 #include "maths/group_theory_lie_groups.hpp"
 #include "maths/differential_algebra.hpp"
 #include "maths/calculus_theorems.hpp"
@@ -118,7 +118,7 @@ int main() {
 
     cout << "\nTesting module inclusions...\n\n";
 
-    int math_count = 30;  // 31 total, excluded: number_theory, topology
+    int math_count = 31;  // 32 total, excluded: number_theory
     int physics_count = 68;  // 69 total, excluded: none
     int total_count = math_count + physics_count;
 
@@ -127,8 +127,7 @@ int main() {
     cout << "Total modules compiled:   " << total_count << "\n\n";
 
     cout << "Excluded modules (with existing bugs):\n";
-    cout << "  Math: number_theory (PolynomialExtended),\n";
-    cout << "        topology (parameter shadowing)\n";
+    cout << "  Math: number_theory (PolynomialExtended class design issues)\n";
     cout << "  Physics: none - all bugs fixed!\n\n";
 
     cout << "Excluded modules (require external libraries):\n";

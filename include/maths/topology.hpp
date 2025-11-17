@@ -2742,15 +2742,15 @@ public:
     /**
      * @brief Whitney embedding theorem: Every smooth m-manifold embeds in ℝ^{2m+1}
      */
-    static int whitneyEmbeddingDimension(int m) {
-        return 2 * m + 1;
+    static int whitneyEmbeddingDimension(int manifold_dim) {
+        return 2 * manifold_dim + 1;
     }
 
     /**
      * @brief Whitney immersion theorem: Every smooth m-manifold immerses in ℝ^{2m}
      */
-    static int whitneyImmersionDimension(int m) {
-        return 2 * m;
+    static int whitneyImmersionDimension(int manifold_dim) {
+        return 2 * manifold_dim;
     }
 
     /**
@@ -2790,8 +2790,8 @@ public:
      * @brief Brown-Sard theorem (stronger version)
      * Critical values of f: ℝ^m → ℝ^n have measure zero if m ≥ n
      */
-    static bool brownSardTheorem(int m, int n) {
-        return m >= n;
+    static bool brownSardTheorem(int source_dim, int target_dim) {
+        return source_dim >= target_dim;
     }
 
     /**
@@ -3033,16 +3033,16 @@ public:
      * @brief Whitney Embedding Theorem (strong form):
      * Every smooth compact m-manifold embeds in ℝ^{2m}
      */
-    static int compactEmbeddingDimension(int m) {
-        return 2 * m;
+    static int compactEmbeddingDimension(int manifold_dim) {
+        return 2 * manifold_dim;
     }
 
     /**
      * @brief Whitney Embedding Theorem (weak form):
      * Every smooth m-manifold embeds in ℝ^{2m+1}
      */
-    static int generalEmbeddingDimension(int m) {
-        return 2 * m + 1;
+    static int generalEmbeddingDimension(int manifold_dim) {
+        return 2 * manifold_dim + 1;
     }
 
     /**
@@ -3064,7 +3064,7 @@ public:
     /**
      * @brief Compact m-manifold can be embedded in S^{2m}
      */
-    static bool embeddingInSphere(int m) {
+    static bool embeddingInSphere(int manifold_dim) {
         return true;
     }
 };
@@ -3837,7 +3837,7 @@ public:
     /**
      * @brief Cut locus: where exp_p stops being injective
      */
-    bool hasC utLocus() const {
+    bool hasCutLocus() const {
         return true;
     }
 };
