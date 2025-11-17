@@ -39,13 +39,13 @@ Comprehensive C++17 header-only library implementing computational algorithms fr
     - [Fluid Dynamics (7 modules)](#fluid-dynamics)
     - [Gauge Theory (6 modules)](#gauge-theory)
     - [Quantum Field Theory (8 modules)](#quantum-field-theory)
-    - [Operator Algebras & Quantum Mechanics](#operator-algebras-and-quantum-mechanics-physicsoperator_algebrashpp)
-    - [Quantum Foundations](#quantum-mechanics-foundations-physicsquantum_foundationshpp)
-    - [Advanced Quantum Mechanics](#advanced-quantum-mechanics-physicsadvanced_quantum_mechanicshpp)
-    - [Quantum Chemistry](#quantum-chemistry-atomic-and-molecular-structure-physicsquantum_chemistryhpp)
-    - [Relativistic Quantum Mechanics](#relativistic-quantum-mechanics-and-spin-physicsrelativistic_quantum_mechanicshpp)
-    - [Loop Quantum Gravity](#loop-quantum-gravity-physicsloop_quantum_gravityhpp)
-    - [Nuclear Physics](#nuclear-physics-and-radioactivity-physicsnuclear_physicshpp)
+    - [Operator Algebras & Quantum Mechanics](#operator-algebras-and-quantum-mechanics)
+    - [Quantum Foundations](#quantum-mechanics-foundations)
+    - [Advanced Quantum Mechanics](#advanced-quantum-mechanics)
+    - [Quantum Chemistry](#quantum-chemistry-atomic-and-molecular-structure)
+    - [Relativistic Quantum Mechanics](#relativistic-quantum-mechanics-and-spin)
+    - [Loop Quantum Gravity](#loop-quantum-gravity)
+    - [Nuclear Physics](#nuclear-physics-and-radioactivity)
 - [🚀 Usage](#-usage)
 - [✨ Features](#-features)
 - [📊 Statistics](#-statistics)
@@ -965,7 +965,7 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 
 ### Basic Physics
 
-**Classical Mechanics:**
+#### Classical Mechanics
 - **Newton's Laws** (`physics/newton_laws.hpp`): Force calculations, Newton's second law
 - **Kinematics** (`physics/kinematics.hpp`): Position, velocity, acceleration equations
 - **Dynamics** (`physics/dynamics.hpp`): Force systems, friction, tension
@@ -977,7 +977,7 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - **Gravitation** (`physics/gravitation.hpp`): Universal gravitation, gravitational fields
 - **Orbital** (`physics/orbital.hpp`): Orbital mechanics, Kepler's laws
 
-**Electromagnetism:**
+#### Electromagnetism
 - **Electrostatics** (`physics/electrostatics.hpp`): Coulomb's law, electric fields, potential
 - **Magnetism** (`physics/magnetism.hpp`): Magnetic fields, Lorentz force
 - **Electric Circuits** (`physics/electric_circuits.hpp`): Ohm's law, RC/RL circuits
@@ -985,42 +985,42 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - **Electromagnetic Waves** (`physics/electromagnetic_waves.hpp`): Wave propagation, Poynting vector
 - **Maxwell Equations** (`physics/maxwell_equations.hpp`): Complete electromagnetic theory
 
-**Waves and Optics:**
+#### Waves and Optics
 - **Wave Mechanics** (`physics/wave_mechanics.hpp`): Wave equation, interference, diffraction
 - **Optics** (`physics/optics.hpp`): Reflection, refraction, lenses, mirrors
 
-**Thermodynamics:**
+#### Thermodynamics
 - **Thermodynamics** (`physics/thermodynamics.hpp`): Laws of thermodynamics, entropy, cycles
 - **Heat Transfer** (`physics/heat_transfer.hpp`): Conduction, convection, radiation
 - **Thermal Expansion** (`physics/thermal_expansion.hpp`): Linear and volumetric expansion
 - **Calorimetry** (`physics/calorimetry.hpp`): Specific heat, latent heat
 
-**Fluid Mechanics:**
+#### Fluid Mechanics
 - **Fluid Mechanics** (`physics/fluid_mechanics.hpp`): Bernoulli's equation, continuity, viscosity
 - **Surface Tension** (`physics/surface_tension.hpp`): Capillary action, contact angle
 
-**Modern Physics:**
+#### Modern Physics
 - **Special Relativity** (`physics/special_relativity.hpp`): Lorentz transformations, time dilation, E=mc²
 - **Quantum Basics** (`physics/quantum_basics.hpp`): Planck's law, photoelectric effect, uncertainty principle
 
-**Statics:**
+#### Statics
 - **Inclined Plane** (`physics/inclined_plane.hpp`): Forces on inclines, friction
 - **Elasticity** (`physics/elasticity.hpp`): Hooke's law, Young's modulus, stress-strain
 
 ### Advanced Physics
 
-**Advanced Classical Mechanics:**
+#### Advanced Classical Mechanics
 - **Hamiltonian Mechanics** (`physics/classical_hamiltonian.hpp`): Hamilton's equations, canonical transformations, generating functions
 - **Phase Space** (`physics/classical_phase_space.hpp`): Phase space analysis, Poincaré sections, symplectic structure
 - **Liouville Theorem** (`physics/classical_liouville.hpp`): Phase space volume conservation, statistical mechanics connection
 
-**Cosmology:**
+#### Cosmology
 - **Friedmann Equations** (`physics/cosmology_friedmann_equations.hpp`): FLRW metric, expansion dynamics, critical density
 - **Expanding Universe** (`physics/cosmology_expanding_universe.hpp`): Hubble's law, scale factor evolution, redshift
 - **Early Universe** (`physics/cosmology_early_universe.hpp`): Radiation/matter domination, recombination, nucleosynthesis
 - **Energy Density** (`physics/cosmology_energy_density.hpp`): Matter, radiation, dark energy components
 
-**Fluid Dynamics:**
+#### Fluid Dynamics
 - **Governing Equations** (`physics/fluid_dynamics_governing_equations.hpp`): Navier-Stokes, continuity, energy equations
 - **Flow Types** (`physics/fluid_dynamics_flow_types.hpp`): Laminar, turbulent, compressible, incompressible
 - **Compressible Flow** (`physics/fluid_dynamics_compressible_flow.hpp`): Mach number, shock waves, supersonic flow
@@ -1029,7 +1029,7 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - **Turbulence** (`physics/fluid_dynamics_turbulence.hpp`): Reynolds decomposition, energy cascade, turbulence models
 - **Dimensionless Numbers** (`physics/fluid_dynamics_dimensionless_numbers.hpp`): Reynolds, Prandtl, Mach, Froude numbers
 
-**Gauge Theory:**
+#### Gauge Theory
 - **Gauge Invariance** (`physics/gauge_theory_gauge_invariance.hpp`): U(1), SU(2), SU(3) gauge symmetries
 - **Higgs Mechanism** (`physics/gauge_theory_higgs_mechanism.hpp`): Spontaneous symmetry breaking, mass generation
 - **Symmetries** (`physics/gauge_theory_symmetries.hpp`): Discrete and continuous symmetries, CPT theorem
@@ -1037,7 +1037,7 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - **Helicity** (`physics/gauge_theory_helicity.hpp`): Helicity conservation, polarization
 - **CP Violation** (`physics/gauge_theory_cp_violation_kaons.hpp`): CP violation in kaon systems
 
-**Quantum Field Theory:**
+#### Quantum Field Theory
 - **Particle Physics** (`physics/qft_particle_physics.hpp`): Standard Model particles, interactions
 - **Antiparticles** (`physics/qft_antiparticles.hpp`): Particle-antiparticle creation/annihilation
 - **Interactions** (`physics/qft_interactions.hpp`): Electromagnetic, weak, strong interactions
@@ -1047,7 +1047,8 @@ All mathematics modules are located in `include/maths/` with a flat structure fo
 - **Supersymmetry** (`physics/qft_supersymmetry.hpp`): SUSY transformations, superpartners
 - **Quark-Gluon Plasma** (`physics/qft_quark_gluon_plasma.hpp`): QCD matter at extreme temperatures
 
-**Operator Algebras and Quantum Mechanics** (`physics/operator_algebras.hpp`):
+#### Operator Algebras and Quantum Mechanics
+**File:** `physics/operator_algebras.hpp`
 Comprehensive functional analysis framework for quantum mechanics (~2,800 lines)
 
 - **Hilbert Spaces**
@@ -1101,7 +1102,8 @@ Comprehensive functional analysis framework for quantum mechanics (~2,800 lines)
 
 **Applications:** Quantum mechanics foundations, quantum information theory, quantum field theory, statistical mechanics, mathematical physics
 
-**Quantum Mechanics Foundations** (`physics/quantum_foundations.hpp`):
+#### Quantum Mechanics Foundations
+**File:** `physics/quantum_foundations.hpp`
 Historical development of quantum mechanics (~1,000 lines)
 
 - **Introduction to Quantum Mechanics**
@@ -1154,7 +1156,8 @@ Historical development of quantum mechanics (~1,000 lines)
 
 **Applications:** Quantum mechanics education, atomic physics, quantum chemistry, historical physics
 
-**Advanced Quantum Mechanics** (`physics/advanced_quantum_mechanics.hpp`):
+#### Advanced Quantum Mechanics
+**File:** `physics/advanced_quantum_mechanics.hpp`
 Advanced topics in quantum mechanics (~1,650 lines)
 
 - **Kummer's Confluent Hypergeometric Functions**
@@ -1280,7 +1283,8 @@ Advanced topics in quantum mechanics (~1,650 lines)
 
 **Applications:** Atomic physics, quantum chemistry, spectroscopy, multi-electron systems, perturbation theory, solid-state physics
 
-**Quantum Chemistry: Atomic and Molecular Structure** (`physics/quantum_chemistry.hpp`):
+#### Quantum Chemistry: Atomic and Molecular Structure
+**File:** `physics/quantum_chemistry.hpp`
 Comprehensive quantum chemistry module for atoms and molecules (~1,300 lines)
 
 **Atomic Structure:**
@@ -1403,7 +1407,8 @@ Comprehensive quantum chemistry module for atoms and molecules (~1,300 lines)
 
 **Applications:** Quantum chemistry, computational chemistry, molecular spectroscopy, chemical bonding theory, organic chemistry, materials science, drug design
 
-**Relativistic Quantum Mechanics and Spin** (`physics/relativistic_quantum_mechanics.hpp`):
+#### Relativistic Quantum Mechanics and Spin
+**File:** `physics/relativistic_quantum_mechanics.hpp`
 Comprehensive spin-1/2 theory and relativistic quantum mechanics (~1,174 lines)
 
 **Spin and Atomic Spectra:**
@@ -1890,7 +1895,8 @@ Comprehensive spin-1/2 theory and relativistic quantum mechanics (~1,174 lines)
 
 ---
 
-**Loop Quantum Gravity** (`physics/loop_quantum_gravity.hpp`):
+#### Loop Quantum Gravity
+**File:** `physics/loop_quantum_gravity.hpp`
 
 **Overview:**
 - Background-independent quantum theory of spacetime geometry
@@ -2270,7 +2276,8 @@ using namespace maths;
 using namespace physics;
 ```
 
-**Nuclear Physics and Radioactivity** (`physics/nuclear_physics.hpp`):
+#### Nuclear Physics and Radioactivity
+**File:** `physics/nuclear_physics.hpp`
 Comprehensive nuclear physics module covering radioactive decay, nuclear stability, and reactor theory (~1,550 lines with extensive computational functions)
 
 **Nuclear Stability and Binding Energy:**
