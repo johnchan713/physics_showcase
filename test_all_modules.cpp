@@ -121,6 +121,7 @@
 // More fluid dynamics modules (Eigen replaced with our Vector class!)
 #include "physics/fluid_dynamics_flow_types.hpp"
 #include "physics/fluid_dynamics_turbulence.hpp"
+#include "physics/fluid_dynamics_vorticity.hpp"
 
 using namespace std;
 
@@ -132,7 +133,7 @@ int main() {
     cout << "\nTesting module inclusions...\n\n";
 
     int math_count = 32;  // All 32 math modules compile!
-    int physics_count = 68;  // 68 physics modules compile!
+    int physics_count = 69;  // 69 physics modules compile!
     int total_count = math_count + physics_count;
 
     cout << "Mathematics modules:      " << math_count << " ✓\n";
@@ -143,17 +144,17 @@ int main() {
     cout << "  None - ALL BUGS FIXED!\n\n";
 
     cout << "Excluded modules (require external Eigen library):\n";
-    cout << "  Fluid dynamics (2 modules - heavy Eigen::VectorXd/MatrixXd usage):\n";
+    cout << "  Fluid dynamics (1 module - heavy Eigen::VectorXd/MatrixXd usage):\n";
     cout << "    - fluid_dynamics_governing_equations.hpp\n";
-    cout << "    - fluid_dynamics_vorticity.hpp\n";
     cout << "  Classical mechanics (3 modules - complex matrix operations):\n";
     cout << "    - classical_liouville.hpp (uses advanced matrix features)\n";
     cout << "    - classical_phase_space.hpp (uses .block(), .norm())\n";
     cout << "    - physics_advanced.hpp (aggregator, includes above modules)\n\n";
-    cout << "SUCCESS: Replaced Eigen in 3 modules with our own Vector/Matrix classes!\n";
+    cout << "SUCCESS: Replaced Eigen in 4 modules with our own Vector/Matrix classes!\n";
     cout << "  - classical_hamiltonian.hpp (Hamiltonian mechanics)\n";
     cout << "  - fluid_dynamics_flow_types.hpp (Potential flow, Stokes flow, etc.)\n";
-    cout << "  - fluid_dynamics_turbulence.hpp (RANS turbulence models)\n\n";
+    cout << "  - fluid_dynamics_turbulence.hpp (RANS turbulence models)\n";
+    cout << "  - fluid_dynamics_vorticity.hpp (Vorticity dynamics, circulation)\n\n";
 
     cout << "========================================\n";
     cout << "  ✓ ALL " << total_count << " MODULES COMPILED SUCCESSFULLY!\n";

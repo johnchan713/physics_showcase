@@ -1,7 +1,8 @@
 #ifndef PHYSICS_ADVANCED_FLUID_DYNAMICS_VORTICITY_HPP
 #define PHYSICS_ADVANCED_FLUID_DYNAMICS_VORTICITY_HPP
 
-#include <Eigen/Dense>
+#include "maths/vectors.hpp"
+#include "maths/matrices.hpp"
 #include <cmath>
 #include <vector>
 #include <functional>
@@ -41,17 +42,17 @@ public:
      * @param velocity_gradient ∂uᵢ/∂xⱼ (3×3 matrix)
      * @return Vorticity vector ω (1/s)
      */
-    static Eigen::Vector3d compute(const Eigen::Matrix3d& velocity_gradient) {
-        Eigen::Vector3d omega;
+    static maths::linear_algebra::Vector compute(const maths::linear_algebra::Matrix& velocity_gradient) {
+        maths::linear_algebra::Vector omega(3);
 
         // ωx = ∂w/∂y - ∂v/∂z
-        omega(0) = velocity_gradient(2, 1) - velocity_gradient(1, 2);
+        omega[0] = velocity_gradient(2, 1) - velocity_gradient(1, 2);
 
         // ωy = ∂u/∂z - ∂w/∂x
-        omega(1) = velocity_gradient(0, 2) - velocity_gradient(2, 0);
+        omega[1] = velocity_gradient(0, 2) - velocity_gradient(2, 0);
 
         // ωz = ∂v/∂x - ∂u/∂y
-        omega(2) = velocity_gradient(1, 0) - velocity_gradient(0, 1);
+        omega[2] = velocity_gradient(1, 0) - velocity_gradient(0, 1);
 
         return omega;
     }
@@ -64,7 +65,7 @@ public:
      * @param omega Vorticity vector (1/s)
      * @return Magnitude (1/s)
      */
-    static double magnitude(const Eigen::Vector3d& omega) {
+    static double magnitude(const maths::linear_algebra::Vector& omega) {
         return omega.norm();
     }
 
@@ -78,8 +79,9 @@ public:
      * @param omega Vorticity vector (1/s)
      * @return Enstrophy (1/s²)
      */
-    static double enstrophy(const Eigen::Vector3d& omega) {
-        return 0.5 * omega.squaredNorm();
+    static double enstrophy(const maths::linear_algebra::Vector& omega) {
+        double norm = omega.norm();
+        return 0.5 * norm * norm;
     }
 
     /**
@@ -91,7 +93,7 @@ public:
      * @param tolerance Threshold for zero
      * @return true if irrotational
      */
-    static bool isIrrotational(const Eigen::Vector3d& omega,
+    static bool isIrrotational(const maths::linear_algebra::Vector& omega,
                                double tolerance = 1e-10) {
         return omega.norm() < tolerance;
     }
@@ -102,12 +104,12 @@ public:
      * Lines tangent to vorticity vector ω at every point
      * Analogous to streamlines but for vorticity field
      */
-    static Eigen::Vector3d vortexLineDirection(const Eigen::Vector3d& omega) {
+    static maths::linear_algebra::Vector vortexLineDirection(const maths::linear_algebra::Vector& omega) {
         double norm = omega.norm();
         if (norm < 1e-10) {
-            return Eigen::Vector3d::Zero();
+            return maths::linear_algebra::Vector(3);
         }
-        return omega / norm;
+        return omega * (1.0 / norm);
     }
 };
 
@@ -136,9 +138,9 @@ public:
      * @param velocity_gradient ∂uᵢ/∂xⱼ
      * @return Vortex stretching (1/s²)
      */
-    static Eigen::Vector3d vortexStretching(
-        const Eigen::Vector3d& omega,
-        const Eigen::Matrix3d& velocity_gradient) {
+    static maths::linear_algebra::Vector vortexStretching(
+        const maths::linear_algebra::Vector& omega,
+        const maths::linear_algebra::Matrix& velocity_gradient) {
 
         return velocity_gradient.transpose() * omega;
     }
@@ -152,11 +154,11 @@ public:
      * @param kinematic_viscosity ν (m²/s)
      * @return Viscous diffusion (1/s²)
      */
-    static Eigen::Vector3d viscousDiffusion(
-        const Eigen::Vector3d& vorticity_laplacian,
+    static maths::linear_algebra::Vector viscousDiffusion(
+        const maths::linear_algebra::Vector& vorticity_laplacian,
         double kinematic_viscosity) {
 
-        return kinematic_viscosity * vorticity_laplacian;
+        return vorticity_laplacian * kinematic_viscosity;
     }
 
     /**
@@ -170,14 +172,14 @@ public:
      * @param kinematic_viscosity ν (m²/s)
      * @return Dω/Dt (1/s²)
      */
-    static Eigen::Vector3d totalEvolution(
-        const Eigen::Vector3d& omega,
-        const Eigen::Matrix3d& velocity_gradient,
-        const Eigen::Vector3d& vorticity_laplacian,
+    static maths::linear_algebra::Vector totalEvolution(
+        const maths::linear_algebra::Vector& omega,
+        const maths::linear_algebra::Matrix& velocity_gradient,
+        const maths::linear_algebra::Vector& vorticity_laplacian,
         double kinematic_viscosity) {
 
-        Eigen::Vector3d stretching = vortexStretching(omega, velocity_gradient);
-        Eigen::Vector3d diffusion = viscousDiffusion(vorticity_laplacian,
+        maths::linear_algebra::Vector stretching = vortexStretching(omega, velocity_gradient);
+        maths::linear_algebra::Vector diffusion = viscousDiffusion(vorticity_laplacian,
                                                      kinematic_viscosity);
 
         return stretching + diffusion;
@@ -209,14 +211,15 @@ public:
      * @param velocity_gradient ∂uᵢ/∂xⱼ
      * @return Stretching rate (1/s²)
      */
-    static double stretchingRate(const Eigen::Vector3d& omega,
-                                 const Eigen::Matrix3d& velocity_gradient) {
-        double omega_mag_sq = omega.squaredNorm();
+    static double stretchingRate(const maths::linear_algebra::Vector& omega,
+                                 const maths::linear_algebra::Matrix& velocity_gradient) {
+        double norm = omega.norm();
+        double omega_mag_sq = norm * norm;
         if (omega_mag_sq < 1e-10) {
             return 0.0;
         }
 
-        Eigen::Vector3d stretching = vortexStretching(omega, velocity_gradient);
+        maths::linear_algebra::Vector stretching = vortexStretching(omega, velocity_gradient);
         return omega.dot(stretching) / omega_mag_sq;
     }
 };
@@ -241,8 +244,8 @@ public:
      * @return Circulation (m²/s)
      */
     static double compute(
-        const std::function<Eigen::Vector3d(const Eigen::Vector3d&)>& velocity_field,
-        const std::vector<Eigen::Vector3d>& path_points) {
+        const std::function<maths::linear_algebra::Vector(const maths::linear_algebra::Vector&)>& velocity_field,
+        const std::vector<maths::linear_algebra::Vector>& path_points) {
 
         if (path_points.size() < 2) {
             throw std::invalid_argument("Need at least 2 points for circulation");
@@ -253,13 +256,13 @@ public:
         for (size_t i = 0; i < path_points.size(); ++i) {
             size_t j = (i + 1) % path_points.size();
 
-            Eigen::Vector3d r_i = path_points[i];
-            Eigen::Vector3d r_j = path_points[j];
-            Eigen::Vector3d dl = r_j - r_i;
+            maths::linear_algebra::Vector r_i = path_points[i];
+            maths::linear_algebra::Vector r_j = path_points[j];
+            maths::linear_algebra::Vector dl = r_j - r_i;
 
             // Use midpoint velocity
-            Eigen::Vector3d r_mid = 0.5 * (r_i + r_j);
-            Eigen::Vector3d u_mid = velocity_field(r_mid);
+            maths::linear_algebra::Vector r_mid = (r_i + r_j) * 0.5;
+            maths::linear_algebra::Vector u_mid = velocity_field(r_mid);
 
             gamma += u_mid.dot(dl);
         }
@@ -278,15 +281,15 @@ public:
      * @return Circulation (m²/s)
      */
     static double fromVorticity(
-        const std::function<Eigen::Vector3d(const Eigen::Vector3d&)>& omega_field,
-        const std::vector<Eigen::Vector3d>& surface_points,
-        const Eigen::Vector3d& normal) {
+        const std::function<maths::linear_algebra::Vector(const maths::linear_algebra::Vector&)>& omega_field,
+        const std::vector<maths::linear_algebra::Vector>& surface_points,
+        const maths::linear_algebra::Vector& normal) {
 
         double gamma = 0.0;
         double area_element = 0.0;  // Simplified: need proper surface integration
 
         for (const auto& point : surface_points) {
-            Eigen::Vector3d omega = omega_field(point);
+            maths::linear_algebra::Vector omega = omega_field(point);
             gamma += omega.dot(normal);
         }
 
@@ -365,8 +368,8 @@ public:
      */
     static double circulationEvolution(
         double kinematic_viscosity,
-        const std::vector<Eigen::Vector3d>& vorticity_curl,
-        const std::vector<Eigen::Vector3d>& path_elements) {
+        const std::vector<maths::linear_algebra::Vector>& vorticity_curl,
+        const std::vector<maths::linear_algebra::Vector>& path_elements) {
 
         if (vorticity_curl.size() != path_elements.size()) {
             throw std::invalid_argument("Curl and path arrays must match");
@@ -429,23 +432,23 @@ public:
      * @param field_point r (m)
      * @return Induced velocity (m/s)
      */
-    static Eigen::Vector3d velocityFromFilament(
+    static maths::linear_algebra::Vector velocityFromFilament(
         double circulation,
-        const Eigen::Vector3d& filament_element,
-        const Eigen::Vector3d& filament_position,
-        const Eigen::Vector3d& field_point) {
+        const maths::linear_algebra::Vector& filament_element,
+        const maths::linear_algebra::Vector& filament_position,
+        const maths::linear_algebra::Vector& field_point) {
 
-        Eigen::Vector3d r = field_point - filament_position;
+        maths::linear_algebra::Vector r = field_point - filament_position;
         double r_mag = r.norm();
 
         if (r_mag < 1e-10) {
-            return Eigen::Vector3d::Zero();  // Singularity at vortex core
+            return maths::linear_algebra::Vector(3);  // Singularity at vortex core
         }
 
-        Eigen::Vector3d cross = filament_element.cross(r);
+        maths::linear_algebra::Vector cross = maths::linear_algebra::CrossProduct::compute(filament_element, r);
         double r_cubed = r_mag * r_mag * r_mag;
 
-        return (circulation / (4.0 * M_PI)) * cross / r_cubed;
+        return cross * (circulation / (4.0 * M_PI * r_cubed));
     }
 
     /**
