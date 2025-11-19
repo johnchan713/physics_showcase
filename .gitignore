@@ -30,3 +30,8 @@ Makefile.cmake
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Novel theory test binaries
+test_qgp
+test_adscft
+test_emergent
