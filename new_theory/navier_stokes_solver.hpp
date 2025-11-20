@@ -29,6 +29,10 @@
 #include <functional>
 #include <algorithm>
 #include <stdexcept>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <cstdlib>
 #include "navier_stokes_regularity.hpp"
 
 namespace new_theory {
@@ -572,10 +576,318 @@ public:
         projectDivergenceFree();
     }
 
+    /**
+     * @brief Compute CFL time step for stability
+     *
+     * CFL condition: dt ≤ C * min(dx/u_max, dx²/ν)
+     *
+     * For stability: dt < dx / u_max (advection)
+     *                dt < dx²/(2dν) (diffusion, d=dimension)
+     *
+     * @param CFL_number Safety factor (typically 0.5)
+     * @return Maximum stable time step
+     */
+    double computeCFLTimeStep(double CFL_number = 0.5) const {
+        // Find maximum velocity
+        double u_max = 0.0;
+        for (int idx = 0; idx < grid.size(); ++idx) {
+            double u_mag = std::sqrt(u.ux[idx]*u.ux[idx] +
+                                     u.uy[idx]*u.uy[idx] +
+                                     u.uz[idx]*u.uz[idx]);
+            u_max = std::max(u_max, u_mag);
+        }
+
+        // Advective CFL
+        double dx_min = std::min({grid.dx, grid.dy, grid.dz});
+        double dt_adv = (u_max > 1e-12) ? dx_min / u_max : 1e10;
+
+        // Diffusive CFL (more restrictive in 3D)
+        double dt_diff = dx_min * dx_min / (6.0 * nu);  // 6 = 2*d for d=3
+
+        // Take minimum and apply safety factor
+        return CFL_number * std::min(dt_adv, dt_diff);
+    }
+
+    /**
+     * @brief Adaptive RK4 step with CFL-based time step
+     *
+     * @param dt_max Maximum desired time step
+     * @param CFL_number CFL safety factor
+     * @return Actual time step used
+     */
+    double stepRK4Adaptive(double dt_max = 0.01, double CFL_number = 0.5) {
+        double dt_cfl = computeCFLTimeStep(CFL_number);
+        double dt = std::min(dt_max, dt_cfl);
+        stepRK4(dt);
+        return dt;
+    }
+
+    /**
+     * @brief Set initial condition: Kolmogorov flow
+     *
+     * u = sin(n*y)
+     * v = 0
+     * w = 0
+     *
+     * Simple shear flow known to develop instabilities at high Re.
+     * Becomes unstable and transitions to turbulence.
+     */
+    void setInitialConditionKolmogorov(int n = 2) {
+        int Nx = grid.Nx, Ny = grid.Ny, Nz = grid.Nz;
+
+        for (int i = 0; i < Nx; ++i) {
+            double x = i * grid.dx;
+            for (int j = 0; j < Ny; ++j) {
+                double y = j * grid.dy;
+                for (int k = 0; k < Nz; ++k) {
+                    double z = k * grid.dz;
+                    int idx = i + Nx * (j + Ny * k);
+
+                    u.ux[idx] = std::sin(n * y);
+                    u.uy[idx] = 0.0;
+                    u.uz[idx] = 0.0;
+                }
+            }
+        }
+
+        time = 0.0;
+        projectDivergenceFree();
+    }
+
+    /**
+     * @brief Set initial condition: Random Gaussian perturbations
+     *
+     * Creates random divergence-free field with specified energy level.
+     * Useful for searching blow-up in generic initial conditions.
+     *
+     * @param energy_target Target kinetic energy
+     * @param seed Random seed
+     */
+    void setInitialConditionRandom(double energy_target = 1.0, int seed = 12345) {
+        std::srand(seed);
+        int Nx = grid.Nx, Ny = grid.Ny, Nz = grid.Nz;
+
+        // Fill with random values
+        for (int idx = 0; idx < grid.size(); ++idx) {
+            u.ux[idx] = 2.0 * (std::rand() / (double)RAND_MAX) - 1.0;
+            u.uy[idx] = 2.0 * (std::rand() / (double)RAND_MAX) - 1.0;
+            u.uz[idx] = 2.0 * (std::rand() / (double)RAND_MAX) - 1.0;
+        }
+
+        // Project to divergence-free
+        projectDivergenceFree();
+
+        // Normalize to target energy
+        double E_current = computeEnergy();
+        if (E_current > 1e-12) {
+            double scale = std::sqrt(energy_target / E_current);
+            for (int idx = 0; idx < grid.size(); ++idx) {
+                u.ux[idx] *= scale;
+                u.uy[idx] *= scale;
+                u.uz[idx] *= scale;
+            }
+        }
+
+        time = 0.0;
+    }
+
+    /**
+     * @brief Set initial condition: Vortex ring
+     *
+     * Concentrated vorticity in toroidal structure.
+     * Potential blow-up candidate due to vortex stretching.
+     *
+     * @param R Major radius
+     * @param a Minor radius (core size)
+     * @param Gamma Circulation strength
+     */
+    void setInitialConditionVortexRing(double R = 1.0, double a = 0.2, double Gamma = 1.0) {
+        int Nx = grid.Nx, Ny = grid.Ny, Nz = grid.Nz;
+        double xc = grid.Lx / 2.0;
+        double yc = grid.Ly / 2.0;
+        double zc = grid.Lz / 2.0;
+
+        for (int i = 0; i < Nx; ++i) {
+            double x = i * grid.dx - xc;
+            for (int j = 0; j < Ny; ++j) {
+                double y = j * grid.dy - yc;
+                for (int k = 0; k < Nz; ++k) {
+                    double z = k * grid.dz - zc;
+                    int idx = i + Nx * (j + Ny * k);
+
+                    // Cylindrical coordinates (r, θ, z) with z-axis vertical
+                    double r = std::sqrt(x*x + y*y);
+                    double theta = std::atan2(y, x);
+
+                    // Distance from ring center
+                    double rho = std::sqrt((r - R)*(r - R) + z*z);
+
+                    // Gaussian vortex core
+                    double vorticity_mag = (Gamma / (a*a)) * std::exp(-rho*rho / (a*a));
+
+                    // Velocity from vortex ring (simplified)
+                    if (r > 1e-6) {
+                        u.ux[idx] = -vorticity_mag * std::sin(theta) * (z / (rho + 1e-6));
+                        u.uy[idx] =  vorticity_mag * std::cos(theta) * (z / (rho + 1e-6));
+                        u.uz[idx] =  vorticity_mag * ((r - R) / (rho + 1e-6));
+                    } else {
+                        u.ux[idx] = 0.0;
+                        u.uy[idx] = 0.0;
+                        u.uz[idx] = 0.0;
+                    }
+                }
+            }
+        }
+
+        time = 0.0;
+        projectDivergenceFree();
+    }
+
+    /**
+     * @brief Compute spectral energy distribution E(k)
+     *
+     * Groups Fourier modes by |k| into shells and computes
+     * total energy in each shell.
+     *
+     * @param k_shells Wave number shell boundaries
+     * @return Energy in each shell
+     */
+    std::vector<double> computeEnergySpectrum(const std::vector<double>& k_shells) const {
+        std::vector<double> E_k(k_shells.size() - 1, 0.0);
+        std::vector<int> counts(k_shells.size() - 1, 0);
+
+        int Nx = grid.Nx, Ny = grid.Ny, Nz = grid.Nz;
+
+        for (int i = 0; i < Nx; ++i) {
+            for (int j = 0; j < Ny; ++j) {
+                for (int k = 0; k < Nz; ++k) {
+                    int idx = i + Nx * (j + Ny * k);
+
+                    double kx = grid.kx[i];
+                    double ky = grid.ky[j];
+                    double kz = grid.kz[k];
+                    double k_mag = std::sqrt(kx*kx + ky*ky + kz*kz);
+
+                    // Find which shell this mode belongs to
+                    for (size_t s = 0; s < k_shells.size() - 1; ++s) {
+                        if (k_mag >= k_shells[s] && k_mag < k_shells[s+1]) {
+                            // Energy in this mode
+                            double E_mode = 0.5 * (std::norm(u.ux_hat[idx]) +
+                                                   std::norm(u.uy_hat[idx]) +
+                                                   std::norm(u.uz_hat[idx]));
+                            E_k[s] += E_mode;
+                            counts[s]++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return E_k;
+    }
+
+    /**
+     * @brief Compute energy dissipation rate ε = ν∫|∇u|² dx
+     *
+     * In Fourier space: ε = ν Σ k² |û_k|²
+     */
+    double computeDissipationRate() const {
+        double epsilon = 0.0;
+
+        for (int idx = 0; idx < grid.size(); ++idx) {
+            double k2 = grid.k2[idx];
+            double u2 = std::norm(u.ux_hat[idx]) +
+                        std::norm(u.uy_hat[idx]) +
+                        std::norm(u.uz_hat[idx]);
+            epsilon += k2 * u2;
+        }
+
+        return nu * epsilon / grid.size();
+    }
+
+    /**
+     * @brief Save time series data to file
+     *
+     * @param filename Output filename
+     */
+    void saveTimeSeries(const std::string& filename) const {
+        std::ofstream file(filename);
+        if (!file.is_open()) {
+            throw std::runtime_error("Cannot open file: " + filename);
+        }
+
+        file << "# Time, Energy, Enstrophy, VorticityMax, Dissipation\n";
+        file << std::scientific << std::setprecision(10);
+
+        for (size_t i = 0; i < time_history.size(); ++i) {
+            file << time_history[i] << " "
+                 << energy_history[i] << " "
+                 << enstrophy_history[i] << " "
+                 << vorticity_Linfty_history[i];
+
+            // Would compute dissipation here
+            file << "\n";
+        }
+
+        file.close();
+    }
+
+    /**
+     * @brief Run simulation until time T with monitoring
+     *
+     * @param T_final Final time
+     * @param dt_output Output interval
+     * @param dt_max Maximum time step
+     * @param use_adaptive Use adaptive time stepping
+     * @return Final regularity status
+     */
+    BlowUpDetector::RegularityStatus runSimulation(
+        double T_final,
+        double dt_output = 0.1,
+        double dt_max = 0.01,
+        bool use_adaptive = true)
+    {
+        double t_next_output = dt_output;
+
+        while (time < T_final) {
+            // Compute time step
+            double dt = use_adaptive ? stepRK4Adaptive(dt_max) : dt_max;
+            if (!use_adaptive) {
+                stepRK4(dt);
+            }
+
+            // Don't overshoot
+            if (time + dt > T_final) {
+                dt = T_final - time;
+                stepRK4(dt);
+            }
+
+            // Output and monitor
+            if (time >= t_next_output) {
+                updateRegularityMonitoring();
+
+                auto status = checkRegularity();
+                if (!status.is_regular) {
+                    std::cout << "BLOW-UP DETECTED at t=" << time << "!\n";
+                    std::cout << "Criterion: " << status.criterion_violated << "\n";
+                    std::cout << "Severity: " << status.severity_score << "\n";
+                    return status;
+                }
+
+                t_next_output += dt_output;
+            }
+        }
+
+        updateRegularityMonitoring();
+        return checkRegularity();
+    }
+
     double getTime() const { return time; }
     const std::vector<double>& getEnergyHistory() const { return energy_history; }
     const std::vector<double>& getEnstrophyHistory() const { return enstrophy_history; }
     const std::vector<double>& getVorticityHistory() const { return vorticity_Linfty_history; }
+    const std::vector<double>& getTimeHistory() const { return time_history; }
 };
 
 } // namespace navier_stokes
