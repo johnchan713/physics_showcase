@@ -713,11 +713,12 @@ auto E_k = solver.computeEnergySpectrum(k_shells);
 2. ✅ ~~Adaptive time stepping (CFL condition)~~ **DONE!**
 3. ✅ ~~Enhanced initial conditions library~~ **DONE!**
 4. ✅ ~~Spectral diagnostics (E(k), dissipation rate)~~ **DONE!**
-5. ✅ ~~Integrate FFTW library for fast transforms~~ **DONE!** 🎉
-6. 🔄 Run high-resolution (256³, 512³) simulations
-7. 🔄 Systematic initial condition parameter search
-8. 🔄 Parallel execution (MPI/OpenMP)
-9. 🔄 Visualization tools (VTK output)
+5. ✅ ~~Integrate FFTW library for fast transforms~~ **DONE!**
+6. ✅ ~~Visualization tools (VTK output)~~ **DONE!** 🎉
+7. ✅ ~~Checkpoint/restart for long simulations~~ **DONE!** 🎉
+8. ✅ ~~High-resolution framework (128³, 256³, 512³)~~ **DONE!** 🎉
+9. 🔄 Parallel execution (MPI/OpenMP) - for extreme resolutions
+10. 🔄 GPU acceleration (CUDA) - for cutting-edge performance
 
 **FFTW Integration:** ✅ **COMPLETE!**
 The solver now supports conditional FFTW compilation:
@@ -728,7 +729,7 @@ See "Building with FFTW" below for instructions.
 
 ### Example Simulation Programs ✨ **NEW!**
 
-Three ready-to-run example programs demonstrate the solver's capabilities:
+Four ready-to-run example programs demonstrate the solver's capabilities:
 
 **1. Taylor-Green Vortex Decay** (`taylor_green_decay`)
 - Classic benchmark for incompressible flow solvers
@@ -753,6 +754,38 @@ Three ready-to-run example programs demonstrate the solver's capabilities:
 - Usage: `./blowup_search [N] [Re_min] [Re_max] [num_Re]`
 - Output: Comprehensive results table, blow-up candidates
 
+**4. High-Resolution Blow-Up** (`highres_blowup`) 🚀 **PRODUCTION!**
+- **Production-quality high-resolution simulations**
+- Supports 64³, 128³, 256³, 512³+ grids
+- **Checkpoint/restart** for long simulations
+- **VTK output** for 3D visualization (ParaView/VisIt)
+- Automatic memory usage estimation
+- Long-time integration (T=50+)
+- Emergency saves on blow-up detection
+- Usage: `./highres_blowup <N> <Re> <IC_type> [checkpoint]`
+- IC types: `abc`, `vortex`, `random`, `kolmogorov`, `taylor-green`
+- Output: Checkpoints every 1.0 time units, VTK files every 2.0 units
+
+**Memory Requirements:**
+```
+64³  → ~60 MB     (laptop friendly)
+128³ → ~480 MB    (standard workstation)
+256³ → ~3.8 GB    (requires good RAM)
+512³ → ~30 GB     (HPC/cluster recommended)
+```
+
+**Example Usage:**
+```bash
+# Standard resolution
+./highres_blowup 128 1000 abc
+
+# High resolution (requires FFTW!)
+./highres_blowup 256 5000 vortex
+
+# Resume from checkpoint
+./highres_blowup 128 1000 abc checkpoints/checkpoint_t10.dat
+```
+
 **Building Examples:**
 ```bash
 # With CMake (automatically built with BUILD_EXAMPLES=ON)
@@ -764,6 +797,7 @@ make
 ./taylor_green_decay 64 100 10.0
 ./reynolds_sweep 64 10 1000 20
 ./blowup_search 64 100 5000 5
+./highres_blowup 128 1000 abc
 
 # Disable building examples
 cmake .. -DBUILD_EXAMPLES=OFF
@@ -779,6 +813,29 @@ gnuplot -e "set logscale xy; plot 'reynolds_sweep.dat' u 1:7 w lp; pause -1"
 
 # View blow-up search results
 cat blowup_search_results.dat
+
+# 3D Visualization with ParaView (from highres_blowup)
+paraview vtk/final_field.vtk              # View final state
+paraview vtk/field_t*.vtk                 # Animate time evolution
+```
+
+**ParaView Visualization Tips:**
+1. **Velocity field**: Use "Glyph" filter with arrows to show flow
+2. **Vorticity**: Apply "Contour" filter on vorticity_magnitude for isosurfaces
+3. **Streamlines**: Use "Stream Tracer" to visualize flow paths
+4. **Animation**: Load time series `field_t*.vtk` and play through time
+5. **Cross-sections**: Use "Slice" filter to see internal structure
+
+**Checkpoint Management:**
+```bash
+# Resume from checkpoint
+./highres_blowup 128 1000 abc checkpoints/checkpoint_t10.dat
+
+# List checkpoints
+ls -lh checkpoints/
+
+# Clean old checkpoints (keep every 5th)
+rm checkpoints/checkpoint_t{1..9}.dat checkpoints/checkpoint_t1{1..4}.dat
 ```
 
 ---

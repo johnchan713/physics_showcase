@@ -103,10 +103,18 @@ if(BUILD_EXAMPLES)
         target_link_libraries(blowup_search ${FFTW_LIBRARIES})
     endif()
 
+    # High-resolution blow-up search with checkpoint/VTK
+    add_executable(highres_blowup examples/navier_stokes/highres_blowup.cpp)
+    target_link_libraries(highres_blowup m)
+    if(USE_FFTW AND FFTW_AVAILABLE)
+        target_link_libraries(highres_blowup ${FFTW_LIBRARIES})
+    endif()
+
     message(STATUS "Navier-Stokes example programs will be built:")
     message(STATUS "  - taylor_green_decay")
     message(STATUS "  - reynolds_sweep")
     message(STATUS "  - blowup_search")
+    message(STATUS "  - highres_blowup (HIGH-RESOLUTION + VTK + CHECKPOINTS)")
 endif()
 
 # Installation rules (optional)

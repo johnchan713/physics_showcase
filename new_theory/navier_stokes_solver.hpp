@@ -1102,6 +1102,302 @@ public:
         return checkRegularity();
     }
 
+    /**
+     * @brief Save checkpoint for restart capability
+     *
+     * Saves complete solver state to binary file for long simulations
+     *
+     * @param filename Checkpoint filename
+     */
+    void saveCheckpoint(const std::string& filename) const {
+        std::ofstream file(filename, std::ios::binary);
+        if (!file.is_open()) {
+            throw std::runtime_error("Cannot open checkpoint file: " + filename);
+        }
+
+        // Write header
+        file.write("NSCHK001", 8);  // Magic number + version
+
+        // Write grid parameters
+        file.write(reinterpret_cast<const char*>(&grid.Nx), sizeof(int));
+        file.write(reinterpret_cast<const char*>(&grid.Ny), sizeof(int));
+        file.write(reinterpret_cast<const char*>(&grid.Nz), sizeof(int));
+        file.write(reinterpret_cast<const char*>(&grid.Lx), sizeof(double));
+        file.write(reinterpret_cast<const char*>(&grid.Ly), sizeof(double));
+        file.write(reinterpret_cast<const char*>(&grid.Lz), sizeof(double));
+
+        // Write solver parameters
+        file.write(reinterpret_cast<const char*>(&nu), sizeof(double));
+        file.write(reinterpret_cast<const char*>(&time), sizeof(double));
+
+        // Write velocity field (physical space)
+        file.write(reinterpret_cast<const char*>(u.ux.data()),
+                   u.ux.size() * sizeof(double));
+        file.write(reinterpret_cast<const char*>(u.uy.data()),
+                   u.uy.size() * sizeof(double));
+        file.write(reinterpret_cast<const char*>(u.uz.data()),
+                   u.uz.size() * sizeof(double));
+
+        // Write history sizes
+        size_t hist_size = time_history.size();
+        file.write(reinterpret_cast<const char*>(&hist_size), sizeof(size_t));
+
+        // Write history arrays
+        file.write(reinterpret_cast<const char*>(time_history.data()),
+                   hist_size * sizeof(double));
+        file.write(reinterpret_cast<const char*>(energy_history.data()),
+                   hist_size * sizeof(double));
+        file.write(reinterpret_cast<const char*>(enstrophy_history.data()),
+                   hist_size * sizeof(double));
+        file.write(reinterpret_cast<const char*>(vorticity_Linfty_history.data()),
+                   hist_size * sizeof(double));
+
+        file.close();
+
+        std::cout << "Checkpoint saved: " << filename
+                  << " (t=" << time << ", size="
+                  << (3 * u.ux.size() * sizeof(double) + hist_size * 4 * sizeof(double)) / (1024.0 * 1024.0)
+                  << " MB)\n";
+    }
+
+    /**
+     * @brief Load checkpoint for restart
+     *
+     * @param filename Checkpoint filename
+     * @return true if successful, false otherwise
+     */
+    bool loadCheckpoint(const std::string& filename) {
+        std::ifstream file(filename, std::ios::binary);
+        if (!file.is_open()) {
+            std::cerr << "Cannot open checkpoint file: " << filename << "\n";
+            return false;
+        }
+
+        // Read and verify header
+        char header[8];
+        file.read(header, 8);
+        if (std::string(header, 8) != "NSCHK001") {
+            std::cerr << "Invalid checkpoint file format\n";
+            return false;
+        }
+
+        // Read grid parameters
+        int Nx_chk, Ny_chk, Nz_chk;
+        double Lx_chk, Ly_chk, Lz_chk;
+        file.read(reinterpret_cast<char*>(&Nx_chk), sizeof(int));
+        file.read(reinterpret_cast<char*>(&Ny_chk), sizeof(int));
+        file.read(reinterpret_cast<char*>(&Nz_chk), sizeof(int));
+        file.read(reinterpret_cast<char*>(&Lx_chk), sizeof(double));
+        file.read(reinterpret_cast<char*>(&Ly_chk), sizeof(double));
+        file.read(reinterpret_cast<char*>(&Lz_chk), sizeof(double));
+
+        // Verify grid compatibility
+        if (Nx_chk != grid.Nx || Ny_chk != grid.Ny || Nz_chk != grid.Nz) {
+            std::cerr << "Checkpoint grid size mismatch!\n";
+            std::cerr << "Checkpoint: " << Nx_chk << "x" << Ny_chk << "x" << Nz_chk << "\n";
+            std::cerr << "Current: " << grid.Nx << "x" << grid.Ny << "x" << grid.Nz << "\n";
+            return false;
+        }
+
+        // Read solver parameters
+        file.read(reinterpret_cast<char*>(&nu), sizeof(double));
+        file.read(reinterpret_cast<char*>(&time), sizeof(double));
+
+        // Read velocity field
+        file.read(reinterpret_cast<char*>(u.ux.data()),
+                  u.ux.size() * sizeof(double));
+        file.read(reinterpret_cast<char*>(u.uy.data()),
+                  u.uy.size() * sizeof(double));
+        file.read(reinterpret_cast<char*>(u.uz.data()),
+                  u.uz.size() * sizeof(double));
+
+        // Read history size
+        size_t hist_size;
+        file.read(reinterpret_cast<char*>(&hist_size), sizeof(size_t));
+
+        // Resize history vectors
+        time_history.resize(hist_size);
+        energy_history.resize(hist_size);
+        enstrophy_history.resize(hist_size);
+        vorticity_Linfty_history.resize(hist_size);
+
+        // Read history arrays
+        file.read(reinterpret_cast<char*>(time_history.data()),
+                  hist_size * sizeof(double));
+        file.read(reinterpret_cast<char*>(energy_history.data()),
+                  hist_size * sizeof(double));
+        file.read(reinterpret_cast<char*>(enstrophy_history.data()),
+                  hist_size * sizeof(double));
+        file.read(reinterpret_cast<char*>(vorticity_Linfty_history.data()),
+                  hist_size * sizeof(double));
+
+        file.close();
+
+        std::cout << "Checkpoint loaded: " << filename << " (t=" << time << ")\n";
+        std::cout << "Resuming simulation from t=" << time << "\n";
+
+        // Recompute Fourier space representation
+        toFourierSpace();
+
+        return true;
+    }
+
+    /**
+     * @brief Export velocity field to VTK format for visualization
+     *
+     * Creates structured grid VTK file for ParaView/VisIt visualization
+     *
+     * @param filename VTK filename (will append .vtk)
+     * @param include_vorticity Also compute and export vorticity field
+     */
+    void saveVTK(const std::string& filename, bool include_vorticity = true) const {
+        std::string vtk_file = filename + ".vtk";
+        std::ofstream file(vtk_file);
+        if (!file.is_open()) {
+            throw std::runtime_error("Cannot open VTK file: " + vtk_file);
+        }
+
+        int Nx = grid.Nx, Ny = grid.Ny, Nz = grid.Nz;
+
+        // VTK header
+        file << "# vtk DataFile Version 3.0\n";
+        file << "Navier-Stokes 3D Velocity Field\n";
+        file << "ASCII\n";
+        file << "DATASET STRUCTURED_POINTS\n";
+        file << "DIMENSIONS " << Nx << " " << Ny << " " << Nz << "\n";
+        file << "ORIGIN 0.0 0.0 0.0\n";
+        file << "SPACING " << grid.dx << " " << grid.dy << " " << grid.dz << "\n";
+        file << "\n";
+        file << "POINT_DATA " << (Nx * Ny * Nz) << "\n";
+
+        // Velocity vector field
+        file << "VECTORS velocity double\n";
+        for (int k = 0; k < Nz; ++k) {
+            for (int j = 0; j < Ny; ++j) {
+                for (int i = 0; i < Nx; ++i) {
+                    int idx = i + Nx * (j + Ny * k);
+                    file << u.ux[idx] << " " << u.uy[idx] << " " << u.uz[idx] << "\n";
+                }
+            }
+        }
+
+        // Velocity magnitude as scalar
+        file << "\nSCALARS velocity_magnitude double 1\n";
+        file << "LOOKUP_TABLE default\n";
+        for (int k = 0; k < Nz; ++k) {
+            for (int j = 0; j < Ny; ++j) {
+                for (int i = 0; i < Nx; ++i) {
+                    int idx = i + Nx * (j + Ny * k);
+                    double mag = std::sqrt(u.ux[idx]*u.ux[idx] +
+                                          u.uy[idx]*u.uy[idx] +
+                                          u.uz[idx]*u.uz[idx]);
+                    file << mag << "\n";
+                }
+            }
+        }
+
+        // Vorticity (if requested)
+        if (include_vorticity) {
+            // Compute vorticity in physical space (simplified)
+            std::vector<double> omega_x(grid.size(), 0.0);
+            std::vector<double> omega_y(grid.size(), 0.0);
+            std::vector<double> omega_z(grid.size(), 0.0);
+
+            // Simplified finite difference vorticity
+            for (int k = 1; k < Nz-1; ++k) {
+                for (int j = 1; j < Ny-1; ++j) {
+                    for (int i = 1; i < Nx-1; ++i) {
+                        int idx = i + Nx * (j + Ny * k);
+                        int idx_xp = (i+1) + Nx * (j + Ny * k);
+                        int idx_xm = (i-1) + Nx * (j + Ny * k);
+                        int idx_yp = i + Nx * ((j+1) + Ny * k);
+                        int idx_ym = i + Nx * ((j-1) + Ny * k);
+                        int idx_zp = i + Nx * (j + Ny * (k+1));
+                        int idx_zm = i + Nx * (j + Ny * (k-1));
+
+                        // ω_x = ∂w/∂y - ∂v/∂z
+                        omega_x[idx] = (u.uz[idx_yp] - u.uz[idx_ym]) / (2*grid.dy) -
+                                      (u.uy[idx_zp] - u.uy[idx_zm]) / (2*grid.dz);
+
+                        // ω_y = ∂u/∂z - ∂w/∂x
+                        omega_y[idx] = (u.ux[idx_zp] - u.ux[idx_zm]) / (2*grid.dz) -
+                                      (u.uz[idx_xp] - u.uz[idx_xm]) / (2*grid.dx);
+
+                        // ω_z = ∂v/∂x - ∂u/∂y
+                        omega_z[idx] = (u.uy[idx_xp] - u.uy[idx_xm]) / (2*grid.dx) -
+                                      (u.ux[idx_yp] - u.ux[idx_ym]) / (2*grid.dy);
+                    }
+                }
+            }
+
+            file << "\nVECTORS vorticity double\n";
+            for (int k = 0; k < Nz; ++k) {
+                for (int j = 0; j < Ny; ++j) {
+                    for (int i = 0; i < Nx; ++i) {
+                        int idx = i + Nx * (j + Ny * k);
+                        file << omega_x[idx] << " " << omega_y[idx] << " " << omega_z[idx] << "\n";
+                    }
+                }
+            }
+
+            file << "\nSCALARS vorticity_magnitude double 1\n";
+            file << "LOOKUP_TABLE default\n";
+            for (int k = 0; k < Nz; ++k) {
+                for (int j = 0; j < Ny; ++j) {
+                    for (int i = 0; i < Nx; ++i) {
+                        int idx = i + Nx * (j + Ny * k);
+                        double mag = std::sqrt(omega_x[idx]*omega_x[idx] +
+                                              omega_y[idx]*omega_y[idx] +
+                                              omega_z[idx]*omega_z[idx]);
+                        file << mag << "\n";
+                    }
+                }
+            }
+        }
+
+        file.close();
+        std::cout << "VTK file saved: " << vtk_file << "\n";
+    }
+
+    /**
+     * @brief Estimate memory usage for given grid size
+     *
+     * @param N Grid resolution (N³)
+     * @return Memory usage in MB
+     */
+    static double estimateMemoryUsage(int N) {
+        size_t grid_points = static_cast<size_t>(N) * N * N;
+
+        // Velocity fields: 3 components × 2 (real + complex) = 6 arrays
+        size_t velocity_mem = 6 * grid_points * sizeof(double);
+
+        // Work arrays (k1, k2, k3, k4, u_temp): 5 × 6 arrays
+        size_t work_mem = 5 * 6 * grid_points * sizeof(double);
+
+        // Grid arrays (kx, ky, kz, k2, dealias_mask)
+        size_t grid_mem = (3*N + 2*grid_points) * sizeof(double);
+
+        // History arrays (estimate 1000 time points max)
+        size_t history_mem = 4 * 1000 * sizeof(double);
+
+        size_t total_bytes = velocity_mem + work_mem + grid_mem + history_mem;
+
+        return total_bytes / (1024.0 * 1024.0);
+    }
+
+    /**
+     * @brief Print memory usage estimate for current grid
+     */
+    void printMemoryUsage() const {
+        double mem_mb = estimateMemoryUsage(grid.Nx);
+        std::cout << "Estimated memory usage: " << std::fixed << std::setprecision(2)
+                  << mem_mb << " MB";
+        if (mem_mb > 1024) {
+            std::cout << " (" << mem_mb/1024.0 << " GB)";
+        }
+        std::cout << "\n";
+    }
+
     double getTime() const { return time; }
     const std::vector<double>& getEnergyHistory() const { return energy_history; }
     const std::vector<double>& getEnstrophyHistory() const { return enstrophy_history; }
