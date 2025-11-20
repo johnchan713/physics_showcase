@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Options
 option(USE_FFTW "Enable FFTW library for production-quality FFT in Navier-Stokes solver" OFF)
 option(BUILD_TESTS "Build test executables for novel theories" ON)
+option(BUILD_EXAMPLES "Build Navier-Stokes example programs" ON)
 
 # Compiler warnings
 if(MSVC)
@@ -79,6 +80,35 @@ if(BUILD_TESTS)
     add_test(NAME NavierStokesSolver COMMAND test_ns_solver)
 endif()
 
+# Navier-Stokes Example Programs
+if(BUILD_EXAMPLES)
+    # Taylor-Green vortex decay simulation
+    add_executable(taylor_green_decay examples/navier_stokes/taylor_green_decay.cpp)
+    target_link_libraries(taylor_green_decay m)
+    if(USE_FFTW AND FFTW_AVAILABLE)
+        target_link_libraries(taylor_green_decay ${FFTW_LIBRARIES})
+    endif()
+
+    # Reynolds number parameter sweep
+    add_executable(reynolds_sweep examples/navier_stokes/reynolds_sweep.cpp)
+    target_link_libraries(reynolds_sweep m)
+    if(USE_FFTW AND FFTW_AVAILABLE)
+        target_link_libraries(reynolds_sweep ${FFTW_LIBRARIES})
+    endif()
+
+    # Systematic blow-up search
+    add_executable(blowup_search examples/navier_stokes/blowup_search.cpp)
+    target_link_libraries(blowup_search m)
+    if(USE_FFTW AND FFTW_AVAILABLE)
+        target_link_libraries(blowup_search ${FFTW_LIBRARIES})
+    endif()
+
+    message(STATUS "Navier-Stokes example programs will be built:")
+    message(STATUS "  - taylor_green_decay")
+    message(STATUS "  - reynolds_sweep")
+    message(STATUS "  - blowup_search")
+endif()
+
 # Installation rules (optional)
 install(TARGETS physics_demo DESTINATION bin)
 install(DIRECTORY include/ DESTINATION include)
@@ -92,6 +122,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "Build tests: ${BUILD_TESTS}")
+message(STATUS "Build examples: ${BUILD_EXAMPLES}")
 if(USE_FFTW)
     if(FFTW_AVAILABLE)
         message(STATUS "FFTW mode: ENABLED (Production)")

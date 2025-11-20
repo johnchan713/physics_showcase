@@ -726,6 +726,61 @@ The solver now supports conditional FFTW compilation:
 
 See "Building with FFTW" below for instructions.
 
+### Example Simulation Programs ✨ **NEW!**
+
+Three ready-to-run example programs demonstrate the solver's capabilities:
+
+**1. Taylor-Green Vortex Decay** (`taylor_green_decay`)
+- Classic benchmark for incompressible flow solvers
+- Studies energy decay: E(t) ≈ E₀ exp(-2νk²t)
+- Validates solver accuracy against known analytical behavior
+- Usage: `./taylor_green_decay [N] [Re] [T_final]`
+- Output: Time series data, energy decay analysis
+
+**2. Reynolds Number Sweep** (`reynolds_sweep`)
+- Parameter study from laminar to turbulent regimes
+- Uses ABC flow (Arnold-Beltrami-Childress)
+- Measures energy, enstrophy, dissipation vs Re
+- Identifies transition to complex dynamics
+- Usage: `./reynolds_sweep [N] [Re_min] [Re_max] [num_points]`
+- Output: Reynolds scaling data, turbulence analysis
+
+**3. Blow-Up Search** (`blowup_search`) 🎯 **Millennium Prize!**
+- Systematic search for finite-time singularities
+- Tests multiple initial conditions (ABC, vortex rings, random)
+- Monitors BKM criterion, enstrophy, vorticity growth
+- **Finding a blow-up could be worth $1,000,000!**
+- Usage: `./blowup_search [N] [Re_min] [Re_max] [num_Re]`
+- Output: Comprehensive results table, blow-up candidates
+
+**Building Examples:**
+```bash
+# With CMake (automatically built with BUILD_EXAMPLES=ON)
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+
+# Run examples
+./taylor_green_decay 64 100 10.0
+./reynolds_sweep 64 10 1000 20
+./blowup_search 64 100 5000 5
+
+# Disable building examples
+cmake .. -DBUILD_EXAMPLES=OFF
+```
+
+**Analyzing Results:**
+```bash
+# Plot energy decay
+gnuplot -e "plot 'taylor_green_timeseries.dat' u 1:2 w l; pause -1"
+
+# Plot Reynolds scaling (log-log)
+gnuplot -e "set logscale xy; plot 'reynolds_sweep.dat' u 1:7 w lp; pause -1"
+
+# View blow-up search results
+cat blowup_search_results.dat
+```
+
 ---
 
 ## 📊 Implementation & Testing
