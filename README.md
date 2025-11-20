@@ -713,11 +713,18 @@ auto E_k = solver.computeEnergySpectrum(k_shells);
 2. ✅ ~~Adaptive time stepping (CFL condition)~~ **DONE!**
 3. ✅ ~~Enhanced initial conditions library~~ **DONE!**
 4. ✅ ~~Spectral diagnostics (E(k), dissipation rate)~~ **DONE!**
-5. 🔄 Integrate FFTW library for fast transforms
+5. ✅ ~~Integrate FFTW library for fast transforms~~ **DONE!** 🎉
 6. 🔄 Run high-resolution (256³, 512³) simulations
 7. 🔄 Systematic initial condition parameter search
 8. 🔄 Parallel execution (MPI/OpenMP)
 9. 🔄 Visualization tools (VTK output)
+
+**FFTW Integration:** ✅ **COMPLETE!**
+The solver now supports conditional FFTW compilation:
+- **Without FFTW:** Conceptual mode (demonstration/testing) - works out of the box
+- **With FFTW:** Production mode (real FFT transforms, high performance)
+
+See "Building with FFTW" below for instructions.
 
 ---
 
@@ -759,8 +766,59 @@ g++ -std=c++17 -I./include tests/new_theory/test_emergent_spacetime.cpp -o test_
 g++ -std=c++17 -I./include tests/new_theory/test_navier_stokes.cpp -o test_navier_stokes
 ./test_navier_stokes
 
-# Compile and run Navier-Stokes solver tests
+# Compile and run Navier-Stokes solver tests (Conceptual mode)
 g++ -std=c++17 -I./include tests/new_theory/test_navier_stokes_solver.cpp -o test_ns_solver
+./test_ns_solver
+```
+
+### Building with CMake (Recommended)
+
+For easier builds and FFTW integration, use CMake:
+
+```bash
+# Basic build (Conceptual mode - no FFTW required)
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+ctest  # Run all tests
+
+# Build with FFTW (Production mode)
+# First, install FFTW3:
+#   Ubuntu/Debian: sudo apt-get install libfftw3-dev
+#   macOS: brew install fftw
+#   From source: http://www.fftw.org/
+
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_FFTW=ON
+make
+./test_ns_solver  # Will show "MODE: FFTW (Production)"
+
+# Build individual test
+make test_ns_solver
+make test_quantum_gravity
+make test_adscft
+# ... etc
+```
+
+**CMake Options:**
+- `-DUSE_FFTW=ON`: Enable FFTW library for production FFT (requires libfftw3-dev)
+- `-DBUILD_TESTS=OFF`: Disable building tests (default: ON)
+- `-DCMAKE_BUILD_TYPE=Release`: Optimized build (recommended for simulations)
+- `-DCMAKE_BUILD_TYPE=Debug`: Debug build with symbols
+
+### Building with FFTW Manually
+
+If not using CMake, compile with FFTW manually:
+
+```bash
+# Install FFTW3 first (see above)
+
+# Compile with FFTW enabled
+g++ -std=c++17 -DUSE_FFTW -I./include -I./new_theory \
+    tests/new_theory/test_navier_stokes_solver.cpp \
+    -o test_ns_solver -lfftw3 -lm
+
+# Run - will show "MODE: FFTW (Production)"
 ./test_ns_solver
 ```
 

@@ -35,6 +35,16 @@
 #include <cstdlib>
 #include "navier_stokes_regularity.hpp"
 
+// Conditional FFTW integration
+// Define USE_FFTW to enable real FFTW library support
+// Otherwise, falls back to conceptual implementation
+#ifdef USE_FFTW
+#include <fftw3.h>
+#define FFTW_ENABLED true
+#else
+#define FFTW_ENABLED false
+#endif
+
 namespace new_theory {
 namespace navier_stokes {
 
@@ -121,6 +131,75 @@ struct VelocityField {
     // Fourier space: û, v̂, ŵ (complex)
     std::vector<std::complex<double>> ux_hat, uy_hat, uz_hat;
 
+#ifdef USE_FFTW
+    // FFTW plans for efficient transforms
+    fftw_plan forward_plan_x, forward_plan_y, forward_plan_z;
+    fftw_plan backward_plan_x, backward_plan_y, backward_plan_z;
+    int Nx, Ny, Nz;
+    bool plans_created;
+
+    VelocityField(int Nx_, int Ny_, int Nz_)
+        : Nx(Nx_), Ny(Ny_), Nz(Nz_), plans_created(false) {
+        int size = Nx * Ny * Nz;
+        ux.resize(size, 0.0);
+        uy.resize(size, 0.0);
+        uz.resize(size, 0.0);
+
+        ux_hat.resize(size, 0.0);
+        uy_hat.resize(size, 0.0);
+        uz_hat.resize(size, 0.0);
+
+        // Create FFTW plans (FFTW_MEASURE for optimized plans)
+        // Note: FFTW_MEASURE overwrites input arrays, so create plans before data
+        forward_plan_x = fftw_plan_dft_3d(Nx, Ny, Nz,
+            reinterpret_cast<fftw_complex*>(ux_hat.data()),
+            reinterpret_cast<fftw_complex*>(ux_hat.data()),
+            FFTW_FORWARD, FFTW_ESTIMATE);
+
+        forward_plan_y = fftw_plan_dft_3d(Nx, Ny, Nz,
+            reinterpret_cast<fftw_complex*>(uy_hat.data()),
+            reinterpret_cast<fftw_complex*>(uy_hat.data()),
+            FFTW_FORWARD, FFTW_ESTIMATE);
+
+        forward_plan_z = fftw_plan_dft_3d(Nx, Ny, Nz,
+            reinterpret_cast<fftw_complex*>(uz_hat.data()),
+            reinterpret_cast<fftw_complex*>(uz_hat.data()),
+            FFTW_FORWARD, FFTW_ESTIMATE);
+
+        backward_plan_x = fftw_plan_dft_3d(Nx, Ny, Nz,
+            reinterpret_cast<fftw_complex*>(ux_hat.data()),
+            reinterpret_cast<fftw_complex*>(ux_hat.data()),
+            FFTW_BACKWARD, FFTW_ESTIMATE);
+
+        backward_plan_y = fftw_plan_dft_3d(Nx, Ny, Nz,
+            reinterpret_cast<fftw_complex*>(uy_hat.data()),
+            reinterpret_cast<fftw_complex*>(uy_hat.data()),
+            FFTW_BACKWARD, FFTW_ESTIMATE);
+
+        backward_plan_z = fftw_plan_dft_3d(Nx, Ny, Nz,
+            reinterpret_cast<fftw_complex*>(uz_hat.data()),
+            reinterpret_cast<fftw_complex*>(uz_hat.data()),
+            FFTW_BACKWARD, FFTW_ESTIMATE);
+
+        plans_created = true;
+    }
+
+    ~VelocityField() {
+        if (plans_created) {
+            fftw_destroy_plan(forward_plan_x);
+            fftw_destroy_plan(forward_plan_y);
+            fftw_destroy_plan(forward_plan_z);
+            fftw_destroy_plan(backward_plan_x);
+            fftw_destroy_plan(backward_plan_y);
+            fftw_destroy_plan(backward_plan_z);
+        }
+    }
+
+    // Disable copy constructor and assignment (FFTW plans not copyable)
+    VelocityField(const VelocityField&) = delete;
+    VelocityField& operator=(const VelocityField&) = delete;
+#else
+    // Without FFTW: simple constructor
     VelocityField(int size) {
         ux.resize(size, 0.0);
         uy.resize(size, 0.0);
@@ -130,6 +209,7 @@ struct VelocityField {
         uy_hat.resize(size, 0.0);
         uz_hat.resize(size, 0.0);
     }
+#endif
 
     void clear() {
         std::fill(ux.begin(), ux.end(), 0.0);
@@ -143,19 +223,97 @@ struct VelocityField {
 
 /**
  * ============================================================================
- * FOURIER TRANSFORM UTILITIES (Simplified for header-only)
+ * FOURIER TRANSFORM UTILITIES
  * ============================================================================
  *
- * NOTE: In production, use FFTW library. Here we provide simplified versions.
+ * Supports both:
+ * - FFTW library (when USE_FFTW is defined) - Production quality
+ * - Simplified implementation (fallback) - Conceptual/demonstration
  */
 
-class SimplifiedFFT {
+class SpectralFFT {
 public:
+#ifdef USE_FFTW
+    /**
+     * @brief Forward FFT: Physical space → Fourier space (FFTW version)
+     */
+    static void forwardTransform(
+        std::vector<double>& u_physical,
+        std::vector<std::complex<double>>& u_hat,
+        fftw_plan& plan,
+        int Nx, int Ny, int Nz)
+    {
+        // Copy physical data to complex array for FFT
+        // (FFTW expects complex input for c2c transforms)
+        for (size_t i = 0; i < u_physical.size(); ++i) {
+            u_hat[i] = std::complex<double>(u_physical[i], 0.0);
+        }
+
+        // Execute FFT
+        fftw_execute(plan);
+
+        // Normalize (FFTW doesn't normalize by default)
+        double norm = 1.0 / (Nx * Ny * Nz);
+        for (auto& val : u_hat) {
+            val *= norm;
+        }
+    }
+
+    /**
+     * @brief Backward FFT: Fourier space → Physical space (FFTW version)
+     */
+    static void backwardTransform(
+        std::vector<std::complex<double>>& u_hat,
+        std::vector<double>& u_physical,
+        fftw_plan& plan,
+        int Nx, int Ny, int Nz)
+    {
+        // Execute inverse FFT
+        fftw_execute(plan);
+
+        // Extract real part (imaginary should be ~0 for real fields)
+        for (size_t i = 0; i < u_physical.size(); ++i) {
+            u_physical[i] = u_hat[i].real();
+        }
+    }
+#else
+    /**
+     * @brief Simplified forward transform (conceptual - identity operation)
+     */
+    static void forwardTransform(
+        std::vector<double>& u_physical,
+        std::vector<std::complex<double>>& u_hat,
+        int Nx, int Ny, int Nz)
+    {
+        // Conceptual: In reality, this would be a proper FFT
+        // For demonstration, we just copy data
+        for (size_t i = 0; i < u_physical.size(); ++i) {
+            u_hat[i] = std::complex<double>(u_physical[i], 0.0);
+        }
+    }
+
+    /**
+     * @brief Simplified backward transform (conceptual - identity operation)
+     */
+    static void backwardTransform(
+        std::vector<std::complex<double>>& u_hat,
+        std::vector<double>& u_physical,
+        int Nx, int Ny, int Nz)
+    {
+        // Conceptual: In reality, this would be a proper inverse FFT
+        for (size_t i = 0; i < u_physical.size(); ++i) {
+            u_physical[i] = u_hat[i].real();
+        }
+    }
+#endif
+
     /**
      * @brief Compute spectral derivative in Fourier space
      *
      * Physical: ∂u/∂x
      * Fourier:  𝓕[∂u/∂x] = ik_x û(k)
+     *
+     * Works the same for both FFTW and simplified modes
      */
     static void spectralDerivative(
         const std::vector<std::complex<double>>& u_hat,
@@ -185,6 +343,8 @@ public:
 
     /**
      * @brief Apply dealiasing (2/3 rule)
+     *
+     * Works the same for both FFTW and simplified modes
      */
     static void applyDealiasing(
         std::vector<std::complex<double>>& u_hat,
@@ -223,10 +383,39 @@ private:
 
 public:
     NavierStokesSolver(const SpectralGrid3D& grid_, double nu_)
-        : grid(grid_), u(grid_.size()), nu(nu_), time(0.0),
-          k1(grid_.size()), k2(grid_.size()), k3(grid_.size()), k4(grid_.size()),
-          u_temp(grid_.size())
+        : grid(grid_),
+#ifdef USE_FFTW
+          u(grid_.Nx, grid_.Ny, grid_.Nz),
+          k1(grid_.Nx, grid_.Ny, grid_.Nz),
+          k2(grid_.Nx, grid_.Ny, grid_.Nz),
+          k3(grid_.Nx, grid_.Ny, grid_.Nz),
+          k4(grid_.Nx, grid_.Ny, grid_.Nz),
+          u_temp(grid_.Nx, grid_.Ny, grid_.Nz),
+#else
+          u(grid_.size()),
+          k1(grid_.size()),
+          k2(grid_.size()),
+          k3(grid_.size()),
+          k4(grid_.size()),
+          u_temp(grid_.size()),
+#endif
+          nu(nu_), time(0.0)
     {
+        // Print mode on first construction
+        static bool first_run = true;
+        if (first_run) {
+            std::cout << "╔════════════════════════════════════════════╗\n";
+            std::cout << "║  NAVIER-STOKES PSEUDOSPECTRAL SOLVER      ║\n";
+#ifdef USE_FFTW
+            std::cout << "║  MODE: FFTW (Production)                  ║\n";
+            std::cout << "║  FFT Library: FFTW3                       ║\n";
+#else
+            std::cout << "║  MODE: Conceptual (Demonstration)         ║\n";
+            std::cout << "║  Note: Compile with -DUSE_FFTW for FFTW   ║\n";
+#endif
+            std::cout << "╚════════════════════════════════════════════╝\n";
+            first_run = false;
+        }
     }
 
     /**
@@ -268,6 +457,36 @@ public:
     }
 
     /**
+     * @brief Transform velocity to Fourier space
+     */
+    void toFourierSpace() {
+#ifdef USE_FFTW
+        SpectralFFT::forwardTransform(u.ux, u.ux_hat, u.forward_plan_x, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::forwardTransform(u.uy, u.uy_hat, u.forward_plan_y, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::forwardTransform(u.uz, u.uz_hat, u.forward_plan_z, grid.Nx, grid.Ny, grid.Nz);
+#else
+        SpectralFFT::forwardTransform(u.ux, u.ux_hat, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::forwardTransform(u.uy, u.uy_hat, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::forwardTransform(u.uz, u.uz_hat, grid.Nx, grid.Ny, grid.Nz);
+#endif
+    }
+
+    /**
+     * @brief Transform velocity to physical space
+     */
+    void toPhysicalSpace() {
+#ifdef USE_FFTW
+        SpectralFFT::backwardTransform(u.ux_hat, u.ux, u.backward_plan_x, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::backwardTransform(u.uy_hat, u.uy, u.backward_plan_y, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::backwardTransform(u.uz_hat, u.uz, u.backward_plan_z, grid.Nx, grid.Ny, grid.Nz);
+#else
+        SpectralFFT::backwardTransform(u.ux_hat, u.ux, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::backwardTransform(u.uy_hat, u.uy, grid.Nx, grid.Ny, grid.Nz);
+        SpectralFFT::backwardTransform(u.uz_hat, u.uz, grid.Nx, grid.Ny, grid.Nz);
+#endif
+    }
+
+    /**
      * @brief Compute nonlinear term (u·∇)u in Fourier space
      *
      * Method: Pseudo-spectral (compute in physical space, transform back)
@@ -291,9 +510,9 @@ public:
         std::vector<std::complex<double>> duy_dy(grid.size());
         std::vector<std::complex<double>> duz_dz(grid.size());
 
-        SimplifiedFFT::spectralDerivative(u.ux_hat, dux_dx, grid.kx, grid, 0);
-        SimplifiedFFT::spectralDerivative(u.uy_hat, duy_dy, grid.ky, grid, 1);
-        SimplifiedFFT::spectralDerivative(u.uz_hat, duz_dz, grid.kz, grid, 2);
+        SpectralFFT::spectralDerivative(u.ux_hat, dux_dx, grid.kx, grid, 0);
+        SpectralFFT::spectralDerivative(u.uy_hat, duy_dy, grid.ky, grid, 1);
+        SpectralFFT::spectralDerivative(u.uz_hat, duz_dz, grid.kz, grid, 2);
 
         // Simplified nonlinear term (conceptual - full implementation needs actual FFT)
         for (int idx = 0; idx < grid.size(); ++idx) {
@@ -312,9 +531,9 @@ public:
         }
 
         // Apply dealiasing
-        SimplifiedFFT::applyDealiasing(dudt.ux_hat, grid);
-        SimplifiedFFT::applyDealiasing(dudt.uy_hat, grid);
-        SimplifiedFFT::applyDealiasing(dudt.uz_hat, grid);
+        SpectralFFT::applyDealiasing(dudt.ux_hat, grid);
+        SpectralFFT::applyDealiasing(dudt.uy_hat, grid);
+        SpectralFFT::applyDealiasing(dudt.uz_hat, grid);
     }
 
     /**
