@@ -36,3 +36,4 @@ test_qgp
 test_adscft
 test_emergent
 test_navier_stokes
+test_ns_solver
